@@ -166,7 +166,8 @@ export const createComment = async ({ blogId, content, guestUser }: AddCommentTy
         commentData.user = currentUser.$id;
       } else if (guestUser) {
         // If no logged-in user, use guest user data
-        commentData.guestUser = guestUser;
+        commentData.guestName = guestUser.name;
+        commentData.guestEmail = guestUser.email;
       } else {
         throw new Error("No user data provided");
       }
@@ -175,7 +176,8 @@ export const createComment = async ({ blogId, content, guestUser }: AddCommentTy
       if (!guestUser) {
         throw new Error("No user data provided");
       }
-      commentData.guestUser = guestUser;
+      commentData.guestName = guestUser.name;
+      commentData.guestEmail = guestUser.email;
     }
 
     // Add blog relationship

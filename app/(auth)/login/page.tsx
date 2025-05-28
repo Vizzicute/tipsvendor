@@ -4,6 +4,7 @@ import Link from "next/link";
 import GoogleButton from "../GoogleButton";
 import Logo from "@/components/Logo";
 import { Metadata } from "next";
+import ForgotPasswordDialog from "@/components/ForgotPasswordDialog";
 
 export const metadata: Metadata = {
   title: "Login"
@@ -33,12 +34,7 @@ const page = () => {
           </Link>
         </span>
         <br />
-        <Link
-          href={"/forgot"}
-          className="w-full ps-4 text-start font-inter text-sm text-red-600 font-semibold"
-        >
-          Forgot Your Password?
-        </Link>
+        <ForgotPasswordDialog />
       </div>
       <div className="w-full my-4 text-center text-gray-500">or</div>
       <div className="w-3/4 px-5 md:w-1/3 pb-16">

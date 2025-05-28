@@ -142,7 +142,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-4">
         {stats.map((stat) => (
           <Link key={stat.title} href={stat.href}>
             <Card className="hover:shadow-lg transition-shadow">
@@ -160,7 +160,7 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <Card>
+      <Card className="w-1/2">
         <CardHeader>
           <CardTitle>Statistics Overview</CardTitle>
         </CardHeader>

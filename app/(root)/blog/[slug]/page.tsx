@@ -29,7 +29,7 @@ const BlogPost = () => {
   const [guestEmail, setGuestEmail] = useState("");
   const { mutateAsync: addComment, isPending: isAddingComment } =
     useAddComment();
-  const { user } = useUserContext();
+  const { user, isAuthenticated } = useUserContext();
 
   const { data: singleBlog, isLoading } = useQuery({
     queryKey: ["single-blog", slug],
@@ -44,7 +44,7 @@ const BlogPost = () => {
       return;
     }
 
-    if (!user && (!guestName.trim() || !guestEmail.trim())) {
+    if (!isAuthenticated && (!guestName.trim() || !guestEmail.trim())) {
       toast.error("Please provide your name and email");
       return;
     }
@@ -53,7 +53,7 @@ const BlogPost = () => {
       await addComment({
         blogId: singleBlog?.$id || "",
         content: comment,
-        ...(user
+        ...(isAuthenticated
           ? {}
           : {
               guestUser: {
@@ -133,7 +133,7 @@ const BlogPost = () => {
           <h2 className="text-2xl font-bold mb-6">Comments</h2>
 
           <div className="mb-8 space-y-4">
-            {!user && (
+            {!isAuthenticated && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="guestName">Name</Label>
@@ -142,6 +142,7 @@ const BlogPost = () => {
                     value={guestName}
                     onChange={(e) => setGuestName(e.target.value)}
                     placeholder="Your name"
+                    className="rounded-[px]"
                   />
                 </div>
                 <div>
@@ -152,6 +153,7 @@ const BlogPost = () => {
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
                     placeholder="Your email"
+                    className="rounded=[px]"
                   />
                 </div>
               </div>
@@ -176,6 +178,64 @@ const BlogPost = () => {
                 "Post Comment"
               )}
             </Button>
+          </div>
+        </div>
+        <div className="md:hidden flex flex-col gap-4 justify-start">
+          <BlogHeadingTextWrapper
+            text="Recent Comments"
+            bgColor="bg-primary"
+            textColor="text-secondary"
+          />
+          <div className="flex flex-col gap-4">
+            <div className="space-y-6">
+              {(() => {
+                const approvedComments =
+                  singleBlog.comments?.filter(
+                    (c: Comment) => c.status === "approved"
+                  ) || [];
+                const latestComments = approvedComments
+                  .sort(
+                    (a: Comment, b: Comment) =>
+                      new Date(b.$createdAt).getTime() -
+                      new Date(a.$createdAt).getTime()
+                  )
+                  .slice(0, 15);
+
+                return latestComments.map((comment: Comment) => (
+                  <div key={comment.$id} className="flex gap-4 items-start">
+                    <Avatar>
+                      <AvatarImage src={comment.user?.imageUrl} />
+                      <AvatarFallback className="bg-stone-200">
+                        {(
+                          comment.user?.name ||
+                          comment.guestName ||
+                          "U"
+                        ).charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold">
+                          {comment.user?.name || comment.guestName}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {format(new Date(comment.$createdAt), "MMM d, yyyy")}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 max-w-[200px] flex flex-wrap">{comment.content}</p>
+                    </div>
+                  </div>
+                ));
+              })()}
+              {(!singleBlog.comments ||
+                singleBlog.comments.filter(
+                  (c: Comment) => c.status === "approved"
+                ).length === 0) && (
+                <p className="text-gray-500 text-center py-4">
+                  No comments yet. Be the first to comment!
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -242,10 +302,10 @@ const BlogPost = () => {
                   <div key={comment.$id} className="flex gap-4 items-start">
                     <Avatar>
                       <AvatarImage src={comment.user?.imageUrl} />
-                      <AvatarFallback>
+                      <AvatarFallback className="bg-stone-200">
                         {(
                           comment.user?.name ||
-                          comment.guestUser?.name ||
+                          comment.guestName ||
                           "U"
                         ).charAt(0)}
                       </AvatarFallback>
@@ -253,7 +313,7 @@ const BlogPost = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold">
-                          {comment.user?.name || comment.guestUser?.name}
+                          {comment.user?.name || comment.guestName}
                         </span>
                         <span className="text-sm text-gray-500">
                           {format(new Date(comment.$createdAt), "MMM d, yyyy")}

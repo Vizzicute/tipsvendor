@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { Menu, User, User2 } from "lucide-react";
+import { Loader2, Menu, User, User2 } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
@@ -29,12 +29,12 @@ const DashboardLayout = ({children}: {children: React.ReactNode;}) => {
         signOutAccount();
         setIsAuthenticated(false);
         setUser(INITIAL_USER);
-        redirect("/login");
+        redirect("/admin-auth");
     };
 
     const roleColors: Record<string, string> = {
-        admin: "bg-blue-500",
-        football_manager: "bg-green-500",
+        admin: "bg-green-500",
+        football_manager: "bg-blue-500",
         basketball_manager: "bg-slate-500",
         football_staff: "bg-yellow-500",
         basketball_staff: "bg-red-500",
@@ -104,11 +104,8 @@ const DashboardLayout = ({children}: {children: React.ReactNode;}) => {
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={handleSignout}>
-                                        {isLoading ? (
-                                            <span className="animate-pulse">Logout</span>
-                                        ) : (
-                                            "Logout"
-                                        )}
+                                        {isLoading && <Loader2 className="animate-spin"/>}
+                                        Logout
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

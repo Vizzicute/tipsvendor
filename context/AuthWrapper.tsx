@@ -19,8 +19,8 @@ export default function AuthWrapper({
     const protectRoute = async () => {
       const user = await getCurrentUser();
 
-      if (!user && pathname !== "/login") {
-        router.replace("/login");
+      if (!user && pathname !== "/admin-auth") {
+        router.replace("/admin-auth");
         return;
       }
 
@@ -38,8 +38,8 @@ export default function AuthWrapper({
         setAuthorized(true); // ✅ user is allowed
       } catch (err) {
         console.error(err);
-        if (pathname !== "/login") {
-          router.replace("/login");
+        if (pathname !== "/admin-auth") {
+          router.replace("/admin-auth");
           return;
         }
       } finally {

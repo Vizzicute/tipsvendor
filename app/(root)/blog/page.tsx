@@ -30,16 +30,7 @@ const page = () => {
     <div className="w-full flex flex-col gap-4 items-center justify-center px-2 mb-4 max-w-7xl">
       <div className="w-full flex items-center justify-around gap-4">
         <BlogMiniNav blogCategories={blogCategories} loading={isLoading} />
-        <div className="relative min-w-fit hidden flex-1 md:flex items-center justify-center">
-          <input
-            type="text"
-            placeholder="Search blog posts..."
-            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-          />
-          <Button variant="ghost" className="absolute right-0">
-            <Search className="w-4 h-4" />
-          </Button>
-        </div>
+        
       </div>
       <BlogHero blog={blog} loading={isLoading} className="h-100" />
       <div className="w-full flex md:flex-row flex-col gap-6 mt-4">

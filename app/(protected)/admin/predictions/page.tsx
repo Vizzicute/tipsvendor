@@ -102,7 +102,7 @@ const page = () => {
   const paginatedData = predictions?.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
-  );
+  ) || [];
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -112,10 +112,10 @@ const page = () => {
 
   const searchedPredictions = paginatedData?.filter(
     (data) =>
-      data.hometeam.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.awayteam.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.league.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.tip.toLowerCase().includes(searchTerm.toLowerCase())
+      data.hometeam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      data.awayteam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      data.league?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      data.tip?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredPredictions = searchedPredictions?.filter((data) => {

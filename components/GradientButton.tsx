@@ -7,7 +7,6 @@ interface GradientButtonProps {
   loading?: boolean;
   disabled?: any;
   className?: string;
-  onClick?: () => void;
 }
 
 const GradientButton = ({
@@ -15,7 +14,6 @@ const GradientButton = ({
   loading,
   disabled,
   className,
-  onClick,
   ...props
 }: GradientButtonProps) => {
   return (

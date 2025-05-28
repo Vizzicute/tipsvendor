@@ -63,7 +63,7 @@ const Hero = ({
             {isAuthenticated ? (
               <GradientButton
                 loading={isPending || isLoading}
-                onClick={() => handleSignout()}
+                onClick={handleSignout}
                 className="w-1/2"
               >
                 Logout

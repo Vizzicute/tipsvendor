@@ -8,10 +8,8 @@ export interface Comment {
     name: string;
     imageUrl?: string;
   };
-  guestUser?: {
-    name: string;
-    email?: string;
-  };
+  guestName: string;
+  guestEmail: string;
   blog: {
     $id: string;
     title: string;

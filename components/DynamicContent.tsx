@@ -144,7 +144,7 @@ const DynamicContent = ({
         <InvestmentResult />
         <BlogSection blog={trimmedBlog} isLoading={isBlogLoading} />
         <SubscriptionCard className="m-2" />
-        <PageContent content={seopage?.content} isLoading={isSeoLoading} />
+        <PageContent content={seopage?.content} />
       </section>
     </>
   );
