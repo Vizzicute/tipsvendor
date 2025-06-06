@@ -131,7 +131,7 @@ const AdminDashboard = () => {
   ];
 
   const recentSubscriptions = subscriptions?.slice(0, 5);
-  const recentUsers = users?.slice(0, 5);
+  const recentUsers = users?.sort((a, b) => new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()).slice(0, 5);
 
   return (
     <div className="space-y-6">

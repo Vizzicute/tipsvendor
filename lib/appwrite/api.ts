@@ -1,6 +1,6 @@
 import { INewUser } from "@/types";
 import { account, appwriteConfig, avatars, databases } from "./config";
-import { ID, OAuthProvider, Permission, Query, Role } from "appwrite";
+import { ID, Models, OAuthProvider, Permission, Query, Role } from "appwrite";
 
 export async function createUserAccount(user: INewUser) {
   try {
@@ -11,7 +11,7 @@ export async function createUserAccount(user: INewUser) {
       user.name
     );
 
-    if (!newAccount) throw Error;
+    if (!newAccount) throw new Error("Failed to create account");
 
     const avatarUrl = avatars.getInitials(user.name).toString();
 
@@ -20,13 +20,36 @@ export async function createUserAccount(user: INewUser) {
       email: newAccount.email,
       name: newAccount.name,
       imageUrl: avatarUrl,
-      imageId: null // Initialize with null since we're using initials avatar
+      imageId: null, // Initialize with null since we're using initials avatar
     });
 
     return newUser;
   } catch (error) {
     console.log(error);
-    return error;
+    throw error;
+  }
+}
+
+export async function createStaffAccount(
+  accountId: string,
+  name: string,
+  email: string,
+  password: string
+): Promise<Models.User<Models.Preferences>> {
+  try {
+    const newAccount = await account.create(
+      accountId,
+      email,
+      password,
+      name
+    );
+
+    if (!newAccount) throw new Error("Failed to create account");
+
+    return newAccount;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 }
 
@@ -44,7 +67,7 @@ export async function saveUserToDB(user: {
       ID.unique(),
       {
         ...user,
-        imageId: user.imageId || null
+        imageId: user.imageId || null,
       }
     );
 

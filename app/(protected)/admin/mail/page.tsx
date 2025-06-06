@@ -105,11 +105,11 @@ export default function MailPage() {
         return (
           subscriptions
             ?.filter((sub) => sub.isValid)
-            .map((sub) => users?.find((user) => user.$id === sub.userId)?.email)
+            .map((sub) => users?.find((user) => user.$id === sub.user.$id)?.email)
             .filter(Boolean) || []
         );
       case "non-subscribers":
-        const subscriberIds = new Set(subscriptions?.map((sub) => sub.userId));
+        const subscriberIds = new Set(subscriptions?.map((sub) => sub.user.$id));
         return (
           users
             ?.filter((user) => !subscriberIds.has(user.$id))
@@ -119,7 +119,7 @@ export default function MailPage() {
         return (
           subscriptions
             ?.filter((sub) => sub.subscriptionType === recipient)
-            .map((sub) => users?.find((user) => user.$id === sub.userId)?.email)
+            .map((sub) => users?.find((user) => user.$id === sub.user.$id)?.email)
             .filter(Boolean) || []
         );
       default:
@@ -190,29 +190,50 @@ export default function MailPage() {
         return acc;
       }, {} as Record<string, any[]>);
 
+      let sentCount = 0;
+
       // Send predictions to each subscriber based on their subscription type
       const sendPromises = validSubscriptions.map(async (subscription) => {
-        const subscriptionTypes = subscription.subscriptionType.split("+");
+        const subscriptionTypes = subscription.subscriptionType.split("&");
         const subscriberPredictions = subscriptionTypes.flatMap(
           (type: string) => predictionsByType[type] || []
         );
 
-        if (subscriberPredictions.length > 0) {
-          return sendMail({
-            to: subscription.user.email,
-            subject: "Today's Predictions",
-            html: "",
-            predictions: subscriberPredictions,
-            subscriptionType: subscription.subscriptionType,
-          });
+        if (subscriberPredictions.length < 1) {
+          toast.error(
+            `No predictions found for subscription type: ${subscription.subscriptionType}`
+          );
+          return;
         }
+
+        const user =
+          users?.find((u) => u.$id === subscription.user?.$id);
+
+        if (!user?.email) {
+          toast.error(
+            `No email found for user with subscription: ${subscription.subscriptionType}`
+          );
+          return;
+        }
+
+        await sendMail({
+          to: user.email,
+          subject: "Today's Predictions",
+          predictions: subscriberPredictions,
+          subscriptionType: subscription.subscriptionType,
+        });
+        sentCount++;
       });
 
       await Promise.all(sendPromises.filter(Boolean));
 
-      toast.success(
-        `Predictions sent successfully to all subscribers based on their subscription types`
-      );
+      if (sentCount > 0) {
+        toast.success(
+          `Predictions sent successfully to ${sentCount} subscriber(s) based on their subscription types`
+        );
+      } else {
+        toast.error("No emails were sent. Please check your data.");
+      }
     } catch (error) {
       console.error("Error sending prediction emails:", error);
       toast.error("Failed to send prediction emails");
@@ -432,6 +453,7 @@ export default function MailPage() {
                   <LoadingButton
                     loading={isLoading}
                     type="submit"
+                    disabled={isLoading}
                     className="w-full"
                   >
                     Send Email
@@ -447,7 +469,8 @@ export default function MailPage() {
             <CardContent>
               <div className="flex justify-between items-center">
                 <CardTitle>Send Prediction Games</CardTitle>
-                <Button
+                <LoadingButton
+                  loading={isLoading}
                   type="button"
                   onClick={sendPredictionsToAllSubscribers}
                   disabled={isLoading}
@@ -456,7 +479,7 @@ export default function MailPage() {
                   {isLoading
                     ? "Sending..."
                     : "Send Predictions to All Subscribers"}
-                </Button>
+                </LoadingButton>
               </div>
             </CardContent>
           </Card>

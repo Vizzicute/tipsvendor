@@ -26,6 +26,7 @@ import {
   roles,
 } from "@/data";
 import { useAddUser } from "@/lib/react-query/queriesAndMutations";
+import { newStaffMail } from "@/lib/utils/sendNewStaffMail";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -55,12 +56,19 @@ const AddStaffForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const staffRole = values.role.replace(/_/g, " ");
     const newStaff = await addUser(values);
 
     if (!newStaff) {
       return toast("Failed. Please try again.");
     } else {
       toast.success("New Staff Added");
+      await newStaffMail(
+        values.name,
+        values.email,
+        `${process.env.NEXT_PUBLIC_APP_URL}/new-staff/${values.email}`,
+        staffRole
+      );
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["documents"] });
       return;

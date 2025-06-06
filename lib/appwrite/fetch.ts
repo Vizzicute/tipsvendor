@@ -17,11 +17,46 @@ export async function getUsers() {
     `${appwriteConfig.databaseId}`,
     `${appwriteConfig.userCollectionId}`
   );
-
   if (!users) throw Error;
-
   return users.documents;
 }
+
+export async function getSingleUserByEmail(email: string) {
+  const user = await databases.listDocuments(
+    `${appwriteConfig.databaseId}`,
+    `${appwriteConfig.userCollectionId}`,
+    [Query.equal("email", email)]
+  );
+
+  if (!user) throw Error;
+
+  return user.documents[0];
+}
+
+export async function getSingleUserByUserId(userId: string) {
+  const user = await databases.listDocuments(
+    `${appwriteConfig.databaseId}`,
+    `${appwriteConfig.userCollectionId}`,
+    [Query.equal("$id", userId)]
+  );
+
+  if (!user) throw Error;
+
+  return user.documents[0];
+}
+
+export async function getAdmin() {
+  const admin = await databases.listDocuments(
+    `${appwriteConfig.databaseId}`,
+    `${appwriteConfig.userCollectionId}`,
+    [Query.equal("role", "admin")]
+  );
+
+  if (!admin) throw Error;
+
+  return admin.documents[0];
+}
+
 
 export async function getBlog() {
   const blogs = await databases.listDocuments(
@@ -80,7 +115,7 @@ export async function getSeoPages() {
     appwriteConfig.seoCollectionId
   );
 
-  if(!seo) throw Error;
+  if (!seo) throw Error;
 
   return seo.documents;
 }
@@ -111,7 +146,7 @@ export async function getSingleSeoPageByUrl(pageUrl: string) {
       keywords: ["football tips", "predictions", "sports betting"],
       h1tag: "Football Tips and Predictions",
       content: "",
-      url: pageUrl
+      url: pageUrl,
     };
   }
 

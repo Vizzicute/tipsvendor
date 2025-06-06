@@ -5,6 +5,7 @@ import BlogContent from "./BlogContent";
 import BlogComments from "./BlogComments";
 import BlogCategories from "./BlogCategories";
 import { Models } from "node-appwrite";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface BlogTabsProps {
   blog: Models.Document[] | undefined;
@@ -14,9 +15,26 @@ interface BlogTabsProps {
   onTabChange?: (value: string) => void;
 }
 
-const BlogTabs = ({ blog, comments, categories, loading, onTabChange }: BlogTabsProps) => {
+const BlogTabs = ({
+  blog,
+  comments,
+  categories,
+  loading,
+  onTabChange,
+}: BlogTabsProps) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const tab = searchParams.get("tab") || "content";
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", value);
+    router.replace(`?${params.toString()}`, { scroll: false });
+    onTabChange?.(value);
+  };
+
   return (
-    <Tabs defaultValue="content" className="w-full" onValueChange={onTabChange}>
+    <Tabs value={tab} className="w-full" onValueChange={handleTabChange}>
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="content">Blog Content</TabsTrigger>
         <TabsTrigger value="comments">Comments</TabsTrigger>
@@ -35,4 +53,4 @@ const BlogTabs = ({ blog, comments, categories, loading, onTabChange }: BlogTabs
   );
 };
 
-export default BlogTabs; 
+export default BlogTabs;

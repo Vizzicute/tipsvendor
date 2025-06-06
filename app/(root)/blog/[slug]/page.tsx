@@ -18,9 +18,9 @@ import { Label } from "@/components/ui/label";
 import { useUserContext } from "@/context/AuthContext";
 import Link from "next/link";
 import BlogHeadingTextWrapper from "@/components/BlogHeadingTextWrapper";
-import { Blog } from "@/hooks/useBlogs";
 import { useBlogs } from "@/hooks/useBlogs";
 import BlogCard from "@/components/BlogCard";
+import { notifyNewComment } from "@/lib/appwrite/notificationTriggers";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -62,6 +62,11 @@ const BlogPost = () => {
               },
             }),
       });
+      await notifyNewComment(
+        singleBlog?.user?.$id || "",
+        isAuthenticated ? user?.name || "User" : guestName,
+        singleBlog?.title || "Blog Post"
+      );
       setComment("");
       setGuestName("");
       setGuestEmail("");

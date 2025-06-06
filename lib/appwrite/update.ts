@@ -1,4 +1,4 @@
-import { appwriteConfig, databases } from "./config";
+import { account, appwriteConfig, databases } from "./config";
 
 export type editPredictionType = {
   datetime: string;
@@ -247,6 +247,32 @@ export async function updateCommentStatus(status: string, commentId: string) {
     );
 
     return newComment;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function verifyUser(userId: string) {
+  try {
+    const user = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId,
+      {
+        isVerified: true,
+      }
+    );
+
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function resetUserPassword(password: string, oldPassword: string) {
+  try {
+    const user = await account.updatePassword(password, oldPassword);
+    return user;
   } catch (error) {
     console.log(error);
   }

@@ -1,15 +1,19 @@
+import { truncate } from "../utils";
+import { getAdmin } from "./fetch";
 import { createNotification } from "./notifications";
+
+const admin = await getAdmin();
 
 // Trigger notification for new user registration
 export async function notifyNewUser(user: string, userName: string) {
   // Notify admin
   await createNotification({
-    user: "admin", // Admin user ID
+    user: admin.$id, // Admin user ID
     type: "new_user",
     title: "New User Registration",
     message: `${userName} has registered on the platform`,
     read: false,
-    data: { user }
+    data: JSON.stringify({ user })
   });
 }
 
@@ -17,12 +21,12 @@ export async function notifyNewUser(user: string, userName: string) {
 export async function notifyNewSubscription(user: string, subscriptionType: string, duration: number) {
   // Notify admin
   await createNotification({
-    user: "admin",
+    user: admin.$id,
     type: "new_subscription",
     title: "New Subscription",
     message: `New ${subscriptionType} subscription for ${duration} days`,
     read: false,
-    data: { user, subscriptionType, duration }
+    data: JSON.stringify({ user, subscriptionType, duration })
   });
 
   // Notify user
@@ -32,7 +36,7 @@ export async function notifyNewSubscription(user: string, subscriptionType: stri
     title: "Subscription Activated",
     message: `Your ${subscriptionType} subscription has been activated for ${duration} days`,
     read: false,
-    data: { subscriptionType, duration }
+    data: JSON.stringify({ subscriptionType, duration })
   });
 }
 
@@ -44,7 +48,7 @@ export async function notifySubscriptionExpiring(user: string, subscriptionType:
     title: "Subscription Expiring Soon",
     message: `Your ${subscriptionType} subscription will expire in ${daysLeft} days`,
     read: false,
-    data: { subscriptionType, daysLeft }
+    data: JSON.stringify({ subscriptionType, daysLeft })
   });
 }
 
@@ -54,9 +58,9 @@ export async function notifyNewComment(postAuthor: string, commenter: string, po
     user: postAuthor,
     type: "new_comment",
     title: "New Comment",
-    message: `${commenter} commented on your post: "${postTitle}"`,
+    message: `${commenter} commented on your post: "${truncate(postTitle, 20)}"`,
     read: false,
-    data: { commenter, postTitle }
+    data: JSON.stringify({ commenter, postTitle })
   });
 }
 
@@ -64,12 +68,12 @@ export async function notifyNewComment(postAuthor: string, commenter: string, po
 export async function notifyPaymentReceived(user: string, amount: number, paymentMethod: string) {
   // Notify admin
   await createNotification({
-    user: "admin",
+    user: admin.$id,
     type: "payment_received",
     title: "Payment Received",
     message: `Payment of ${amount} received via ${paymentMethod}`,
     read: false,
-    data: { user, amount, paymentMethod }
+    data: JSON.stringify({ user, amount, paymentMethod })
   });
 
   // Notify user
@@ -79,7 +83,7 @@ export async function notifyPaymentReceived(user: string, amount: number, paymen
     title: "Payment Successful",
     message: `Your payment of ${amount} via ${paymentMethod} was successful`,
     read: false,
-    data: { amount, paymentMethod }
+    data: JSON.stringify({ amount, paymentMethod })
   });
 }
 
@@ -91,7 +95,7 @@ export async function notifyStaffAssignment(user: string, role: string) {
     title: "Staff Role Assigned",
     message: `You have been assigned the role of ${role}`,
     read: false,
-    data: { role }
+    data: JSON.stringify({ role })
   });
 }
 
@@ -103,6 +107,6 @@ export async function notifyPredictionResult(user: string, predictionId: string,
     title: "Prediction Result Available",
     message: `Your prediction result is ${result} with ${accuracy}% accuracy`,
     read: false,
-    data: { predictionId, result, accuracy }
+    data: JSON.stringify({ predictionId, result, accuracy })
   });
 } 

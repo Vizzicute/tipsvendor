@@ -20,6 +20,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
+import { account } from "@/lib/appwrite/config";
+import { verificationMail } from "@/lib/utils/verificationMail";
+import { useMutation } from "@tanstack/react-query";
+import { getCurrentUser } from "@/lib/appwrite/api";
+import { notifyNewUser } from "@/lib/appwrite/notificationTriggers";
 
 const RegisterForm = () => {
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
@@ -27,6 +32,25 @@ const RegisterForm = () => {
     useCreateUserAccount();
   const { mutateAsync: signInAccount, isPending: isSigningInUser } =
     useSignInAccount();
+    const { mutateAsync: currentUser, isPending: isFetchingUser } = useMutation({
+      mutationFn: async () => getCurrentUser(),
+    });
+
+  // Add mutation for verificationMail
+  const {
+    mutateAsync: verifyMail,
+    isPending: isVerifyingMail,
+  } = useMutation({
+    mutationFn: async ({
+      email,
+      name,
+      link,
+    }: {
+      email: string;
+      name: string;
+      link: string;
+    }) => verificationMail(email, name, link),
+  });
 
   const formSchema = z.object({
     name: z.string().min(2, {
@@ -55,10 +79,18 @@ const RegisterForm = () => {
     }
 
     const isLoggedIn = await checkAuthUser();
+    const user = await currentUser();
 
-    if (isLoggedIn) {
+    if (isLoggedIn && user) {
+      await verifyMail({
+        email: values.email,
+        name: values.name ? values.name : "",
+        link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user.$id}`,
+      });
+      await notifyNewUser(user.$id, user.name);
+      toast.success("Registration successful! Please check your email for verification.");
       form.reset();
-      redirect("/");
+      redirect("/dashboard");
     }
   }
 
@@ -126,7 +158,13 @@ const RegisterForm = () => {
           )}
         />
         <LoadingButton
-          loading={isCreatingAccount || isSigningInUser || isUserLoading}
+          loading={
+            isCreatingAccount ||
+            isSigningInUser ||
+            isUserLoading ||
+            isVerifyingMail ||
+            isFetchingUser
+          }
           type="submit"
           className="w-full text-stone-100 rounded-full uppercase"
         >

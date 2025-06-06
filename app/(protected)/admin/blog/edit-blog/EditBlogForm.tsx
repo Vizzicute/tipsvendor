@@ -37,22 +37,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-
-interface Blog {
-  $id: string;
-  title: string;
-  content: string;
-  slug: string;
-  status: string;
-  blogCategories: Array<{ $id: string; name: string }>;
-  publishedAt: string;
-  featuredImage: string;
-  featuredImageId: string;
-  $createdAt: string;
-}
+import { Models } from "appwrite";
 
 interface EditBlogFormProps {
-  blog: Blog;
+  blog: Models.Document;
 }
 
 interface CategorySelectProps {

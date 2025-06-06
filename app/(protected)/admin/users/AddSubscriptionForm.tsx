@@ -50,9 +50,9 @@ const subscriptionTypes = [
   { value: "investment", label: "Investment Plan" },
   { value: "vip", label: "Vip Tips" },
   { value: "mega", label: "Mega Odds" },
-  { value: "investment+vip", label: "Investment Plan & Vip Tips" },
-  { value: "investment+mega", label: "Investment Plan & Mega Odds" },
-  { value: "vip+mega", label: "Vip Tips & Mega Odds" },
+  { value: "investment&vip", label: "Investment Plan & Vip Tips" },
+  { value: "investment&mega", label: "Investment Plan & Mega Odds" },
+  { value: "vip&mega", label: "Vip Tips & Mega Odds" },
   { value: "all", label: "All Plans" },
 ];
 

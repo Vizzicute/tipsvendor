@@ -2,19 +2,6 @@ import { getEmailSettings } from "@/lib/appwrite/appConfig";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-const emailSettings = await getEmailSettings();
-
-// Create reusable transporter object using SMTP transport
-const transporter = nodemailer.createTransport({
-  host: emailSettings.smtpHost,
-  port: Number(emailSettings.smtpPort),
-  secure: emailSettings.smtpSecure,
-  auth: {
-    user: emailSettings.smtpUser,
-    pass: emailSettings.smtpPass,
-  },
-});
-
 function generatePredictionTable(predictions: any[], subscriptionType: string) {
   const subscriptionTypeText =
     subscriptionType === "investment"
@@ -23,11 +10,11 @@ function generatePredictionTable(predictions: any[], subscriptionType: string) {
       ? "Vip Tips"
       : subscriptionType === "mega"
       ? "Mega Odds"
-      : subscriptionType === "investment+vip"
+      : subscriptionType === "investment&vip"
       ? "Investment Plan And Vip Tips"
-      : subscriptionType === "investment+mega"
+      : subscriptionType === "investment&mega"
       ? "Investment Plan And Mega Odds"
-      : subscriptionType === "vip+mega"
+      : subscriptionType === "vip&mega"
       ? "Vip Tips And Mega Odds"
       : "Investment Plan, Vip Tips And Mega Odds";
 
@@ -82,57 +69,70 @@ function generatePredictionTable(predictions: any[], subscriptionType: string) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { to, subject, predictions, subscriptionType } = body;
+    const { to, subject, html, predictions, subscriptionType } = body;
 
-    if (!to || !subject || !predictions) {
+    if (!to || !subject || (!html && !predictions)) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    // Filter predictions for today's date
-    const today = new Date().toISOString().split("T")[0];
-    const todayPredictions = predictions.filter((pred: any) => {
-      const predDate = new Date(pred.datetime).toISOString().split("T")[0];
-      return predDate === today;
+    const emailSettings = await getEmailSettings();
+    const transporter = nodemailer.createTransport({
+      host: emailSettings.smtpHost,
+      port: Number(emailSettings.smtpPort),
+      secure: emailSettings.smtpSecure,
+      auth: {
+        user: emailSettings.smtpUser,
+        pass: emailSettings.smtpPass,
+      },
     });
 
-    // Split subscription types if user has multiple subscriptions
-    const subscriptionTypes = subscriptionType.split("+");
+    let mailHtml = html;
 
-    // Generate tables for each subscription type
-    const tablesHtml = subscriptionTypes.map((type: string) => {
-      const typePredictions = todayPredictions.filter(
-        (pred: any) => pred.subscriptionType === type
-      );
-      return generatePredictionTable(typePredictions, type);
-    }).join("");
+    if (predictions && Array.isArray(predictions) && subscriptionType) {
+      const today = new Date().toISOString().split("T")[0];
+      const todayPredictions = predictions.filter((pred: any) => {
+        const predDate = new Date(pred.datetime).toISOString().split("T")[0];
+        return predDate === today;
+      });
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
-        <h2 style="color: #3b2b1b; text-align: center; margin-bottom: 20px;">Today's Predictions</h2>
-        ${tablesHtml}
-        <p style="text-align: center; color: #718096; font-size: 14px; margin-top: 20px;">
-          Thank you for subscribing to our predictions!
-        </p>
-      </div>
-    `;
+      const subscriptionTypes = subscriptionType.split("&");
+      const tablesHtml = subscriptionTypes
+        .map((type: string) => {
+          const typePredictions = todayPredictions.filter(
+            (pred: any) => pred.subscriptionType === type
+          );
+          return generatePredictionTable(typePredictions, type);
+        })
+        .join("");
+
+      mailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
+          <h2 style="color: #3b2b1b; text-align: center; margin-bottom: 20px;">Today's Predictions</h2>
+          ${tablesHtml}
+          <p style="text-align: center; color: #718096; font-size: 14px; margin-top: 20px;">
+            Thank you for subscribing to our predictions!
+          </p>
+        </div>
+      `;
+    }
 
     const mailOptions = {
-      from: emailSettings.smtpUser,
+      from: emailSettings.smtpFrom,
       to,
       subject,
-      html,
+      html: mailHtml,
     };
 
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error sending email:", error);
+  } catch (error: any) {
+    console.error("Error sending email:", error, error?.response);
     return NextResponse.json(
-      { error: "Failed to send email" },
+      { error: error?.message || "Failed to send email" },
       { status: 500 }
     );
   }

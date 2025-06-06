@@ -12,10 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/lib/appwrite/notifications";
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+} from "@/lib/appwrite/notifications";
 import { useUserContext } from "@/context/AuthContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function NotificationsDropdown() {
   const { user } = useUserContext();
@@ -41,7 +46,7 @@ export default function NotificationsDropdown() {
     },
   });
 
-  const unreadCount = notifications?.filter(n => !n.read).length || 0;
+  const unreadCount = notifications?.filter((n) => !n.read).length || 0;
 
   const handleNotificationClick = (notificationId: string) => {
     markAsReadMutation.mutate(notificationId);
@@ -68,13 +73,36 @@ export default function NotificationsDropdown() {
     }
   };
 
+  const getNotificationLink = (type: string) => {
+    switch (type) {
+      case "new_comment":
+        return "/admin/blog?tab=comments";
+      case "new_subscription":
+        return "/admin/user?tab=subscriptions";
+      case "new_user":
+        return "/admin/user";
+      case "subscription_expiring":
+        return "/admin/user?tab=subscriptions";
+      case "payment_received":
+        return "/admin/payments";
+      case "prediction_result":
+        return "/admin/predictions";
+      case "staff_assignment":
+        return "/admin/staff";
+      default:
+        return "#";
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
+          <Bell className="size-5" />
           {unreadCount > 0 && (
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full text-white text-[8px] text-center">
+              {unreadCount.toString()}
+            </span>
           )}
         </Button>
       </DropdownMenuTrigger>
@@ -113,12 +141,25 @@ export default function NotificationsDropdown() {
                 onClick={() => handleNotificationClick(notification.id)}
               >
                 <div className="flex items-start gap-2">
-                  <span className="text-lg">{getNotificationIcon(notification.type)}</span>
+                  <span className="text-lg">
+                    {getNotificationIcon(notification.type)}
+                  </span>
                   <div className="flex-1">
                     <p className="font-medium">{notification.title}</p>
-                    <p className="text-sm text-muted-foreground">{notification.message}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {notification.message}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {format(new Date(notification.$createdAt), "MMM d, h:mm a")}
+                      {format(
+                        new Date(notification.$createdAt),
+                        "MMM d, h:mm a"
+                      )}{" "}
+                      <Link
+                        href={`${getNotificationLink(notification.type)}`}
+                        className="text-blue-400 hover:underline"
+                      >
+                        View {notification.title}
+                      </Link>
                     </p>
                   </div>
                 </div>
@@ -129,4 +170,4 @@ export default function NotificationsDropdown() {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-} 
+}

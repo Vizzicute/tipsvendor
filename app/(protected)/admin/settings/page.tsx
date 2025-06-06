@@ -42,9 +42,9 @@ import { useQueryClient } from "@tanstack/react-query";
 const emailSettingsSchema = z.object({
   smtpHost: z.string().min(1, "SMTP host is required"),
   smtpPort: z.string().min(1, "SMTP port is required"),
-  smtpUser: z.string().min(1, "Invalid Email Username"),
+  smtpUser: z.string().email("Invalid Email Username"),
   smtpPass: z.string().min(1, "SMTP password is required"),
-  smtpFrom: z.string().email("Invalid email address"),
+  smtpFrom: z.string().min(1, "Invalid email address"),
 });
 
 const siteSettingsSchema = z.object({
@@ -441,7 +441,7 @@ export default function SettingsPage() {
                     name="smtpUser"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>SMTP Username</FormLabel>
+                        <FormLabel>SMTP User Email</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="your-email@gmail.com"
@@ -476,7 +476,7 @@ export default function SettingsPage() {
                     name="smtpFrom"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>From Email</FormLabel>
+                        <FormLabel>SMTP UserName</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="noreply@yourdomain.com"

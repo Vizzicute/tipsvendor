@@ -48,12 +48,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import DeleteUserDialog from "@/components/DeleteUserDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditUserForm from "./EditUserForm";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const page = () => {
+  const searchParams = useSearchParams();
+    const router = useRouter();
+    const tab = searchParams.get("tab") || "users";
+  
+    const handleTabChange = (value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set("tab", value);
+      router.replace(`?${params.toString()}`, { scroll: false });
+    };
+  
   const {
     data: users,
     isPending: isLoading,
@@ -99,14 +118,22 @@ const page = () => {
     }
   }, [startDate, endDate]);
 
-  const totalPages = Math.ceil((activeTab === "users" ? users?.filter((data) => data.role === "user")?.length || 0 : subscriptions?.length || 0) / PAGE_SIZE);
+  const totalPages = Math.ceil(
+    (activeTab === "users"
+      ? users?.filter((data) => data.role === "user")?.length || 0
+      : subscriptions?.length || 0) / PAGE_SIZE
+  );
 
   const onlyUsers = users?.filter((data) => data.role === "user");
   const subscribedUsers = users?.filter((data) => data.subscription);
 
-  const paginatedData = activeTab === "users" 
-    ? onlyUsers?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-    : subscriptions?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const paginatedData =
+    activeTab === "users"
+      ? onlyUsers?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+      : subscriptions?.slice(
+          (currentPage - 1) * PAGE_SIZE,
+          currentPage * PAGE_SIZE
+        );
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -166,9 +193,13 @@ const page = () => {
       case "country-desc":
         return (b.country || "").localeCompare(a.country || "");
       case "subscription-asc":
-        return (a.subscriptionType || "").localeCompare(b.subscriptionType || "");
+        return (a.subscriptionType || "").localeCompare(
+          b.subscriptionType || ""
+        );
       case "subscription-desc":
-        return (b.subscriptionType || "").localeCompare(a.subscriptionType || "");
+        return (b.subscriptionType || "").localeCompare(
+          a.subscriptionType || ""
+        );
       default:
         return 0;
     }
@@ -189,9 +220,7 @@ const page = () => {
               Filter
             </>
           )}
-          {filterBy === "yesterday" && (
-            <>Filter By: Joined Yesterday</>
-          )}
+          {filterBy === "yesterday" && <>Filter By: Joined Yesterday</>}
           {filterBy === "today" && <>Filter By: Joined Today</>}
           {filterBy === "custom-date" && startDate && endDate && (
             <>
@@ -220,41 +249,26 @@ const page = () => {
       <PopoverContent className="w-fit h-fit flex flex-col gap-0">
         {activeTab === "users" ? (
           <>
-            <Button
-              variant={"ghost"}
-              onClick={() => setFilterBy("yesterday")}
-            >
+            <Button variant={"ghost"} onClick={() => setFilterBy("yesterday")}>
               Joined Yesterday
               {filterBy === "yesterday" && <Check />}
             </Button>
-            <Button
-              variant={"ghost"}
-              onClick={() => setFilterBy("today")}
-            >
+            <Button variant={"ghost"} onClick={() => setFilterBy("today")}>
               Joined Today
               {filterBy === "today" && <Check />}
             </Button>
           </>
         ) : (
           <>
-            <Button
-              variant={"ghost"}
-              onClick={() => setFilterBy("valid")}
-            >
+            <Button variant={"ghost"} onClick={() => setFilterBy("valid")}>
               Valid Subscriptions
               {filterBy === "valid" && <Check />}
             </Button>
-            <Button
-              variant={"ghost"}
-              onClick={() => setFilterBy("expired")}
-            >
+            <Button variant={"ghost"} onClick={() => setFilterBy("expired")}>
               Expired Subscriptions
               {filterBy === "expired" && <Check />}
             </Button>
-            <Button
-              variant={"ghost"}
-              onClick={() => setFilterBy("frozen")}
-            >
+            <Button variant={"ghost"} onClick={() => setFilterBy("frozen")}>
               Frozen Subscriptions
               {filterBy === "frozen" && <Check />}
             </Button>
@@ -273,11 +287,7 @@ const page = () => {
                   )}
                 >
                   <CalendarIcon />
-                  {startDate ? (
-                    format(startDate, "PPP")
-                  ) : (
-                    <span>From</span>
-                  )}
+                  {startDate ? format(startDate, "PPP") : <span>From</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -299,11 +309,7 @@ const page = () => {
                   )}
                 >
                   <CalendarIcon />
-                  {endDate ? (
-                    format(endDate, "PPP")
-                  ) : (
-                    <span>To</span>
-                  )}
+                  {endDate ? format(endDate, "PPP") : <span>To</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -327,7 +333,11 @@ const page = () => {
         <h1 className="text-2xl font-bold tracking-tight">Users</h1>
         {activeTab === "users" ? <AddUser /> : <AddSubscription />}
       </div>
-      <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
+      <Tabs
+        value={tab}
+        className="w-full"
+        onValueChange={handleTabChange}
+      >
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
@@ -369,10 +379,14 @@ const page = () => {
                       <DropdownMenuItem onClick={() => setSortBy("email-desc")}>
                         Email (Z-A)
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy("country-asc")}>
+                      <DropdownMenuItem
+                        onClick={() => setSortBy("country-asc")}
+                      >
                         Country (A-Z)
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy("country-desc")}>
+                      <DropdownMenuItem
+                        onClick={() => setSortBy("country-desc")}
+                      >
                         Country (Z-A)
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -386,6 +400,7 @@ const page = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Country</TableHead>
+                      <TableHead>Verification</TableHead>
                       <TableHead>Joined Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
@@ -395,7 +410,18 @@ const page = () => {
                       <TableRow key={user.$id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.country}</TableCell>
+                        <TableCell>{user.country ? user.country : "N/A"}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`rounded-full text-center ${
+                              user.isVerified === true
+                                ? "text-green-500 bg-green-100"
+                                : "text-red-500 bg-red-100"
+                            }`}
+                          >
+                            {user.isVerified === true ? "verified" : "not verified"}
+                          </span>
+                        </TableCell>
                         <TableCell>
                           {format(new Date(user.$createdAt), "PPP")}
                         </TableCell>
@@ -429,7 +455,10 @@ const page = () => {
                               </Dialog>
                               <DropdownMenuItem>View Details</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DeleteUserDialog accountId={user.$id} text="User" />
+                              <DeleteUserDialog
+                                accountId={user.$id}
+                                text="User"
+                              />
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -444,23 +473,33 @@ const page = () => {
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => handlePageChange(page)}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -494,10 +533,14 @@ const page = () => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Sort By</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => setSortBy("subscription-asc")}>
+                      <DropdownMenuItem
+                        onClick={() => setSortBy("subscription-asc")}
+                      >
                         Plan (A-Z)
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setSortBy("subscription-desc")}>
+                      <DropdownMenuItem
+                        onClick={() => setSortBy("subscription-desc")}
+                      >
                         Plan (Z-A)
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -520,15 +563,23 @@ const page = () => {
                     {subscriptions?.map((subscription: any) => (
                       <TableRow key={subscription.$id}>
                         <TableCell>{subscription.user.email}</TableCell>
-                        <TableCell className="capitalize">{subscription.subscriptionType}</TableCell>
+                        <TableCell className="capitalize">
+                          {subscription.subscriptionType}
+                        </TableCell>
                         <TableCell>{subscription.duration} days</TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            subscription.isValid ? "bg-green-100 text-green-800" :
-                            subscription.isValid === false ? "bg-red-100 text-red-800" :
-                            "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {subscription.isValid ? "Valid" : subscription.status}
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              subscription.isValid
+                                ? "bg-green-100 text-green-800"
+                                : subscription.isValid === false
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {subscription.isValid
+                              ? "Valid"
+                              : subscription.status}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -544,11 +595,17 @@ const page = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit Subscription</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Edit Subscription
+                              </DropdownMenuItem>
                               <DropdownMenuItem>View Details</DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-amber-500">Freeze Subscription</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500">Cancel Subscription</DropdownMenuItem>
+                              <DropdownMenuItem className="text-amber-500">
+                                Freeze Subscription
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">
+                                Cancel Subscription
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -563,23 +620,33 @@ const page = () => {
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => handlePageChange(page)}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>

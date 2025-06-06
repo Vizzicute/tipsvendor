@@ -2,12 +2,15 @@ import React, { cache } from 'react'
 import { getSingleBlog } from '@/lib/appwrite/fetch'
 import { notFound } from 'next/navigation'
 import EditBlogForm from '../EditBlogForm'
+import { useParams } from 'next/navigation'
+export default async function Page() {
+    const params = useParams();
+    const blogId = params?.blogId;
 
-interface pageProps {
-    params: { blogId: string }
-}
+    if (typeof blogId !== 'string') {
+      notFound();
+    }
 
-export default async function Page({params: { blogId }}: pageProps) {
     const blog = await getSingleBlog(blogId);
 
     if(!blog) notFound();

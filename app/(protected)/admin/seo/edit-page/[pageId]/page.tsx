@@ -1,15 +1,18 @@
 import { getSingleSeoPage } from '@/lib/appwrite/fetch'
-import { notFound } from 'next/navigation'
+import { notFound, useParams } from 'next/navigation'
 import EditPageForm from '../EditPageForm'
 
-interface pageProps {
-    params: { pageId: string }
-}
+export default async function Page() {
+  const params = useParams();
+  const pageId = params?.pageId;
 
-export default async function Page({params: { pageId }}: pageProps) {
-    const seoPage = await getSingleSeoPage(pageId);
+  if (typeof pageId !== 'string') {
+    notFound();
+  }
 
-    if(!seoPage) notFound();
+  const seoPage = await getSingleSeoPage(pageId);
+
+  if(!seoPage) notFound();
   return (
     <div className='space-y-2'>
       <div className='w-full flex items-center justify-start'>

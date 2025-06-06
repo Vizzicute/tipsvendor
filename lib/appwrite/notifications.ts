@@ -8,7 +8,7 @@ export interface Notification {
   title: string;
   message: string;
   read: boolean;
-  data?: Record<string, any>;
+  data?: string;
   $createdAt?: string;
 }
 
