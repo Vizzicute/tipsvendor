@@ -78,11 +78,11 @@ export default function NotificationsDropdown() {
       case "new_comment":
         return "/admin/blog?tab=comments";
       case "new_subscription":
-        return "/admin/user?tab=subscriptions";
+        return "/admin/users?tab=subscriptions";
       case "new_user":
-        return "/admin/user";
+        return "/admin/users";
       case "subscription_expiring":
-        return "/admin/user?tab=subscriptions";
+        return "/admin/users?tab=subscriptions";
       case "payment_received":
         return "/admin/payments";
       case "prediction_result":

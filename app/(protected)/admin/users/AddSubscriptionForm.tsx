@@ -39,6 +39,7 @@ import {
 import { useAddSubscription } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
 import LoadingButton from "@/components/LoadingButton";
+import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
 
 const formSchema = z.object({
   user: z.string().min(1, "User is required"),
@@ -91,6 +92,7 @@ const AddSubscriptionForm = () => {
       return;
     }
     toast.success("Subscription Added");
+    notifyNewSubscription(values.user, values.subscriptionType, parseInt(values.duration));
     queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
     form.reset();
   }

@@ -122,7 +122,7 @@ const DynamicContent = ({
   }
 
   return (
-    <>
+    <main>
       <section>
         <Hero
           h1tag={seopage?.h1tag}
@@ -146,7 +146,7 @@ const DynamicContent = ({
         <SubscriptionCard className="m-2" />
         <PageContent content={seopage?.content} />
       </section>
-    </>
+    </main>
   );
 };
 

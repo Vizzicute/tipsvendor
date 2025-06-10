@@ -27,9 +27,9 @@ export type editUserType = {
   name: string;
   email: string;
   country: string;
-  role: string;
-  address: string;
-  phone: string;
+  role?: string;
+  address?: string;
+  phone?: string;
   imageId?: string;
   imageUrl?: string;
 }

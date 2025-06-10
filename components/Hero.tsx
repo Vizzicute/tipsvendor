@@ -5,7 +5,7 @@ import React from "react";
 import GradientButton from "./GradientButton";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
@@ -19,6 +19,7 @@ const Hero = ({
   description: string;
   isSeoLoading: boolean;
 }) => {
+  const pathname = usePathname();
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
   const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading } =
     useUserContext();
@@ -36,11 +37,7 @@ const Hero = ({
       <div className="relative z-10 text-white p-6 w-full flex flex-wrap md:flex-nowrap gap-4">
         <div className="w-full md:w-[65%] flex flex-wrap items-center gap-4">
           <h1 className="font-bold capitalize text-white text-2xl md:text-3xl md:text-left text-center">
-            {isSeoLoading ? (
-              <Skeleton className="w-full h-full" />
-            ) : (
-              h1tag
-            )}
+            {isSeoLoading ? <Skeleton className="w-full h-full" /> : h1tag}
           </h1>
           <h4 className="font-normal text-center md:text-left text-sm text-white">
             {isSeoLoading ? (
@@ -80,12 +77,14 @@ const Hero = ({
           >
             <GradientButton className="w-full">Vip Packages</GradientButton>
           </Link>
-          <Link
-            href="/livescore"
-            className="w-full flex justify-center items-center"
-          >
-            <GradientButton className="w-full">Livescore</GradientButton>
-          </Link>
+          {pathname !== "/livescore" && (
+            <Link
+              href="/livescore"
+              className="w-full flex justify-center items-center"
+            >
+              <GradientButton className="w-full">Livescore</GradientButton>
+            </Link>
+          )}
           <Link
             href="https://t.me"
             target="_blank"

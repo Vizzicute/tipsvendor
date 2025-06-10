@@ -41,7 +41,7 @@ const LoginForm = () => {
     const session = await signInAccount(user);
 
     if (!session) {
-      toast("Login Failed.");
+      toast("Login Failed. Invalid Credentials.");
 
       return;
     }

@@ -93,7 +93,7 @@ const page = () => {
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState(tab);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [opendropdown1, setOpenDropdown1] = useState(false);
