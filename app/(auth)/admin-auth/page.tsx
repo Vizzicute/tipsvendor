@@ -5,7 +5,6 @@ import React, { useEffect } from "react";
 import AuthForm from "./AuthForm";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { useRouter } from "next/navigation";
-import { Metadata } from "next";
 
 const page = () => {
   const router = useRouter();

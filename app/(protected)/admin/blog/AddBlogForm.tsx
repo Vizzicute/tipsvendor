@@ -3,7 +3,6 @@
 import LoadingButton from "@/components/LoadingButton";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandInput,
@@ -40,95 +39,6 @@ import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "draft-blog-post";
 
-interface CategorySelectProps {
-  value: string[];
-  onChange: (value: string[]) => void;
-  categories: Array<{ $id: string; name: string }>;
-}
-
-const CategorySelect = React.memo(({ value, onChange, categories }: CategorySelectProps) => {
-  const [open, setOpen] = useState(false);
-
-  const handleCategoryChange = useCallback((itemId: string) => {
-    const newValue = value.includes(itemId)
-      ? value.filter((id) => id !== itemId)
-      : [...value, itemId];
-    onChange(newValue);
-  }, [value, onChange]);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-        >
-          {value.filter(Boolean).length > 0
-            ? value
-                .map(
-                  (id) =>
-                    categories?.find(
-                      (item) => item.$id === id
-                    )?.name
-                )
-                .filter(Boolean)
-                .join(", ")
-            : "Select Blog Categories"}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
-        <Command>
-          <CommandInput placeholder="Search categories..." />
-          <CommandList>
-            <CommandGroup>
-              {categories?.map((item) => (
-                <CommandItem
-                  key={item.$id}
-                  onSelect={() => handleCategoryChange(item.$id)}
-                  className="flex items-center justify-between"
-                >
-                  <span>{item.name}</span>
-                  <div
-                    role="checkbox"
-                    aria-checked={value.includes(item.$id)}
-                    className={cn(
-                      "h-4 w-4 rounded border border-primary",
-                      value.includes(item.$id) && "bg-primary"
-                    )}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleCategoryChange(item.$id);
-                    }}
-                  >
-                    {value.includes(item.$id) && (
-                      <svg
-                        className="h-4 w-4 text-primary-foreground text-center"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-});
-
-CategorySelect.displayName = "CategorySelect";
-
 const AddBlogForm = () => {
   const { data: blogCategories } = useQuery({
     queryKey: ["documents"],
@@ -146,7 +56,6 @@ const AddBlogForm = () => {
   const datetimeLocalValue = `${year}-${month}-${day}T${hours}:${minutes}`;
 
   const [status, setStatus] = useState("published");
-  const [open, setOpen] = useState(false);
 
   const queryClient = useQueryClient();
   const editorRef = React.useRef<{ input: string }>(null);

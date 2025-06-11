@@ -3,7 +3,7 @@
 import AddPrediction from "@/components/AddPrediction";
 import DeletePredictionDialog from "@/components/DeletePredictionDialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,9 +63,7 @@ import {
 
 const page = () => {
   const {
-    data: predictions,
-    isPending: isLoading,
-    error,
+    data: predictions
   } = useQuery({
     queryKey: ["documents"],
     queryFn: getPredictions,
@@ -75,7 +73,7 @@ const page = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [opendropdown1, setOpenDropdown1] = useState(false);
+  const [, setOpenDropdown1] = useState(false);
   const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
     setOpenDropdown1(v);
 

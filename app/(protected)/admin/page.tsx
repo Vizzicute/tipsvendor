@@ -41,9 +41,7 @@ const AdminDashboard = () => {
   });
 
   const {
-    data: blogs,
-    isPending: isBlogsLoading,
-    error: blogsError,
+    data: blogs
   } = useQuery({
     queryKey: ["blogs"],
     queryFn: getBlog,

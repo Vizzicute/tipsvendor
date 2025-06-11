@@ -70,22 +70,18 @@ const UserProfileForm = ({ user }: { user: Models.Document }) => {
     },
   });
 
-  const imageUrl = form.watch("imageUrl");
-
   const { mutateAsync: editUser, isPending: isEditing } = useEditUser();
   const queryClient = useQueryClient();
 
   const onSubmit = async (data: ProfileFormValues) => {
     try {
       let avatarUrl = null;
-      let avatarId = null;
       if (avatarFile) {
         const result = await editAvatar({
           newAvatar: avatarFile,
           oldAvatarId: user?.imageId,
         });
         avatarUrl = result.avatarUrl;
-        avatarId = result.avatarId;
       }
       await editUser({
         user: {

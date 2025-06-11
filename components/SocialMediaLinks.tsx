@@ -8,7 +8,6 @@ import {
   Instagram,
   Linkedin,
   Youtube,
-  Mail,
   Send,
 } from "lucide-react";
 

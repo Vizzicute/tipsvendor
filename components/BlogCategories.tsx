@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import React, { useState } from "react";
 import {
   Pagination,

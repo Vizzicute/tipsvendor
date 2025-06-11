@@ -15,11 +15,6 @@ const Page = () => {
     queryFn: () => getSingleSeoPageByUrl(pageTitle),
   });
 
-  const formattedTime = (date: string | Date): string => {
-    const d = new Date(date);
-    return d.toTimeString().split(":").slice(0, 2).join(":");
-  };
-
   const getDateOnly = (input: string | Date) => {
     const date = new Date(input);
     return date.toISOString().split("T")[0]; // Already gives the YYYY-MM-DD format
@@ -63,7 +58,7 @@ const Page = () => {
           ))}
         </div>
         <script
-          api="livescore"
+          data-api="livescore"
           src="https://www.livescore.bz/api.livescore.0.1.js"
           type="text/javascript"
         ></script>
@@ -72,7 +67,7 @@ const Page = () => {
           data-1={day === today ? "today" : day === yesterday ? "yesterday" : "tomorrow"}
           href="https://www.livescore.bz"
           lang="en"
-          sport="football(soccer)"
+          data-sport="football(soccer)"
         >
           <h4>Loading...</h4>
         </Link>

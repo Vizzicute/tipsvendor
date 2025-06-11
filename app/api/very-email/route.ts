@@ -3,7 +3,6 @@ import { Client, Users } from "node-appwrite";
 import { databases } from "@/lib/appwrite/config"; // adjust import as needed
 import { appwriteConfig } from "@/lib/appwrite/config"; // adjust import as needed
 import { getSingleUserByUserId } from "@/lib/appwrite/fetch";
-import { Models } from "appwrite";
 
 
 export async function POST(request: Request) {

@@ -20,7 +20,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
-import { account } from "@/lib/appwrite/config";
 import { verificationMail } from "@/lib/utils/verificationMail";
 import { useMutation } from "@tanstack/react-query";
 import { getCurrentUser } from "@/lib/appwrite/api";

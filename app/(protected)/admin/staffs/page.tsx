@@ -41,7 +41,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -63,8 +62,6 @@ import DeleteUserDialog from "@/components/DeleteUserDialog";
 const page = () => {
   const {
     data: staffs,
-    isPending: isLoading,
-    error,
   } = useQuery({
     queryKey: ["documents"],
     queryFn: getUsers,
@@ -74,7 +71,7 @@ const page = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [opendropdown1, setOpenDropdown1] = useState(false);
+  const [, setOpenDropdown1] = useState(false);
   const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
     setOpenDropdown1(v);
 
@@ -121,7 +118,6 @@ const page = () => {
   const filteredstaffs = searchedstaffs?.filter((data) => {
     const today = getDateOnly(new Date());
     const yesterday = getDateOnly(new Date(Date.now() - 86400000));
-    const tomorrow = getDateOnly(new Date(Date.now() + 86400000));
 
     if (filterBy === "") return true;
 
@@ -161,8 +157,6 @@ const page = () => {
 
   const formattedDate = (date: Date): string =>
     date.toISOString().split("T")[0];
-  const formattedTime = (date: Date): string =>
-    date.toTimeString().split(":").slice(0, 2).join(":");
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);

@@ -24,7 +24,7 @@ const AddSubscription = () => {
           <DialogTitle>Add Subscription</DialogTitle>
         </DialogHeader>
         <div className="relative">
-          <AddSubscriptionForm onSuccess={() => setOpen(false)} />
+          <AddSubscriptionForm />
         </div>
       </DialogContent>
     </Dialog>

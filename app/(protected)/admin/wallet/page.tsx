@@ -4,11 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { CreditCard, Banknote, Bitcoin, Phone, Building2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { fetchExchangeRates, formatCurrency } from "@/lib/utils/exchangeRates";
+import { fetchExchangeRates } from "@/lib/utils/exchangeRates";
 import { paymentDetails } from "@/lib/config/paymentDetails";
 import Link from "next/link";
 
@@ -20,7 +18,6 @@ interface ExchangeRate {
 
 export default function WalletPage() {
   const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadExchangeRates = async () => {
@@ -30,8 +27,6 @@ export default function WalletPage() {
       } catch (error) {
         console.error("Error loading exchange rates:", error);
         toast.error("Failed to load exchange rates");
-      } finally {
-        setIsLoading(false);
       }
     };
 

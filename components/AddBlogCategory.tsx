@@ -1,6 +1,5 @@
 "use client";
 
-import AddPredictionForm from '@/app/(protected)/admin/predictions/AddPredictionForm';
 import { DialogTrigger } from './ui/dialog';
 import { Plus } from 'lucide-react';
 import React from 'react'

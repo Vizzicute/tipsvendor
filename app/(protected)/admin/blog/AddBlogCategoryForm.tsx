@@ -52,6 +52,7 @@ const AddBlogCategoryForm = () => {
         toast("Category added successfully.");
       }
     } catch (error) {
+      console.error("Error adding blog category:", error);
       toast("Failed. Please try again.");
     }
   }

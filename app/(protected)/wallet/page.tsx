@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Wallet, CreditCard, Banknote, History } from "lucide-react";
+import { CreditCard, Banknote, History } from "lucide-react";
 import LoadingButton from "@/components/LoadingButton";
 import { getWalletSettings } from "@/lib/appwrite/appConfig";
 
@@ -32,7 +31,7 @@ interface WalletSettings {
 
 export default function WalletPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("deposit");
+  const [, setActiveTab] = useState("deposit");
   const [walletSettings, setWalletSettings] = useState<WalletSettings | null>(null);
   const [amount, setAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");

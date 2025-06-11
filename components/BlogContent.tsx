@@ -36,15 +36,8 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { cn, truncate } from "@/lib/utils";
 import { format } from "date-fns";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+
+
 import DeleteBlogDialog from "@/components/DeleteBlogDialog";
 import Link from "next/link";
 import BlogStatusActionDialog from "@/components/BlogStatusActionDialog";
@@ -59,7 +52,7 @@ const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [opendropdown1, setOpenDropdown1] = useState(false);
+  const [, setOpenDropdown1] = useState(false);
   const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
     setOpenDropdown1(v);
 
@@ -88,11 +81,6 @@ const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
     currentPage * PAGE_SIZE
   );
 
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   const searchedBlog = paginatedData?.filter((data) =>
     data.title?.toLowerCase().includes(searchTerm.toLowerCase())

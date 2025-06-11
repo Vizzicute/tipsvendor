@@ -2,7 +2,6 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import AuthWrapper from "@/context/AuthWrapper";
 import { getCurrentUser } from "@/lib/appwrite/api";
-import { useQuery } from "@tanstack/react-query";
 import { Metadata } from "next";
 import React from "react";
 

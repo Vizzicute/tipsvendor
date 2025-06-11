@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getBlog, getBlogCategories } from "@/lib/appwrite/fetch";
 import React from "react";
 import BlogMiniNav from "@/components/BlogMiniNav";
-import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 import BlogHero from "@/components/BlogHero";
 import BlogsByCategory from "@/components/BlogsByCategory";
 import { Models } from "appwrite";
@@ -19,7 +17,7 @@ const page = () => {
     queryFn: getBlogCategories,
   });
 
-  const { data: blog, isLoading: isBlogLoading } = useQuery({
+  const { data: blog } = useQuery({
     queryKey: ["blog"],
     queryFn: getBlog,
   });

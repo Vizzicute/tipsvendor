@@ -3,19 +3,13 @@
 import { cn } from "@/lib/utils";
 import {
   Home,
-  Calendar,
-  FileText,
   Settings,
   User,
   Activity,
-  FileCheck,
-  ShieldCheck,
-  BookOpen,
   Gamepad,
   Newspaper,
   Users,
   ChartNoAxesCombined,
-  Banknote,
   Wallet,
   Mail,
 } from "lucide-react";

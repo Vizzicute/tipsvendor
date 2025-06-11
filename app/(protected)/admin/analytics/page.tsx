@@ -3,9 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSubscriptions, getUsers, getBlog, getPredictions } from "@/lib/appwrite/fetch";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, CreditCard, Newspaper, Users, TrendingUp, Calendar, DollarSign } from "lucide-react";
-import { format, subDays, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isToday, isYesterday } from "date-fns";
-import { cn, truncate } from "@/lib/utils";
+import { CreditCard, Users, TrendingUp, DollarSign } from "lucide-react";
+import { format, subDays, startOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isToday, isYesterday } from "date-fns";
+import { truncate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 
@@ -107,8 +107,6 @@ export default function AnalyticsPage() {
     if (!predictions) return [];
     
     const now = new Date();
-    const today = startOfDay(now);
-    const yesterday = startOfDay(subDays(now, 1));
     const lastWeekStart = startOfWeek(subDays(now, 7));
     const lastWeekEnd = endOfWeek(subDays(now, 7));
     const thisWeekStart = startOfWeek(now);

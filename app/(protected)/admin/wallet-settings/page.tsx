@@ -15,7 +15,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Wallet, CreditCard, Settings } from "lucide-react";
 import LoadingButton from "@/components/LoadingButton";
 import { getWalletSettings, updateSettings } from "@/lib/appwrite/appConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

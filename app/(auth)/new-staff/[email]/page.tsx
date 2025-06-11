@@ -19,7 +19,6 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import { PasswordInput } from "@/components/PasswordInput";
 import { verifyAccount } from "@/lib/utils/verification";
-import { useQuery } from "@tanstack/react-query";
 import { createStaffAccount } from "@/lib/appwrite/api";
 
 const formSchema = z
@@ -94,6 +93,7 @@ export default function setPasswordPage() {
             }, 2000);
           }
         } catch (err) {
+          console.error("Verification error:", err);
           toast.error("Verification failed. Please try again.");
         }
       } else {

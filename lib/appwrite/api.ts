@@ -1,6 +1,6 @@
 import { INewUser } from "@/types";
 import { account, appwriteConfig, avatars, databases } from "./config";
-import { ID, Models, OAuthProvider, Permission, Query, Role } from "appwrite";
+import { ID, Models, OAuthProvider, Query } from "appwrite";
 
 export async function createUserAccount(user: INewUser) {
   try {

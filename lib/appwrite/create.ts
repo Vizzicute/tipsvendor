@@ -1,4 +1,4 @@
-import { ID, Permission, Role } from "appwrite";
+import { ID } from "appwrite";
 import { appwriteConfig, avatars, databases } from "./config";
 import { getCurrentUser } from "./api";
 

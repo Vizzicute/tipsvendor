@@ -2,16 +2,12 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
 import AddPredictionForm from "@/app/(protected)/admin/predictions/AddPredictionForm";
 
 const AddPrediction = () => {

@@ -1,14 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import BlogTabs from "@/components/BlogTabs";
-import { useBlogs, Blog } from "@/hooks/useBlogs";
+import { useBlogs } from "@/hooks/useBlogs";
 import { useSearchParams } from "next/navigation";
-import { Filter } from "@/components/Filter";
 import AddBlogCategory from "@/components/AddBlogCategory";
 import { useQuery } from "@tanstack/react-query";
 import { getBlogCategories, getComments } from "@/lib/appwrite/fetch";
@@ -29,7 +28,7 @@ export default function BlogPage() {
     queryFn: () => getBlogCategories(),
   });
 
-  const filteredBlogs = blogs ? blogs.filter((blog: Blog) => {
+  const filteredBlogs = blogs ? blogs.filter((blog) => {
     if (status === "all") return true;
     return blog.status === status;
   }) : [];

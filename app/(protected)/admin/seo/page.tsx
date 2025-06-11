@@ -1,53 +1,23 @@
 "use client";
 
-import DeletePredictionDialog from "@/components/DeletePredictionDialog";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+
+
+
 import { getSeoPages } from "@/lib/appwrite/fetch";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import { Dialog } from "@radix-ui/react-dialog";
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { truncate } from "@/lib/utils";
+import React from "react";
+
+
+
+
 import Link from "next/link";
 import { FilePlus2 } from "lucide-react";
 
 const page = () => {
   const {
     data: seopages,
-    isPending: isLoading,
   } = useQuery({
     queryKey: ["documents"],
     queryFn: getSeoPages,

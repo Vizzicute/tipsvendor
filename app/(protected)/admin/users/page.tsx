@@ -5,8 +5,6 @@ import AddUser from "./AddUser";
 import AddSubscription from "./AddSubscription";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  ArrowDownAZ,
-  ArrowUpZA,
   CalendarIcon,
   Check,
   Filter,
@@ -43,7 +41,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -51,7 +48,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -75,8 +71,6 @@ const page = () => {
   
   const {
     data: users,
-    isPending: isLoading,
-    error,
   } = useQuery({
     queryKey: ["documents"],
     queryFn: getUsers,
@@ -84,8 +78,6 @@ const page = () => {
 
   const {
     data: subscriptions,
-    isPending: isSubscriptionsLoading,
-    error: subscriptionsError,
   } = useQuery({
     queryKey: ["subscriptions"],
     queryFn: getSubscriptions,
@@ -93,10 +85,10 @@ const page = () => {
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState(tab);
+  const [activeTab] = useState(tab);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [opendropdown1, setOpenDropdown1] = useState(false);
+  const [, setOpenDropdown1] = useState(false);
   const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
     setOpenDropdown1(v);
 
@@ -125,7 +117,6 @@ const page = () => {
   );
 
   const onlyUsers = users?.filter((data) => data.role === "user");
-  const subscribedUsers = users?.filter((data) => data.subscription);
 
   const paginatedData =
     activeTab === "users"
@@ -152,7 +143,6 @@ const page = () => {
   const filteredUsers = searchedUsers?.filter((data) => {
     const today = getDateOnly(new Date());
     const yesterday = getDateOnly(new Date(Date.now() - 86400000));
-    const tomorrow = getDateOnly(new Date(Date.now() + 86400000));
 
     if (filterBy === "") return true;
 

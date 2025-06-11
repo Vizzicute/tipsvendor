@@ -15,7 +15,7 @@ import { useEditPage } from "@/lib/react-query/queriesAndMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Models } from "appwrite";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -57,7 +57,7 @@ const EditPageForm = ({ page }: EditPageFormProps) => {
     try {
       values.content = editorRef.current?.input || "";
       // Split keywords only when submitting
-      values.keywords = keywordsInput.split(',').map(k => k.trim()).filter(Boolean);
+      values.keywords = keywordsInput.split(',').map((k: string) => k.trim()).filter(Boolean);
 
       const newpage = await editpage({
         page: values,

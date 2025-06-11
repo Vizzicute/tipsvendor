@@ -1,4 +1,6 @@
-import React, { cache } from 'react'
+"use client";
+
+import React from 'react'
 import { getSingleBlog } from '@/lib/appwrite/fetch'
 import { notFound } from 'next/navigation'
 import EditBlogForm from '../EditBlogForm'

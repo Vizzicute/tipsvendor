@@ -10,7 +10,6 @@ import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { getBlog, getPredictions } from "@/lib/appwrite/fetch";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
-import { truncate } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Models } from "appwrite";
 import { formatDate } from "date-fns";
@@ -33,13 +32,13 @@ const Page = () => {
   const { setUser, isAuthenticated, setIsAuthenticated } = useUserContext();
 
   // Only fetch user if authenticated to avoid Appwrite 401 error
-  const { data: currentUser, isLoading: isUserLoading } = useQuery({
+  const { data: currentUser } = useQuery({
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
     enabled: isAuthenticated,
   });
 
-  const { data: predictions, isPending: isLoading } = useQuery({
+  const { data: predictions } = useQuery({
     queryKey: ["predictions"],
     queryFn: getPredictions,
   });
