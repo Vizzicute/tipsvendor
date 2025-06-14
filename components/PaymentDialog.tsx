@@ -40,10 +40,13 @@ const PaymentDialog = ({
   };
 
   // Format amount with commas and 2 decimals
-  const formattedAmount = `${currency} ${Number(amount).toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const formattedAmount = `${currency} ${Number(amount).toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  )}`;
 
   function useIsMobile() {
     const [isMobile, setIsMobile] = useState(false);
@@ -98,9 +101,7 @@ const PaymentDialog = ({
           {/* Bank Transfer (NGN) */}
           {settings.bankAccount?.accountNumber && (
             <div className="w-full border rounded-lg p-4 flex flex-col gap-1 bg-stone-50">
-              <div className="font-semibold text-base">
-                Bank Transfer (NGN)
-              </div>
+              <div className="font-semibold text-base">Bank Transfer (NGN)</div>
               <div className="text-xs text-muted-foreground">
                 Transfer to the Nigerian bank account below
               </div>
@@ -133,9 +134,7 @@ const PaymentDialog = ({
           {/* USD Bank Transfer */}
           {settings.usdBankAccount?.accountNumber && (
             <div className="w-full border rounded-lg p-4 flex flex-col gap-1 bg-stone-50">
-              <div className="font-semibold text-base">
-                USD Bank Transfer
-              </div>
+              <div className="font-semibold text-base">USD Bank Transfer</div>
               <div className="text-xs text-muted-foreground">
                 Transfer USD to the bank account below
               </div>
@@ -148,7 +147,9 @@ const PaymentDialog = ({
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => handleCopy(settings.usdBankAccount.accountNumber)}
+                  onClick={() =>
+                    handleCopy(settings.usdBankAccount.accountNumber)
+                  }
                   className={
                     copied === settings.usdBankAccount.accountNumber
                       ? "bg-green-200"
@@ -238,9 +239,7 @@ const PaymentDialog = ({
                 Send USDT to the address below
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs">
-                  {settings.crypto.usdt.address}
-                </span>
+                <span className="text-xs">{settings.crypto.usdt.address}</span>
                 <Button
                   size="icon"
                   variant="ghost"
@@ -289,17 +288,13 @@ const PaymentDialog = ({
                 Pay with Skrill
               </div>
               <div className="flex items-center gap-2 mt-2">
-                <span className="text-xs">
-                  {settings.skrill.email}
-                </span>
+                <span className="text-xs">{settings.skrill.email}</span>
                 <Button
                   size="icon"
                   variant="ghost"
                   onClick={() => handleCopy(settings.skrill.email)}
                   className={
-                    copied === settings.skrill.email
-                      ? "bg-green-200"
-                      : ""
+                    copied === settings.skrill.email ? "bg-green-200" : ""
                   }
                 >
                   {copied === settings.skrill.email ? (
@@ -324,7 +319,9 @@ const PaymentDialog = ({
             <DrawerHeader>
               <DrawerTitle>Payment Details</DrawerTitle>
             </DrawerHeader>
-            <PaymentContent />
+            <div className="overflow-y-scroll h-full">
+              <PaymentContent />
+            </div>
           </DrawerContent>
         </Drawer>
       ) : (
