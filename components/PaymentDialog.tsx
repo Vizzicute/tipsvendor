@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { Button } from "./ui/button";
@@ -44,6 +44,19 @@ const PaymentDialog = ({
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
+
+  function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+      const check = () => setIsMobile(window.innerWidth < 640);
+      check();
+      window.addEventListener("resize", check);
+      return () => window.removeEventListener("resize", check);
+    }, []);
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
 
   // Payment content (shared by Dialog and Drawer)
   const PaymentContent = () => (
@@ -304,9 +317,17 @@ const PaymentDialog = ({
   );
 
   return (
-    <div>
-      {/* Desktop: Dialog */}
-      <div className="max-sm:hidden">
+    <>
+      {isMobile ? (
+        <Drawer open={open} onOpenChange={onClose}>
+          <DrawerContent className="p-4">
+            <DrawerHeader>
+              <DrawerTitle>Payment Details</DrawerTitle>
+            </DrawerHeader>
+            <PaymentContent />
+          </DrawerContent>
+        </Drawer>
+      ) : (
         <Dialog open={open} onOpenChange={onClose} modal={false}>
           <DialogContent className="w-[60%] h-[70%] overflow-y-scroll p-4 rounded-sm">
             <DialogHeader className="py-5 text-center">
@@ -315,21 +336,8 @@ const PaymentDialog = ({
             <PaymentContent />
           </DialogContent>
         </Dialog>
-      </div>
-      {/* Mobile: Drawer */}
-      <div className="sm:hidden">
-        <Drawer open={open} onOpenChange={onClose} modal={false}>
-          <DrawerContent className="p-4">
-            <DrawerHeader>
-              <DrawerTitle>Payment Details</DrawerTitle>
-            </DrawerHeader>
-            <div className="overflow-y-scroll">
-              <PaymentContent />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
