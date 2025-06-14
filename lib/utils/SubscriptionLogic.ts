@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
 import { Models } from "appwrite";
-import { useEditSubscription } from "../react-query/queriesAndMutations";
 
-const { mutateAsync: editSubscription } = useEditSubscription();
-
-export async function checkAndUpdateSubscription(subscription: Models.Document) {
+export async function checkAndUpdateSubscription(
+  subscription: Models.Document,
+  editSubscription: (args: any) => Promise<any>
+) {
   const isValid = subscription.isValid;
   const isFreeze = subscription.isFreeze;
   const freezeStart = subscription.freezeStart;

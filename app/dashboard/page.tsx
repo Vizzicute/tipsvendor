@@ -9,7 +9,7 @@ import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { getBlog, getPredictions } from "@/lib/appwrite/fetch";
-import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
+import { useEditSubscription, useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { checkAndUpdateSubscription } from "@/lib/utils/SubscriptionLogic";
 import { useQuery } from "@tanstack/react-query";
 import { Models } from "appwrite";
@@ -30,7 +30,8 @@ const getDateOnly = (input: string | Date) => {
 const Page = () => {
   const { mutateAsync: signOutAccount, isPending: isSigningOut } =
     useSignOutAccount();
-  const { user, setUser, isAuthenticated, setIsAuthenticated } = useUserContext();
+  const { user, setUser, isAuthenticated, setIsAuthenticated } =
+    useUserContext();
 
   // Only fetch user if authenticated to avoid Appwrite 401 error
   const { data: currentUser } = useQuery({
@@ -77,6 +78,8 @@ const Page = () => {
     ?.sort((a, b) => a.comments.length - b.comments.length)
     .slice(0, 6);
 
+  const { mutateAsync: editSubscription } = useEditSubscription();
+
   useEffect(() => {
     if (currentUser?.subscription) {
       // If subscription is an array, check all; else, check the single subscription
@@ -84,10 +87,10 @@ const Page = () => {
         ? currentUser.subscription
         : [currentUser.subscription];
       subs.forEach((sub) => {
-        checkAndUpdateSubscription(sub);
+        checkAndUpdateSubscription(sub, editSubscription);
       });
     }
-  }, [currentUser]);
+  }, [currentUser, editSubscription]);
 
   return (
     <main>
@@ -330,13 +333,12 @@ function isExpiring(subscription: Models.Document) {
       : 0;
 
   const expiryDate = new Date(
-    startDate.getTime() +
-      duration * 24 * 60 * 60 * 1000 +
-      freezeDuration
+    startDate.getTime() + duration * 24 * 60 * 60 * 1000 + freezeDuration
   );
 
   // Consider expiring if less than or equal to 3 days left
-  const daysLeft = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+  const daysLeft =
+    (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
   return daysLeft <= 3 && daysLeft > 0;
 }
 
