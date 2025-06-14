@@ -12,7 +12,6 @@ import LoadingButton from "./LoadingButton";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { useDeleteSubscription } from "@/lib/react-query/queriesAndMutations";
 import { freezeSubscription } from "@/lib/appwrite/update";
 
 interface UnfreezeSubscriptionProps {

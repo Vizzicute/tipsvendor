@@ -5,7 +5,6 @@ import Hero from "@/components/Hero";
 import { Button } from "@/components/ui/button";
 import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import React, { useState } from "react";
 
 const Page = () => {

@@ -39,7 +39,6 @@ import {
 import { useEditSubscription } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
 import LoadingButton from "@/components/LoadingButton";
-import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
 import { Models } from "appwrite";
 
 const formSchema = z.object({
