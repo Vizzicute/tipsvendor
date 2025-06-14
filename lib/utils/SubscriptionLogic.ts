@@ -1,3 +1,5 @@
+"use client";
+
 import { Models } from "appwrite";
 import { useEditSubscription } from "../react-query/queriesAndMutations";
 
