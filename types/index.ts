@@ -3,6 +3,7 @@ export type IUser = {
   id: string;
   name: string;
   email: string;
+  country?: string;
   imageUrl: string;
   role: string;
 };

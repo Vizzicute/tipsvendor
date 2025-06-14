@@ -3,13 +3,17 @@
 import BlogCard from "@/components/BlogCard";
 import BlogHeadingTextWrapper from "@/components/BlogHeadingTextWrapper";
 import LoadingButton from "@/components/LoadingButton";
+import SubscriptionCard from "@/components/SubscriptionCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { getBlog, getPredictions } from "@/lib/appwrite/fetch";
-import { useEditSubscription, useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
+import {
+  useEditSubscription,
+  useSignOutAccount,
+} from "@/lib/react-query/queriesAndMutations";
 import { checkAndUpdateSubscription } from "@/lib/utils/SubscriptionLogic";
 import { useQuery } from "@tanstack/react-query";
 import { Models } from "appwrite";
@@ -50,6 +54,11 @@ const Page = () => {
   const tomorrow = getDateOnly(new Date(Date.now() + 86400000));
   const [day, setDay] = useState(today);
 
+  const bankerPredictions = predictions?.filter(
+    (prediction) =>
+      getDateOnly(prediction.datetime) === day && prediction.isBanker === true
+  );
+
   const dateButtons = [
     { label: "Yesterday", date: yesterday },
     { label: "Today", date: today },
@@ -63,11 +72,38 @@ const Page = () => {
     redirect("/login");
   };
 
+  // Get all subscriptions as array
   const subscriptions: Models.Document[] = currentUser?.subscription
     ? Array.isArray(currentUser.subscription)
       ? currentUser.subscription
       : [currentUser.subscription]
     : [];
+
+  // Helper functions
+  const anyFreezed = subscriptions.some((sub) => sub.isFreeze);
+  const anyValid = subscriptions.some((sub) => sub.isValid && !sub.isFreeze);
+  const anyExpiring = subscriptions.some(
+    (sub) => sub.isValid && !sub.isFreeze && isExpiring(sub)
+  );
+  const allExpired =
+    subscriptions.length > 0 &&
+    subscriptions.every((sub) => !sub.isValid && !sub.isFreeze);
+
+  let status = "Inactive";
+  let statusColor = "bg-red-500";
+  if (anyFreezed) {
+    status = "Freezed";
+    statusColor = "bg-blue-400";
+  } else if (anyExpiring) {
+    status = "Expiring";
+    statusColor = "bg-yellow-500";
+  } else if (anyValid) {
+    status = "Active";
+    statusColor = "bg-green-500";
+  } else if (allExpired) {
+    status = "Expired";
+    statusColor = "bg-red-500";
+  }
 
   const { data: blogs, isLoading: isBlogsLoading } = useQuery({
     queryKey: ["blogs"],
@@ -104,7 +140,7 @@ const Page = () => {
               disabled={isSigningOut}
               onClick={handleSignout}
               variant={"ghost"}
-              className="font-semibold text-amber-600 hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 rounded-full underline-offset-4 hover:underline decoration-amber-600 decoration-2 focus:decoration-amber-500 focus:decoration-2"
+              className="font-semibold text-amber-600 hover:bg-transparent hover:text-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 rounded-full underline-offset-4 hover:underline decoration-amber-600 decoration-2 focus:decoration-amber-500 focus:decoration-2"
             >
               Logout
             </LoadingButton>
@@ -145,23 +181,9 @@ const Page = () => {
               <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                 <span>Subscription Status:</span>
                 <span
-                  className={`text-white rounded-full font-normal text-sm px-2 py-1 ${
-                    currentUser?.subscription?.isFreeze
-                      ? "bg-blue-500"
-                      : !currentUser?.subscription?.isValid
-                      ? "bg-red-500"
-                      : isExpiring(currentUser?.subscription)
-                      ? "bg-yellow-500"
-                      : "bg-green-500"
-                  }`}
+                  className={`text-white rounded-full font-normal text-sm px-2 py-1 ${statusColor}`}
                 >
-                  {currentUser?.subscription?.isFreeze
-                    ? "Freezed"
-                    : !currentUser?.subscription?.isValid
-                    ? "Expired"
-                    : isExpiring(currentUser?.subscription)
-                    ? "Expiring"
-                    : "Active"}
+                  {status}
                 </span>
               </div>
             </div>
@@ -170,32 +192,109 @@ const Page = () => {
       </section>
       <section className="w-full flex flex-col justify-center items-center">
         <div className="p-5 w-full flex items-center justify-center gap-5">
-          {dateButtons.map(({ label, date }) => (
-            <Button
-              key={date}
-              onClick={() => setDay(date)}
-              className={`p-2 md:w-[20%] w-[30%] text-sm ${
-                day === date
-                  ? "bg-transparent border border-primary text-primary"
-                  : "bg-primary text-white"
-              }`}
-            >
-              {label}
-            </Button>
-          ))}
+          {(subscriptions.length > 0 || (bankerPredictions && bankerPredictions.length > 0)) &&
+            dateButtons.map(({ label, date }) => (
+              <Button
+                key={date}
+                onClick={() => setDay(date)}
+                className={`p-2 md:w-[20%] w-[30%] text-sm ${
+                  day === date
+                    ? "bg-transparent border border-primary text-primary"
+                    : "bg-primary text-white"
+                }`}
+              >
+                {label}
+              </Button>
+            ))}
         </div>
       </section>
       <section className="w-full flex flex-col items-center mt-8">
-        {subscriptions
-          .filter((sub: Models.Document) => sub.isValid)
-          .map((sub: Models.Document, idx: number) => {
-            // Get all types for this subscription
-            const types =
-              sub.subscriptionType === "all"
-                ? ["investment", "vip", "mega"] // all premium types
-                : sub.subscriptionType.split("&");
+        {subscriptions.length === 0 ? (
+          <div className="w-full max-w-3xl text-center my-6">
+            <h2 className="text-xl font-bold mb-2 capitalize">
+              No Active Subscription
+            </h2>
+            {bankerPredictions?.length === 0 ? (
+              <p className="text-gray-500 py-8">
+                No Banker Predictions Available
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="border-collapse w-full text-center text-[10px] overflow-x-scroll no-scrollbar">
+                  <thead>
+                    <tr className="bg-primary text-secondary">
+                      <th className="py-2">Time</th>
+                      <th className="py-2">Leagues</th>
+                      <th className="py-2">Matches</th>
+                      <th className="py-2">Tips</th>
+                      <th className="py-2">Scores</th>
+                      <th className="py-2">Odds</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bankerPredictions?.map((pred: Models.Document) => (
+                      <tr
+                        key={pred.$id}
+                        className="text-[12px] odd:bg-white even:bg-gray-100 border-b"
+                      >
+                        <td className="py-2">{formattedTime(pred.datetime)}</td>
+                        <td className="py-2 uppercase">
+                          {pred.league || "N/A"}
+                        </td>
+                        <td className="py-2">
+                          {pred.hometeam + " vs " + pred.awayteam}
+                        </td>
+                        <td className="py-2">{pred.tip}</td>
+                        <td
+                          className={` ${
+                            pred.status === "win"
+                              ? "text-green-500"
+                              : pred.status === "loss"
+                              ? "text-red-500"
+                              : "text-gray-600"
+                          } py-2`}
+                        >
+                          {pred.homescore + ":" + pred.awayscore}
+                        </td>
+                        <td className="py-2">{pred.odd?.toString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        ) : (
+          // For each type, show status based on all subscriptions
+          (() => {
+            // Collect all types from all subscriptions
+            const allTypes = subscriptions
+              .flatMap((sub) =>
+                sub.subscriptionType === "all"
+                  ? ["investment", "vip", "mega"]
+                  : sub.subscriptionType.split("&")
+              )
+              .filter((v, i, a) => a.indexOf(v) === i); // unique
 
-            return types.map((type: string) => {
+            return allTypes.map((type, idx) => {
+              // Find all subscriptions for this type
+              const subsForType = subscriptions.filter(
+                (sub) =>
+                  sub.subscriptionType === "all" ||
+                  sub.subscriptionType.split("&").includes(type)
+              );
+
+              const isTypeFreezed = subsForType.some((sub) => sub.isFreeze);
+              const isTypeValid = subsForType.some(
+                (sub) => sub.isValid && !sub.isFreeze
+              );
+              const isTypeExpiring = subsForType.some(
+                (sub) => sub.isValid && !sub.isFreeze && isExpiring(sub)
+              );
+              const isTypeAllExpired =
+                subsForType.length > 0 &&
+                subsForType.every((sub) => !sub.isValid && !sub.isFreeze);
+
               // Filter predictions for this type and selected day
               const predictionsForType = (predictions || [])
                 .filter(
@@ -214,6 +313,39 @@ const Page = () => {
               if (day === yesterday) msg = "No prediction was added";
               else if (day === today) msg = "No prediction added yet";
               else if (day === tomorrow) msg = "No prediction available yet";
+
+              if (isTypeFreezed) {
+                return (
+                  <div
+                    key={type + idx}
+                    className="w-full max-w-3xl text-center my-6"
+                  >
+                    <h2 className="text-xl font-bold mb-2 capitalize">
+                      {type} Predictions
+                    </h2>
+                    <div className="text-gray-500 py-8">
+                      Predictions are temporarily frozen
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isTypeAllExpired) {
+                return (
+                  <div
+                    key={type + idx}
+                    className="w-full max-w-3xl text-center my-6"
+                  >
+                    <h2 className="text-xl font-bold mb-2 capitalize">
+                      {type} Predictions
+                    </h2>
+                    <div className="text-gray-500 py-8">
+                      Your subscription has expired. Please renew to access
+                      predictions.
+                    </div>
+                  </div>
+                );
+              }
 
               if (predictionsForType.length === 0) {
                 return (
@@ -293,8 +425,15 @@ const Page = () => {
                 </div>
               );
             });
-          })}
+          })()
+        )}
       </section>
+      {!subscriptions ||
+        (!anyValid && (
+          <section className="p-2">
+            <SubscriptionCard />
+          </section>
+        ))}
       <section className="w-full flex flex-col p-2">
         <div className="space-y-2">
           <BlogHeadingTextWrapper

@@ -51,7 +51,7 @@ const SubscriptionCard = ({ className }: Props) => {
     defaultValues: {
       plan: "",
       duration: "",
-      country: "",
+      country: user.country || "",
       amount: "",
     },
   });
@@ -262,25 +262,25 @@ const SubscriptionCard = ({ className }: Props) => {
                           <SelectLabel>Your Country</SelectLabel>
                           <SelectLabel>Africa</SelectLabel>
                           {africanCountries.map((data) => (
-                            <SelectItem key={data.name} value={data.value}>
+                            <SelectItem key={data.name} value={data.name}>
                               {data.name}
                             </SelectItem>
                           ))}
                           <SelectLabel>Europe</SelectLabel>
                           {europeanCountries.map((data) => (
-                            <SelectItem key={data.name} value={data.value}>
+                            <SelectItem key={data.name} value={data.name}>
                               {data.name}
                             </SelectItem>
                           ))}
                           <SelectLabel>America</SelectLabel>
                           {americanCountries.map((data) => (
-                            <SelectItem key={data.name} value={data.value}>
+                            <SelectItem key={data.name} value={data.name}>
                               {data.name}
                             </SelectItem>
                           ))}
                           <SelectLabel>Asia</SelectLabel>
                           {asianCountries.map((data) => (
-                            <SelectItem key={data.name} value={data.value}>
+                            <SelectItem key={data.name} value={data.name}>
                               {data.name}
                             </SelectItem>
                           ))}
