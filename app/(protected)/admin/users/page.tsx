@@ -4,12 +4,7 @@ import React, { useEffect, useState } from "react";
 import AddUser from "./AddUser";
 import AddSubscription from "./AddSubscription";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  CalendarIcon,
-  Check,
-  Filter,
-  Search,
-} from "lucide-react";
+import { CalendarIcon, Check, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -57,35 +52,34 @@ import DeleteUserDialog from "@/components/DeleteUserDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditUserForm from "./EditUserForm";
 import { useRouter, useSearchParams } from "next/navigation";
+import CancelSubscription from "@/components/CancelSubscription";
+import FreezeSubscription from "@/components/FreezeSubscription";
+import UnfreezeSubscription from "@/components/UnfreezeSubscription";
+import EditSubscription from "./EditSubscription";
 
 const page = () => {
   const searchParams = useSearchParams();
-    const router = useRouter();
-    const tab = searchParams.get("tab") || "users";
-  
-    const handleTabChange = (value: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set("tab", value);
-      router.replace(`?${params.toString()}`, { scroll: false });
-    };
-  
-  const {
-    data: users,
-  } = useQuery({
+  const router = useRouter();
+  const tab = searchParams.get("tab") || "users";
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("tab", value);
+    router.replace(`?${params.toString()}`, { scroll: false });
+  };
+
+  const { data: users } = useQuery({
     queryKey: ["documents"],
     queryFn: getUsers,
   });
 
-  const {
-    data: subscriptions,
-  } = useQuery({
+  const { data: subscriptions } = useQuery({
     queryKey: ["subscriptions"],
     queryFn: getSubscriptions,
   });
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab] = useState(tab);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [, setOpenDropdown1] = useState(false);
@@ -111,7 +105,7 @@ const page = () => {
   }, [startDate, endDate]);
 
   const totalPages = Math.ceil(
-    (activeTab === "users"
+    (tab === "users"
       ? users?.filter((data) => data.role === "user")?.length || 0
       : subscriptions?.length || 0) / PAGE_SIZE
   );
@@ -119,7 +113,7 @@ const page = () => {
   const onlyUsers = users?.filter((data) => data.role === "user");
 
   const paginatedData =
-    activeTab === "users"
+    tab === "users"
       ? onlyUsers?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
       : subscriptions?.slice(
           (currentPage - 1) * PAGE_SIZE,
@@ -157,7 +151,7 @@ const page = () => {
       return usersDate >= start && usersDate <= end;
     }
 
-    if (activeTab === "subscriptions") {
+    if (tab === "subscriptions") {
       if (filterBy === "valid") return data.status === "active";
       if (filterBy === "expired") return data.status === "expired";
       if (filterBy === "frozen") return data.status === "frozen";
@@ -195,6 +189,43 @@ const page = () => {
     }
   });
 
+  // Filter, search, and sort subscriptions
+  const searchedSubscriptions = paginatedData?.filter(
+    (data) =>
+      data.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      data.subscriptionType?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredSubscriptions = searchedSubscriptions?.filter((data) => {
+    const today = getDateOnly(new Date());
+    const yesterday = getDateOnly(new Date(Date.now() - 86400000));
+    const subDate = getDateOnly(data.$createdAt);
+
+    if (filterBy === "") return true;
+    if (filterBy === "today") return subDate === today;
+    if (filterBy === "yesterday") return subDate === yesterday;
+    if (filterBy === "custom-date" && startDate && endDate) {
+      const start = getDateOnly(startDate);
+      const end = getDateOnly(endDate);
+      return subDate >= start && subDate <= end;
+    }
+    if (filterBy === "valid") return data.isValid === true && data.isFreeze === false;
+    if (filterBy === "expired") return data.isValid === false;
+    if (filterBy === "frozen") return data.isFreeze === true;
+    return true;
+  });
+
+  const sortedSubscriptions = filteredSubscriptions?.sort((a, b) => {
+    switch (sortBy) {
+      case "subscription-asc":
+        return (a.subscriptionType || "").localeCompare(b.subscriptionType || "");
+      case "subscription-desc":
+        return (b.subscriptionType || "").localeCompare(a.subscriptionType || "");
+      default:
+        return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
+    }
+  });
+
   const FilterButton = () => (
     <Popover>
       <PopoverTrigger asChild>
@@ -225,19 +256,19 @@ const page = () => {
               </span>
             </>
           )}
-          {activeTab === "subscriptions" && filterBy === "valid" && (
+          {tab === "subscriptions" && filterBy === "valid" && (
             <>Filter By: Valid Subscriptions</>
           )}
-          {activeTab === "subscriptions" && filterBy === "expired" && (
+          {tab === "subscriptions" && filterBy === "expired" && (
             <>Filter By: Expired Subscriptions</>
           )}
-          {activeTab === "subscriptions" && filterBy === "frozen" && (
+          {tab === "subscriptions" && filterBy === "frozen" && (
             <>Filter By: Frozen Subscriptions</>
           )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-fit h-fit flex flex-col gap-0">
-        {activeTab === "users" ? (
+        {tab === "users" ? (
           <>
             <Button variant={"ghost"} onClick={() => setFilterBy("yesterday")}>
               Joined Yesterday
@@ -321,13 +352,9 @@ const page = () => {
     <div className="space-y-6">
       <div className="flex w-full justify-between items-center">
         <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-        {activeTab === "users" ? <AddUser /> : <AddSubscription />}
+        {tab === "users" ? <AddUser /> : <AddSubscription />}
       </div>
-      <Tabs
-        value={tab}
-        className="w-full"
-        onValueChange={handleTabChange}
-      >
+      <Tabs value={tab} className="w-full" onValueChange={handleTabChange}>
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="subscriptions">Subscriptions</TabsTrigger>
@@ -400,7 +427,9 @@ const page = () => {
                       <TableRow key={user.$id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.country ? user.country : "N/A"}</TableCell>
+                        <TableCell>
+                          {user.country ? user.country : "N/A"}
+                        </TableCell>
                         <TableCell>
                           <span
                             className={`rounded-full text-center ${
@@ -409,7 +438,9 @@ const page = () => {
                                 : "text-red-500 bg-red-100"
                             }`}
                           >
-                            {user.isVerified === true ? "verified" : "not verified"}
+                            {user.isVerified === true
+                              ? "verified"
+                              : "not verified"}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -550,7 +581,7 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {subscriptions?.map((subscription: any) => (
+                    {sortedSubscriptions?.map((subscription: any) => (
                       <TableRow key={subscription.$id}>
                         <TableCell>{subscription.user.email}</TableCell>
                         <TableCell className="capitalize">
@@ -560,23 +591,27 @@ const page = () => {
                         <TableCell>
                           <span
                             className={`px-2 py-1 rounded-full text-xs ${
-                              subscription.isValid
+                              subscription.isValid === true &&
+                              subscription.isFreeze === false
                                 ? "bg-green-100 text-green-800"
                                 : subscription.isValid === false
                                 ? "bg-red-100 text-red-800"
                                 : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
-                            {subscription.isValid
+                            {subscription.isValid === true &&
+                            subscription.isFreeze === false
                               ? "Valid"
-                              : subscription.status}
+                              : subscription.isValid === false
+                              ? "Expired"
+                              : "Freezed"}
                           </span>
                         </TableCell>
                         <TableCell>
                           {format(new Date(subscription.$createdAt), "PPP")}
                         </TableCell>
                         <TableCell>
-                          <DropdownMenu>
+                          <DropdownMenu modal={false}>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
                                 <span className="sr-only">Open menu</span>
@@ -585,17 +620,23 @@ const page = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>
-                                Edit Subscription
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
+                              <EditSubscription subscription={subscription} />
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-amber-500">
-                                Freeze Subscription
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500">
-                                Cancel Subscription
-                              </DropdownMenuItem>
+                              {subscription.isFreeze === true ? (
+                                <UnfreezeSubscription
+                                  subscriptionId={subscription.$id}
+                                  text="Subscription"
+                                />
+                              ) : (
+                                <FreezeSubscription
+                                  subscriptionId={subscription.$id}
+                                  text="Subscription"
+                                />
+                              )}
+                              <CancelSubscription
+                                subscriptionId={subscription.$id}
+                                text="Subscription"
+                              />
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

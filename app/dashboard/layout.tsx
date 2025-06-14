@@ -5,12 +5,12 @@ import { getCurrentUser } from "@/lib/appwrite/api";
 import { Metadata } from "next";
 import React from "react";
 
+const currentUser = await getCurrentUser();
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const currentUser = await getCurrentUser();
-
     return {
-      title: `${currentUser?.name || "User"} Dashboard`,
+      title: currentUser ? currentUser.name + " Dashboard" : "User Dashboard",
       description: "Dashboard for managing user's account",
     };
   } catch (error) {

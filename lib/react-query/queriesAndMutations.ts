@@ -6,6 +6,7 @@ import {
   googleAuth,
   signInAccount,
   signOutAccount,
+  signOutAllAccount,
 } from "../appwrite/api";
 import {
   addBlog,
@@ -217,6 +218,12 @@ export const useSignInAccount = () => {
 export const useSignOutAccount = () => {
   return useMutation({
     mutationFn: signOutAccount,
+  });
+};
+
+export const useSignOutAllAccount = () => {
+  return useMutation({
+    mutationFn: signOutAllAccount,
   });
 };
 

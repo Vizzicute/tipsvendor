@@ -20,7 +20,7 @@ export default function AuthWrapper({
       const user = await getCurrentUser();
 
       if(!user && pathname === "/dashboard") {
-        router.replace("login");
+        router.replace("/login");
         return;
       }
 

@@ -57,20 +57,40 @@ const Page = () => {
             </Button>
           ))}
         </div>
+        <script id="skin">
+          var tr_leagueHeader_bg="#3b2b1b";
+          var tr_leagueHeader_color="#d1b47a";
+          var tr_leagueHeader_fontSize="1.2em";
+          var tr_leagueHeader_fontWeight="bold";
+          var tr_leagueHeader_padding="5px 10px";
+          var tr_leagueHeader_borderBottom="1px solid #d1b47a";
+          var tr_leagueHeader_borderTop="1px solid #d1b47a";
+          var tr_leagueHeader_borderLeft="1px solid #d1b47a";
+          var tr_leagueHeader_borderRight="1px solid #d1b47a";
+        </script>
         <script
-          data-api="livescore"
+          // @ts-expect-error: livescore.bz expects non-standard attributes
+          api="livescore"
           src="https://www.livescore.bz/api.livescore.0.1.js"
           type="text/javascript"
         ></script>
-        <Link
+
+        <a
           id="livescore"
-          data-1={day === today ? "today" : day === yesterday ? "yesterday" : "tomorrow"}
+          data-1={
+            day === today
+              ? "today"
+              : day === yesterday
+              ? "yesterday"
+              : "tomorrow"
+          }
           href="https://www.livescore.bz"
           lang="en"
-          data-sport="football(soccer)"
+          // @ts-expect-error: livescore.bz expects non-standard attributes
+          sport="football(soccer)"
         >
           <h4>Loading...</h4>
-        </Link>
+        </a>
       </section>
     </main>
   );

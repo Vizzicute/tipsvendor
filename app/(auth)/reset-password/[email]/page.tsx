@@ -85,7 +85,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-screen w-full p-2 space-y-4">
       <Link href={"/"}>
         <Logo width={100} />
       </Link>

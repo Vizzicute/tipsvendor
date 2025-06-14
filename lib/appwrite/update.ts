@@ -61,9 +61,11 @@ export type editSeoPageType ={
 }
 
 export type editSubscriptionType = {
-  subscriptionType: string;
-  duration: string;
-  user: string;
+  subscriptionType?: string;
+  duration?: string;
+  user?: string;
+  updatedAt?: Date;
+  isValid?: boolean;
 }
 
 export async function editPrediction(
@@ -206,10 +208,32 @@ export async function editSubscription(subscription: editSubscriptionType, subsc
       appwriteConfig.databaseId,
       appwriteConfig.subscriptionId,
       subscriptionId,
-      {
-        subscription,
-        updatedAt: new Date(),
-      }
+      subscription
+    );
+
+    return newSubscription;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function freezeSubscription(subscriptionId: string, freeze: boolean) {
+  try {
+    const updateData: Record<string, any> = {
+      isFreeze: freeze,
+    };
+
+    if (freeze) {
+      updateData.freezeStart = new Date();
+    } else {
+      updateData.freezeEnd = new Date();
+    }
+
+    const newSubscription = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.subscriptionId,
+      subscriptionId,
+      updateData
     );
 
     return newSubscription;

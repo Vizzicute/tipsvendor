@@ -120,6 +120,16 @@ export async function signOutAccount() {
   }
 }
 
+export async function signOutAllAccount() {
+  try {
+    const session = await account.deleteSessions();
+
+    return session;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function googleAuth() {
   try {
     const googleSession = await account.createOAuth2Session(

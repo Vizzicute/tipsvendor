@@ -35,7 +35,7 @@ const BlogHero = ({ blog, className, loading }: BlogHeroProps) => {
   const handleCategoryClick = (e: React.MouseEvent, slug: string) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/blog/${slug}`);
+    router.push(`/blog/category/${slug}`);
   };
 
   return (

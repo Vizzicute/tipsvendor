@@ -10,11 +10,12 @@ import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { getBlog, getPredictions } from "@/lib/appwrite/fetch";
 import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
+import { checkAndUpdateSubscription } from "@/lib/utils/SubscriptionLogic";
 import { useQuery } from "@tanstack/react-query";
 import { Models } from "appwrite";
 import { formatDate } from "date-fns";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const formattedTime = (date: string | Date): string => {
   const d = new Date(date);
@@ -29,7 +30,7 @@ const getDateOnly = (input: string | Date) => {
 const Page = () => {
   const { mutateAsync: signOutAccount, isPending: isSigningOut } =
     useSignOutAccount();
-  const { setUser, isAuthenticated, setIsAuthenticated } = useUserContext();
+  const { user, setUser, isAuthenticated, setIsAuthenticated } = useUserContext();
 
   // Only fetch user if authenticated to avoid Appwrite 401 error
   const { data: currentUser } = useQuery({
@@ -75,6 +76,18 @@ const Page = () => {
   const interestingBlogs = blogs
     ?.sort((a, b) => a.comments.length - b.comments.length)
     .slice(0, 6);
+
+  useEffect(() => {
+    if (currentUser?.subscription) {
+      // If subscription is an array, check all; else, check the single subscription
+      const subs = Array.isArray(currentUser.subscription)
+        ? currentUser.subscription
+        : [currentUser.subscription];
+      subs.forEach((sub) => {
+        checkAndUpdateSubscription(sub);
+      });
+    }
+  }, [currentUser]);
 
   return (
     <main>
@@ -130,12 +143,22 @@ const Page = () => {
                 <span>Subscription Status:</span>
                 <span
                   className={`text-white rounded-full font-normal text-sm px-2 py-1 ${
-                    currentUser?.subscription?.isValid
-                      ? "bg-green-500"
-                      : "bg-red-500"
+                    currentUser?.subscription?.isFreeze
+                      ? "bg-blue-500"
+                      : !currentUser?.subscription?.isValid
+                      ? "bg-red-500"
+                      : isExpiring(currentUser?.subscription)
+                      ? "bg-yellow-500"
+                      : "bg-green-500"
                   }`}
                 >
-                  {currentUser?.subscription?.isValid ? "Active" : "Inactive"}
+                  {currentUser?.subscription?.isFreeze
+                    ? "Freezed"
+                    : !currentUser?.subscription?.isValid
+                    ? "Expired"
+                    : isExpiring(currentUser?.subscription)
+                    ? "Expiring"
+                    : "Active"}
                 </span>
               </div>
             </div>
@@ -290,5 +313,31 @@ const Page = () => {
     </main>
   );
 };
+
+function isExpiring(subscription: Models.Document) {
+  if (!subscription?.isValid) return false;
+  const duration = Number(subscription.duration) || 0;
+  const freezeStart = subscription.freezeStart;
+  const freezeEnd = subscription.freezeEnd;
+  const createdAt = subscription.$createdAt;
+  const updatedAt = subscription.updatedAt;
+  const now = new Date();
+
+  const startDate = new Date(updatedAt || createdAt);
+  const freezeDuration =
+    freezeStart && freezeEnd
+      ? new Date(freezeEnd).getTime() - new Date(freezeStart).getTime()
+      : 0;
+
+  const expiryDate = new Date(
+    startDate.getTime() +
+      duration * 24 * 60 * 60 * 1000 +
+      freezeDuration
+  );
+
+  // Consider expiring if less than or equal to 3 days left
+  const daysLeft = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+  return daysLeft <= 3 && daysLeft > 0;
+}
 
 export default Page;

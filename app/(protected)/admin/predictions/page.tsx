@@ -65,7 +65,7 @@ const page = () => {
   const {
     data: predictions
   } = useQuery({
-    queryKey: ["documents"],
+    queryKey: ["predictions"],
     queryFn: getPredictions,
   });
 

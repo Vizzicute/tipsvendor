@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +23,11 @@ import { editUser } from "@/lib/appwrite/update";
 import { editAvatar } from "@/lib/appwrite/media";
 import LoadingButton from "@/components/LoadingButton";
 import { Camera, Phone, MapPin } from "lucide-react";
+import { forgotPasswordEmail } from "@/components/ForgotPasswordDialog";
+import { sendMail } from "@/lib/utils/mail";
+import { useSignOutAllAccount } from "@/lib/react-query/queriesAndMutations";
+import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -28,11 +40,24 @@ const profileSchema = z.object({
 export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
   const { data: user, isLoading: isLoadingUser } = useQuery({
     queryKey: ["currentUser"],
     queryFn: getCurrentUser,
   });
+
+  const { mutateAsync: signoutAllAccount, isPending: isSigningOut } =
+    useSignOutAllAccount();
+  const { setUser, isAuthenticated, setIsAuthenticated } =
+    useUserContext();
+
+  const handleSignout = async () => {
+    signoutAllAccount();
+    setIsAuthenticated(false);
+    setUser(INITIAL_USER);
+    redirect("/admin-auth");
+  };
 
   const queryClient = useQueryClient();
 
@@ -90,23 +115,26 @@ export default function ProfilePage() {
       if (avatarFile) {
         const result = await editAvatar({
           newAvatar: avatarFile,
-          oldAvatarId: user?.imageId
+          oldAvatarId: user?.imageId,
         });
         avatarUrl = result.avatarUrl;
         avatarId = result.avatarId;
       }
 
       // Update user profile using editUser function
-      const updatedUser = await editUser({
-        name: data.name,
-        email: data.email,
-        phone: data.phone || "",
-        country: data.country || "",
-        address: data.address || "",
-        role: user?.role || "user",
-        imageId: avatarId || user?.imageId,
-        imageUrl: avatarUrl || user?.imageUrl
-      }, user?.$id || "");
+      const updatedUser = await editUser(
+        {
+          name: data.name,
+          email: data.email,
+          phone: data.phone || "",
+          country: data.country || "",
+          address: data.address || "",
+          role: user?.role || "user",
+          imageId: avatarId || user?.imageId,
+          imageUrl: avatarUrl || user?.imageUrl,
+        },
+        user?.$id || ""
+      );
 
       if (!updatedUser) {
         throw new Error("Failed to update profile");
@@ -126,6 +154,27 @@ export default function ProfilePage() {
     return <div>Loading...</div>;
   }
 
+  async function changePassword() {
+    try {
+      setIsPasswordLoading(true);
+      const emailContent = forgotPasswordEmail(
+        user?.email,
+        `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${user?.email}`
+      ) as string;
+      await sendMail({
+        to: user?.email,
+        subject: "Password Reset Request",
+        html: emailContent,
+      });
+      toast.success("password reset mail sent");
+    } catch (error) {
+      console.error(error);
+      toast.error("failed. please try again");
+    } finally {
+      setIsPasswordLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -140,9 +189,13 @@ export default function ProfilePage() {
           <CardContent>
             <div className="flex flex-col items-center space-y-4 mb-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage 
-                  src={avatarFile ? URL.createObjectURL(avatarFile) : user?.avatar || user?.imageUrl} 
-                  alt={user?.name} 
+                <AvatarImage
+                  src={
+                    avatarFile
+                      ? URL.createObjectURL(avatarFile)
+                      : user?.avatar || user?.imageUrl
+                  }
+                  alt={user?.name}
                 />
                 <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -180,7 +233,10 @@ export default function ProfilePage() {
             </div>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -279,9 +335,15 @@ export default function ProfilePage() {
               <p className="text-sm text-muted-foreground">
                 Update your password to keep your account secure.
               </p>
-              <Button variant="outline" className="w-full">
+              <LoadingButton
+                loading={isPasswordLoading}
+                disabled={isPasswordLoading}
+                onClick={changePassword}
+                variant="outline"
+                className="w-full"
+              >
                 Change Password
-              </Button>
+              </LoadingButton>
             </div>
 
             <div className="space-y-2">
@@ -289,9 +351,14 @@ export default function ProfilePage() {
               <p className="text-sm text-muted-foreground">
                 Add an extra layer of security to your account.
               </p>
-              <Button variant="outline" className="w-full">
-                Enable 2FA
-              </Button>
+              <LoadingButton
+                onClick={handleSignout}
+                loading={isSigningOut}
+                variant="outline"
+                className="w-full capitalize"
+              >
+                Logout from all devices
+              </LoadingButton>
             </div>
 
             <div className="space-y-2">
@@ -308,4 +375,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-} 
+}

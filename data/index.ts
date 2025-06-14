@@ -92,96 +92,10 @@ export const SubnavLinks = [
   },
 ];
 
-export const tableStat = [
-  {
-    id: "1",
-    time: "14:00",
-    date: "2025-03-29",
-    league: "WCQ",
-    hometeam: "Nigeria",
-    awayteam: "Zimbabwe",
-    tip: "1",
-    homescore: "1",
-    awayscore: "1",
-    status: "loss",
-  },
-  {
-    id: "2",
-    time: "16:00",
-    date: "2025-03-29",
-    league: "WCQ",
-    hometeam: "Germany",
-    awayteam: "Italy",
-    tip: "1",
-    homescore: "3",
-    awayscore: "1",
-    status: "win",
-  },
-  {
-    id: "3",
-    time: "17:00",
-    date: "2025-03-29",
-    league: "WCQ",
-    hometeam: "Benin",
-    awayteam: "Togo",
-    tip: "X",
-    homescore: "1",
-    awayscore: "1",
-    status: "win",
-  },
-  {
-    id: "4",
-    time: "21:00",
-    date: "2025-03-29",
-    league: "WCQ",
-    hometeam: "England",
-    awayteam: "Albania",
-    tip: "1",
-    homescore: "-",
-    awayscore: "-",
-    status: "N/A",
-  },
-  {
-    id: "5",
-    time: "19:00",
-    date: "2025-03-29",
-    league: "WCQ",
-    hometeam: "Egypt",
-    awayteam: "Senegal",
-    tip: "1",
-    homescore: "2",
-    awayscore: "1",
-    status: "win",
-  },
-];
-
 export const advert = [
   "https://bit.ly/3OMEgqF",
   "https://bluepreditz.com/images/1xbet-logo.png",
 ];
-
-export const blogData = [
-  {
-    title: "Sancho reveals his childhood idols and explains the key reason to join Chelsea",
-    imgUrl: "https://blog.tipsvendor.com/wp-content/uploads/2024/09/CgAGVmbXArWAfPszAAEjxKtGaCw045.jpg.webp",
-    dateTime: "2024-09-03 14:36",
-  },
-  {
-    title: "Who will win Golden Boot for each league in the coming season？",
-    imgUrl: "https://blog.tipsvendor.com/wp-content/uploads/2024/08/CgAGVWa-Cs2ABAINAADRsZg7fO4235.jpg-696x464.webp",
-    dateTime: "2024-09-03 16:44",
-  },
-  {
-    title: "Chelsea make 6m Euros profit on a youngstar who never played for the club",
-    imgUrl: "https://blog.tipsvendor.com/wp-content/uploads/2024/09/CgAGVmbW8_CAePsxAAC4lFAQcaA148.jpg-696x464.webp",
-    dateTime: "2024-09-04 18:04",
-  },
-  {
-    title: "Youssouf Fofana to AC Milan from AS Monaco",
-    imgUrl: "https://blog.tipsvendor.com/wp-content/uploads/2024/08/CgAGVma-DfCAEAzMAAMwcqUsoZg119.jpg-696x870.webp",
-    dateTime: "2024-09-05 11:23",
-  },
-]
 
 export const topleagues = [
   { name: "Premier League", value: "epl" },

@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: seopage?.description || "Get the best football tips and predictions",
       keywords: seopage?.keywords || ["football tips", "predictions", "sports betting"],
       openGraph: {
-        title: seopage?.title || "Tipsvendor - Top Football Tips and Prediction Website",
+        title: "Tipsvendor - Top Football Tips and Prediction Website",
         description: seopage?.description || "Get the best football tips and predictions",
         images: "/logo.jpg",
       },

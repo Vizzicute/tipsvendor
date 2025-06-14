@@ -4,6 +4,7 @@ import { Models } from "appwrite";
 import { truncate } from "@/lib/utils";
 import { format } from "date-fns";
 import BlogCard from "./BlogCard";
+import Link from "next/link";
 
 interface BlogsByCategoryProps {
   blogCategories: Models.Document[];
@@ -51,11 +52,11 @@ const BlogsByCategory = ({
 
   return (
     <div className={cn("w-full flex flex-col gap-4", className)}>
-      <BlogHeadingTextWrapper
+      <Link className="hover:underline" href={process.env.NEXT_PUBLIC_APP_URL + "/blog/category/" + blogCategoryName}><BlogHeadingTextWrapper
         text={blogCategory?.name}
         bgColor="bg-primary"
         textColor="text-secondary"
-      />
+      /></Link>
       <div className="w-full flex flex-row gap-4">
         <div className="w-1/2 flex flex-col gap-4">
           <img

@@ -102,7 +102,7 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
     if (!newPrediction) {
       return toast("Failed. Please try again.");
     } else {
-      queryClient.invalidateQueries({ queryKey: ["documents"] });
+      queryClient.invalidateQueries({ queryKey: ["predictions"] });
       toast.success("Prediction Updated");
     }
   }
