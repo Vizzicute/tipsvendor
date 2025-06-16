@@ -48,6 +48,22 @@ export async function deleteBlog(
   }
 }
 
+export async function deleteBlogCategory(
+  blogCategoryId: string
+) {
+  try {
+    const newBlog = await databases.deleteDocument(
+      `${appwriteConfig.databaseId}`,
+      `${appwriteConfig.blogCategoriesCollectionId}`,
+      `${blogCategoryId}`
+    );
+
+    return newBlog;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function deleteSubscription(
   subscriptionId: string
 ) {

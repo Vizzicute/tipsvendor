@@ -2,13 +2,16 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Doughnut } from "react-chartjs-2";
+import { Doughnut, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
   CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
 } from "chart.js";
 import { useQuery } from "@tanstack/react-query";
 import { getUsers, getSubscriptions, getBlog } from "@/lib/appwrite/fetch";
@@ -17,7 +20,15 @@ import Link from "next/link";
 import { useUserContext } from "@/context/AuthContext";
 
 // Register ChartJS components
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement
+);
 
 const AdminDashboard = () => {
   const { user } = useUserContext();
@@ -40,9 +51,7 @@ const AdminDashboard = () => {
     queryFn: getSubscriptions,
   });
 
-  const {
-    data: blogs
-  } = useQuery({
+  const { data: blogs } = useQuery({
     queryKey: ["blogs"],
     queryFn: getBlog,
   });
@@ -58,14 +67,14 @@ const AdminDashboard = () => {
       {
         data: [totalUsers, totalStaff, totalSubscriptions],
         backgroundColor: [
-          "rgba(54, 162, 235, 0.8)",
-          "rgba(255, 99, 132, 0.8)",
-          "rgba(75, 192, 192, 0.8)",
+          "rgba(231, 219, 199, 0.85)",
+          "rgba(210, 180, 122, 0.85)",
+          "rgba(166, 124, 82, 0.85)",
         ],
         borderColor: [
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 99, 132, 1)",
-          "rgba(75, 192, 192, 1)",
+          "rgba(231, 219, 199, 1)",
+          "rgba(210, 180, 122, 1)",
+          "rgba(166, 124, 82, 1)",
         ],
         borderWidth: 1,
       },
@@ -99,37 +108,147 @@ const AdminDashboard = () => {
       value: subscriptions?.length || 0,
       icon: CreditCard,
       href: "/admin/users?tab=subscriptions",
-      color: "text-blue-500",
-      bgColor: "bg-blue-100",
+      color: "text-slate-500",
+      bgColor: "bg-slate-100",
     },
     {
       title: "Total Users",
-      value: users?.filter(user => user.role === "user").length || 0,
+      value: users?.filter((user) => user.role === "user").length || 0,
       icon: Users,
       href: "/admin/users",
-      color: "text-green-500",
-      bgColor: "bg-green-100",
+      color: "text-cyan-500",
+      bgColor: "bg-cyan-100",
     },
     {
       title: "Total Blog Posts",
       value: blogs?.length || 0,
       icon: Newspaper,
       href: "/admin/blog",
-      color: "text-purple-500",
-      bgColor: "bg-purple-100",
+      color: "text-amber-500",
+      bgColor: "bg-amber-100",
     },
     {
       title: "Total Staff",
-      value: users?.filter(user => user.role !== "user").length || 0,
+      value: users?.filter((user) => user.role !== "user").length || 0,
       icon: Activity,
       href: "/admin/staffs",
-      color: "text-orange-500",
-      bgColor: "bg-orange-100",
+      color: "text-stone-500",
+      bgColor: "bg-stone-100",
     },
   ];
 
   const recentSubscriptions = subscriptions?.slice(0, 5);
-  const recentUsers = users?.sort((a, b) => new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()).slice(0, 5);
+  const recentUsers = users
+    ?.sort(
+      (a, b) =>
+        new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()
+    )
+    .slice(0, 5);
+
+  // Helper to get month labels from last year to now
+  function getMonthLabels() {
+    const labels = [];
+    const now = new Date();
+    const start = new Date(now.getFullYear() - 1, now.getMonth() + 1, 1); // next month last year
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      labels.push(
+        date.toLocaleString("default", { month: "short", year: "2-digit" })
+      );
+    }
+    return labels;
+  }
+
+  const monthLabels = getMonthLabels();
+
+  // Helper to count users/subscriptions per month
+  interface HasCreatedAt {
+    $createdAt: string;
+    [key: string]: any;
+  }
+
+  function countPerMonth<T extends HasCreatedAt>(
+    items: T[],
+    dateField: keyof T = "$createdAt"
+  ): number[] {
+    const counts: number[] = Array(12).fill(0);
+    const now = new Date();
+    const start = new Date(now.getFullYear() - 1, now.getMonth() + 1, 1);
+    items?.forEach((item) => {
+      const date = new Date(item[dateField] as string);
+      // Only count if in range
+      if (date >= start && date <= now) {
+        const monthDiff =
+          (date.getFullYear() - start.getFullYear()) * 12 +
+          (date.getMonth() - start.getMonth());
+        if (monthDiff >= 0 && monthDiff < 12) {
+          counts[monthDiff]++;
+        }
+      }
+    });
+    return counts;
+  }
+
+  const normalUsers = users?.filter((user) => user.role === "user");
+
+  const usersPerMonth = countPerMonth(normalUsers || []);
+  const subscriptionsPerMonth = countPerMonth(subscriptions || []);
+
+  // Multi-axis line chart data
+  const lineChartData = {
+    labels: monthLabels,
+    datasets: [
+      {
+        label: "Users Registered",
+        data: usersPerMonth,
+        yAxisID: "y-users",
+        borderColor: "#64748b",
+        backgroundColor: "rgba(100, 116, 139, 0.15)",
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: "#64748b",
+      },
+      {
+        label: "Subscriptions",
+        data: subscriptionsPerMonth,
+        yAxisID: "y-subs",
+        borderColor: "#78716c",
+        backgroundColor: "rgba(120, 113, 108, 0.15)",
+        tension: 0.4,
+        pointRadius: 4,
+        pointBackgroundColor: "#78716c",
+      },
+    ],
+  };
+
+  const lineChartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: "top" as const },
+      title: {
+        display: true,
+        text: "Monthly Users & Subscriptions (Past 12 Months)",
+      },
+    },
+    scales: {
+      "y-users": {
+        type: "linear" as const,
+        display: true,
+        position: "left" as const,
+        title: { display: true, text: "Users" },
+        beginAtZero: true,
+        grid: { drawOnChartArea: false },
+      },
+      "y-subs": {
+        type: "linear" as const,
+        display: true,
+        position: "right" as const,
+        title: { display: true, text: "Subscriptions" },
+        beginAtZero: true,
+        grid: { drawOnChartArea: false },
+      },
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -158,18 +277,27 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <Card className="w-1/2">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Statistics Overview</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px] flex items-center justify-center">
-            <Doughnut data={chartData} options={chartOptions} />
+        <CardContent className="flex flex-row items-center justify-between space-x-4">
+          <div className="h-[250px] w-fit flex items-center justify-center">
+            <Doughnut
+              data={chartData}
+              options={chartOptions}
+              className="w-full"
+            />
+          </div>
+          <div className="h-[350px] flex flex-1 items-center justify-center p-1">
+            <Line
+              data={lineChartData}
+              options={lineChartOptions}
+              className="w-full"
+            />
           </div>
         </CardContent>
       </Card>
-
-      
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
@@ -184,10 +312,16 @@ const AdminDashboard = () => {
                   className="flex items-center justify-between border-b pb-2"
                 >
                   <div>
-                    <p className="font-medium capitalize">{subscription.subscriptionType}</p>
-                    <p className="text-sm text-muted-foreground">{subscription.duration} Days Subscriptions</p>
+                    <p className="font-medium capitalize">
+                      {subscription.subscriptionType}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {subscription.duration} Days Subscriptions
+                    </p>
                   </div>
-                  <div className="text-sm font-medium capitalize">{subscription.status}</div>
+                  <div className="text-sm font-medium capitalize">
+                    {subscription.status}
+                  </div>
                 </div>
               ))}
             </div>
@@ -207,9 +341,13 @@ const AdminDashboard = () => {
                 >
                   <div>
                     <p className="font-medium">{user.name}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
-                  <div className="text-sm font-medium capitalize">{user.role}</div>
+                  <div className="text-sm font-medium capitalize">
+                    {user.role}
+                  </div>
                 </div>
               ))}
             </div>

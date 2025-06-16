@@ -68,6 +68,11 @@ export type editSubscriptionType = {
   isValid?: boolean;
 }
 
+export type editBlogCategoryType = {
+  name: string;
+  slug: string;
+}
+
 export async function editPrediction(
   prediction: editPredictionType,
   gameId: string
@@ -153,6 +158,29 @@ export async function editBlog(blog: editBlogType, blogId: string, fileId: strin
       appwriteConfig.blogCollectionId,
       blogId,
       updateData
+    );
+
+    if (!newBlog) {
+      throw new Error("Failed to update blog");
+    }
+
+    return newBlog;
+  } catch (error) {
+    console.error("Error updating blog:", error);
+    throw error;
+  }
+}
+
+export async function editBlogCategory(blog: editBlogCategoryType, blogCategoryId: string) {
+  try {
+    const newBlog = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.blogCollectionId,
+      blogCategoryId,
+      {
+        ...blog,
+        updatedAt: new Date(),
+      }
     );
 
     if (!newBlog) {

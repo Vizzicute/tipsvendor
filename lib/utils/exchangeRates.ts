@@ -60,9 +60,9 @@ export function calculateSubscriptionPrice(
     case "investment": planRatio = 1; break;
     case "vip": planRatio = 1.6; break;
     case "mega": planRatio = 2; break;
-    case "investment+vip": planRatio = 2.6; break;
-    case "investment+mega": planRatio = 3; break;
-    case "vip+mega": planRatio = 3.6; break;
+    case "investment&vip": planRatio = 2.6; break;
+    case "investment&mega": planRatio = 3; break;
+    case "vip&mega": planRatio = 3.6; break;
     case "all": planRatio = 4.6; break;
     default: planRatio = 1;
   }

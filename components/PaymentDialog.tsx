@@ -69,7 +69,7 @@ const PaymentDialog = ({
       <div className="w-full flex justify-between items-center mb-2">
         <span className="font-semibold text-base">Subscription for:</span>
         <span className="font-mono text-lg">
-          {plan} ({duration} days)
+          {plan === "all" ? "All Plans" : plan} ({duration} days)
         </span>
       </div>
       <div className="w-full flex justify-between items-center mb-2">

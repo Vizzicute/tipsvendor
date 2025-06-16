@@ -8,6 +8,52 @@ import { format, subDays, startOfDay, startOfWeek, endOfWeek, startOfMonth, endO
 import { truncate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { countryDiscounts } from "@/lib/config/countryDiscount";
+import { africanCountries, americanCountries, asianCountries, europeanCountries } from "@/data";
+import { getExchangeRate, calculateSubscriptionPrice as calcPriceUtil } from "@/lib/utils/exchangeRates";
+
+
+function getCurrency(country: string) {
+  switch (country?.toLowerCase()) {
+    case "nga": return "NGN";
+    case "gha": return "GHS";
+    case "ken": return "KES";
+    case "cmr": return "XAF";
+    case "zaf": return "ZAR";
+    case "uga": return "UGX";
+    default: return "USD";
+  }
+}
+
+// Use the exchangeRates util for price calculation
+function getDiscountedPriceUSD(sub: any) {
+  const allCountries = [
+    ...africanCountries,
+    ...asianCountries,
+    ...europeanCountries,
+    ...americanCountries,
+  ];
+  const subscriberCountry = allCountries.find(
+    (country) => country.name.toLowerCase() === sub.user?.country?.toLowerCase()
+  );
+  const currency = getCurrency(subscriberCountry?.value || "USD");
+  let price = calcPriceUtil(30, sub.subscriptionType, sub.duration, "USD");
+  const discount = subscriberCountry?.value ? countryDiscounts[subscriberCountry.value] || 0 : 0;
+  if (discount > 0) {
+    price = price - price * discount;
+  }
+  // Convert to USD using exchange rate
+  const rate = getExchangeRate(currency) || 1;
+  const priceInUSD = currency === "USD" ? price : price / rate;
+  return priceInUSD;
+}
+
+// Calculate earnings in USD using exchange rate logic and discount
+const calculateEarningsUSD = (subscriptions: any[]) => {
+  return subscriptions.reduce((total, sub) => {
+    return total + getDiscountedPriceUSD(sub);
+  }, 0);
+};
 
 export default function AnalyticsPage() {
   const [predictionTimeFilter, setPredictionTimeFilter] = useState("all");
@@ -40,52 +86,8 @@ export default function AnalyticsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  // Calculate earnings based on subscription ratios
-  const calculateEarnings = (subscriptions: any[]) => {
-    const basePrice = 30;
-    return subscriptions.reduce((total, sub) => {
-      // Plan ratio
-      let planRatio = 1;
-      switch (sub.subscriptionType) {
-        case "investment": planRatio = 1; break;
-        case "vip": planRatio = 1.6; break;
-        case "mega": planRatio = 2; break;
-        case "investment+vip": planRatio = 2.6; break;
-        case "investment+mega": planRatio = 3; break;
-        case "vip+mega": planRatio = 3.6; break;
-        case "all": planRatio = 4.6; break;
-        default: planRatio = 1;
-      }
-
-      // Duration ratio
-      let durationRatio = 1;
-      switch (sub.duration) {
-        case "10": durationRatio = 1; break;
-        case "20": durationRatio = 1.8; break;
-        case "30": durationRatio = 2.55; break;
-        default: durationRatio = 1;
-      }
-
-      // Country ratio (default to 1 for USD)
-      let countryRatio = 1;
-      if (sub.country) {
-        switch (sub.country.toLowerCase()) {
-          case "nga": countryRatio = 333.34; break;
-          case "gha": countryRatio = 12.17; break;
-          case "ken": countryRatio = 33.33; break;
-          case "cmr": countryRatio = 116.67; break;
-          case "zaf": countryRatio = 5; break;
-          case "uga": countryRatio = 800; break;
-          default: countryRatio = 1;
-        }
-      }
-
-      return total + (basePrice * planRatio * durationRatio * countryRatio);
-    }, 0);
-  };
-
-  const totalEarnings = calculateEarnings(activeSubscriptions);
-  const thisMonthEarnings = calculateEarnings(
+  const totalEarnings = calculateEarningsUSD(activeSubscriptions);
+  const thisMonthEarnings = calculateEarningsUSD(
     activeSubscriptions.filter(sub => {
       const subDate = new Date(sub.$createdAt);
       const now = new Date();
@@ -385,4 +387,4 @@ export default function AnalyticsPage() {
       </div>
     </div>
   );
-} 
+}

@@ -25,6 +25,8 @@ import {
   addResult,
   addResultType,
   editBlog,
+  editBlogCategory,
+  editBlogCategoryType,
   editBlogType,
   editPrediction,
   editPredictionType,
@@ -38,7 +40,7 @@ import {
   editUserType,
   updateBlogStatus,
 } from "../appwrite/update";
-import { deleteBlog, deleteComment, deletePrediction, deleteSubscription, deleteUser } from "../appwrite/delete";
+import { deleteBlog, deleteBlogCategory, deleteComment, deletePrediction, deleteSubscription, deleteUser } from "../appwrite/delete";
 
 export const useCreateUserAccount = () => {
   return useMutation({
@@ -134,6 +136,18 @@ export const useEditBlog = () => {
   });
 };
 
+export const useEditBlogCategory = () => {
+  return useMutation({
+    mutationFn: ({
+      category,
+      blogCategoryId
+    }: {
+      category: editBlogCategoryType;
+      blogCategoryId: string;
+    }) => editBlogCategory(category, blogCategoryId),
+  });
+};
+
 export const useEditPage = () => {
   return useMutation({
     mutationFn: ({
@@ -193,6 +207,12 @@ export const useDeleteSubscription = () => {
 export const useDeleteBlog = () => {
   return useMutation({
     mutationFn: (blogId: string) => deleteBlog(blogId),
+  });
+};
+
+export const useDeleteBlogCategory = () => {
+  return useMutation({
+    mutationFn: (blogCategoryId: string) => deleteBlogCategory(blogCategoryId),
   });
 };
 

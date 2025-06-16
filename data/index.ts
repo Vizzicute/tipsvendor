@@ -316,3 +316,48 @@ export const roles = [
   "blog_staff",
   "user",
 ];
+
+export const planBenefits: Record<string, string[]> = {
+  investment: [
+    "Access to 1.5 odds to 2 odds daily",
+    "Access to weekend odds",
+    "Over 90% Accuracy",
+    "Guaranteed Profits",
+  ],
+  vip: [
+    "Access to 2 odds to 3 odds daily",
+    "Access to weekend odds",
+    "Over 80% Accuracy",
+    "Guaranteed Profits",
+  ],
+  mega: [
+    "Access to 3 odds to 5 odds daily",
+    "Access to weekend odds",
+    "Over 70% Accuracy",
+    "Guaranteed Profits",
+  ],
+  "investment&vip": [
+    "Access to (1.5 - 2 odds) and (2 -3 odds) daily",
+    "Access to weekend odds",
+    "Over 85% Accuracy",
+    "Guaranteed Profits",
+  ],
+  "investment&mega": [
+    "Access to (1.5 - 2 odds) and (3 - 5 odds) daily",
+    "Access to weekend odds",
+    "Over 80% Accuracy",
+    "Guaranteed Profits",
+  ],
+  "vip&mega": [
+    "Access to (2 - 3 odds) and (3 - 5 odds) daily",
+    "Access to weekend odds",
+    "Over 75% Accuracy",
+    "Guaranteed Profits",
+  ],
+  all: [
+    "Access to  (1.5 - 2 odds), (2 - 3 odds), and (3 - 5 odds) daily",
+    "Access to weekend odds",
+    "Over 80% Accuracy",
+    "Guaranteed Profits",
+  ],
+};

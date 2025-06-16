@@ -7,8 +7,9 @@ import { CreditCard, Banknote, Bitcoin, Phone, Building2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { fetchExchangeRates } from "@/lib/utils/exchangeRates";
-import { paymentDetails } from "@/lib/config/paymentDetails";
 import Link from "next/link";
+import { getWalletSettings } from "@/lib/appwrite/appConfig";
+import { useQuery } from "@tanstack/react-query";
 
 interface ExchangeRate {
   currency: string;
@@ -17,6 +18,11 @@ interface ExchangeRate {
 }
 
 export default function WalletPage() {
+  const { data: settings, isLoading } = useQuery({
+    queryKey: ["wallet-settings"],
+    queryFn: getWalletSettings,
+  });
+
   const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>([]);
 
   useEffect(() => {
@@ -86,17 +92,17 @@ export default function WalletPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Test Card Details</Label>
+                    <Label>Api Keys</Label>
                     <div className="grid gap-2">
                       <div className="p-2 border rounded">
                         <p className="text-sm font-medium">
-                          Card Number: {paymentDetails.paystack.testCard.number}
+                          Public Key: {settings.paystack?.publicKey}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Expiry: {paymentDetails.paystack.testCard.expiry}
+                          Secret Key: {settings.paystack?.secretKey}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          CVV: {paymentDetails.paystack.testCard.cvv}
+                          Web Hook Secret: {settings.paystack?.webhookSecret}
                         </p>
                       </div>
                     </div>
@@ -123,15 +129,13 @@ export default function WalletPage() {
                     <div className="grid gap-2">
                       <div className="p-2 border rounded">
                         <p className="text-sm font-medium">
-                          Bank: {paymentDetails.bankTransfer.nigerian.bank}
+                          Bank: {settings.bankAccount?.bankName}
                         </p>
                         <p className="text-sm">
-                          Account Name:{" "}
-                          {paymentDetails.bankTransfer.nigerian.accountName}
+                          Account Name: {settings.bankAccount?.accountName}
                         </p>
                         <p className="text-sm">
-                          Account Number:{" "}
-                          {paymentDetails.bankTransfer.nigerian.accountNumber}
+                          Account Number: {settings.bankAccount?.accountNumber}
                         </p>
                       </div>
                     </div>
@@ -169,22 +173,21 @@ export default function WalletPage() {
                     <div className="grid gap-2">
                       <div className="p-2 border rounded">
                         <p className="text-sm font-medium">
-                          Bank: {paymentDetails.bankTransfer.usd.bank}
+                          Bank: {settings.usdBankAccount?.bankName}
                         </p>
                         <p className="text-sm">
-                          Account Name:{" "}
-                          {paymentDetails.bankTransfer.usd.accountName}
+                          Account Name: {settings.usdBankAccount?.accountName}
                         </p>
                         <p className="text-sm">
                           Account Number:{" "}
-                          {paymentDetails.bankTransfer.usd.accountNumber}
+                          {settings.usdBankAccount?.accountNumber}
                         </p>
                         <p className="text-sm">
                           Routing Number:{" "}
-                          {paymentDetails.bankTransfer.usd.routingNumber}
+                          {settings.usdBankAccount?.routingNumber}
                         </p>
                         <p className="text-sm">
-                          SWIFT/BIC: {paymentDetails.bankTransfer.usd.swiftBic}
+                          SWIFT/BIC: {settings.usdBankAccount?.swiftCode}
                         </p>
                       </div>
                     </div>
@@ -209,27 +212,25 @@ export default function WalletPage() {
                   <div className="space-y-2">
                     <Label>Supported Countries</Label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {paymentDetails.mobileMoney.mtn.supportedCountries.map(
-                        (country) => (
-                          <div key={country} className="p-2 border rounded">
-                            <p className="text-sm font-medium">{country}</p>
-                            <p className="text-sm text-muted-foreground">
-                              1 USD ={" "}
-                              {getExchangeRate(
-                                country === "CMR" ? "XAF" : country
-                              ).toFixed(2)}{" "}
-                              {country === "CMR" ? "XAF" : country}
-                            </p>
-                          </div>
-                        )
-                      )}
+                      {["GHA", "UGA", "CMR"].map((country) => (
+                        <div key={country} className="p-2 border rounded">
+                          <p className="text-sm font-medium">{country}</p>
+                          <p className="text-sm text-muted-foreground">
+                            1 USD ={" "}
+                            {getExchangeRate(
+                              country === "CMR" ? "XAF" : country === "GHA" ? "GHS" : "UGX"
+                            ).toFixed(2)}{" "}
+                            {country === "CMR" ? "XAF" : country  === "GHA" ? "GHS" : "UGX"}
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>MTN MoMo Number</Label>
                     <div className="p-2 border rounded">
                       <p className="text-sm font-medium">
-                        {paymentDetails.mobileMoney.mtn.number}
+                        {settings.mobileMoney?.accountNumber}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Please include your email as reference
@@ -256,8 +257,15 @@ export default function WalletPage() {
                   <div className="space-y-2">
                     <Label>Supported Cryptocurrencies</Label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {paymentDetails.crypto.supportedCoins.map((crypto) => (
-                        <div key={crypto.symbol} className="p-2 border rounded">
+                      {[
+                        { name: "Bitcoin", symbol: "BTC" },
+                        { name: "Ethereum", symbol: "ETH" },
+                        { name: "USDT", symbol: "USDT" },
+                      ].map((crypto) => (
+                        <div
+                          key={crypto.symbol}
+                          className="p-2 border rounded"
+                        >
                           <p className="text-sm font-medium">{crypto.name}</p>
                           <p className="text-sm text-muted-foreground">
                             {crypto.symbol}
@@ -272,13 +280,13 @@ export default function WalletPage() {
                       <div className="p-2 border rounded">
                         <p className="text-sm font-medium">BTC Address</p>
                         <p className="text-xs break-all">
-                          {paymentDetails.crypto.addresses.btc}
+                          {settings.crypto?.bitcoin?.address}
                         </p>
                       </div>
                       <div className="p-2 border rounded">
                         <p className="text-sm font-medium">ETH Address</p>
                         <p className="text-xs break-all">
-                          {paymentDetails.crypto.addresses.eth}
+                          {settings.crypto?.ethereum?.address}
                         </p>
                       </div>
                       <div className="p-2 border rounded">
@@ -286,7 +294,7 @@ export default function WalletPage() {
                           USDT Address (TRC20)
                         </p>
                         <p className="text-xs break-all">
-                          {paymentDetails.crypto.addresses.usdt}
+                          {settings.crypto?.usdt?.address}
                         </p>
                       </div>
                     </div>

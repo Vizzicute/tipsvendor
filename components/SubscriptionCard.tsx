@@ -18,6 +18,7 @@ import {
   americanCountries,
   asianCountries,
   europeanCountries,
+  planBenefits,
 } from "@/data";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,7 @@ import { toast } from "sonner";
 import { useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
 import PaymentDialog from "./PaymentDialog";
+import { countryDiscounts } from "@/lib/config/countryDiscount";
 
 interface Props {
   className?: string;
@@ -82,7 +84,7 @@ const SubscriptionCard = ({ className }: Props) => {
     return () => clearInterval(interval);
   }, []);
 
-  const isAnyOptionSelected = () => {
+  const isAllOptionSelected = () => {
     const values = form.getValues();
     return Boolean(values.plan && values.duration && values.country);
   };
@@ -90,7 +92,7 @@ const SubscriptionCard = ({ className }: Props) => {
   // Improved: calculate price based on selected plan, duration, and country
   const calculateTotalPrice = () => {
     const values = form.getValues();
-    if (!isAnyOptionSelected() || isRatesLoading) return 0;
+    if (!isAllOptionSelected() || isRatesLoading) return 0;
 
     const currency = getCurrency(values.country);
     let price = calculateSubscriptionPrice(
@@ -112,17 +114,17 @@ const SubscriptionCard = ({ className }: Props) => {
   // Improved: get currency code based on country value
   const getCurrency = (country: string) => {
     switch (country.toLowerCase()) {
-      case "nga":
+      case "Nigeria":
         return "NGN";
-      case "gha":
+      case "Ghana":
         return "GHS";
-      case "ken":
+      case "Kenya":
         return "KES";
-      case "cmr":
+      case "Cameroon":
         return "XAF";
-      case "zaf":
+      case "South Africa":
         return "ZAR";
-      case "uga":
+      case "Uganda":
         return "UGX";
       default:
         return "USD";
@@ -131,7 +133,7 @@ const SubscriptionCard = ({ className }: Props) => {
 
   // Improved: set amount field automatically when options change
   useEffect(() => {
-    if (isAnyOptionSelected() && !isRatesLoading) {
+    if (isAllOptionSelected() && !isRatesLoading) {
       form.setValue("amount", String(calculateTotalPrice()));
     }
   }, [
@@ -158,22 +160,25 @@ const SubscriptionCard = ({ className }: Props) => {
     }
   };
 
-  const countryDiscounts: Record<string, number> = {
-    // country value: discount percentage (e.g., 0.1 for 10%)
-    nga: 0.785, // Nigeria gets 78.5% off
-    ken: 0.7, // Kenya gets 70% off
-    zaf: 0.33, // South Africa gets 33% off
-    uga: 0.81, // Uganda gets 81% off
-    cmr: 0.2, // Cameroon gets 20% off
-    gha: 0.05, // Ghana gets 5% off
-  };
+  const selectedPlan = form.watch("plan");
+  const benefits = planBenefits[selectedPlan];
 
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle>Subscription Counter</CardTitle>
       </CardHeader>
-      <CardContent className="m-0 p-0">
+      <CardContent className="flex flex-col items-center justify-center gap-4">
+        {isAllOptionSelected() && <div className="flex flex-col p-2 items-center justify-start">
+          <h2 className="text-lg font-semibold">Benefits of Subscription</h2>
+          <ul className="list-disc pl-5 text-sm">
+            {benefits.map((benefit, index) => (
+              <li key={index} className="mb-1">
+                {benefit}
+              </li>
+            ))}
+          </ul>
+        </div>}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -295,10 +300,10 @@ const SubscriptionCard = ({ className }: Props) => {
 
             <div className="flex flex-col items-center gap-1">
               <span className="font-semibold">Total Price: </span>
-              <span className={`${!isAnyOptionSelected() && "text-[10px]"}`}>
+              <span className={`${!isAllOptionSelected() && "text-[10px]"}`}>
                 {isRatesLoading
                   ? "Calculating..."
-                  : isAnyOptionSelected()
+                  : isAllOptionSelected()
                   ? formatCurrency(
                       calculateTotalPrice(),
                       getCurrency(form.getValues().country)
@@ -311,7 +316,7 @@ const SubscriptionCard = ({ className }: Props) => {
               loading={isLoading}
               type="submit"
               className="rounded-full bg-amber-600 px-10 capitalize"
-              disabled={!isAnyOptionSelected() || isRatesLoading}
+              disabled={!isAllOptionSelected() || isRatesLoading}
             >
               <ShoppingCart />
               Subscribe Now

@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -30,6 +29,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Models } from "node-appwrite";
+import DeleteBlogCategoryDialog from "./DeleteBlogCategoryDialog";
+import EditBlogCategory from "@/app/(protected)/admin/blog/EditBlogCategory";
 interface BlogCategoriesProps {
   categories: Models.Document[];
   isLoading: boolean;
@@ -53,9 +54,10 @@ const BlogCategories = ({ categories, isLoading }: BlogCategoriesProps) => {
     }
   };
 
-  const searchedCategories = paginatedData?.filter((category) =>
-    category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const searchedCategories = paginatedData?.filter(
+    (category) =>
+      category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -102,7 +104,9 @@ const BlogCategories = ({ categories, isLoading }: BlogCategoriesProps) => {
               <TableBody>
                 {searchedCategories?.map((category) => (
                   <TableRow key={category.$id}>
-                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {category.name}
+                    </TableCell>
                     <TableCell>{category.blog.length}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -129,14 +133,12 @@ const BlogCategories = ({ categories, isLoading }: BlogCategoriesProps) => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <EditBlogCategory category={category} />
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>
-                            {category.status === "active" ? "Deactivate" : "Activate"}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            Delete
-                          </DropdownMenuItem>
+                          <DeleteBlogCategoryDialog
+                            blogCategoryId={category.$id}
+                            text={category.name}
+                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -152,23 +154,33 @@ const BlogCategories = ({ categories, isLoading }: BlogCategoriesProps) => {
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => handlePageChange(page)}
-                          isActive={currentPage === page}
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -182,4 +194,4 @@ const BlogCategories = ({ categories, isLoading }: BlogCategoriesProps) => {
   );
 };
 
-export default BlogCategories; 
+export default BlogCategories;

@@ -215,7 +215,7 @@ const UserProfileForm = ({ user }: { user: Models.Document }) => {
                     <SelectGroup>
                       <SelectLabel>American Countries</SelectLabel>
                       {americanCountries.map((country) => (
-                        <SelectItem key={country.value} value={country.value}>
+                        <SelectItem key={country.value} value={country.name}>
                           {country.name}
                         </SelectItem>
                       ))}
@@ -223,7 +223,7 @@ const UserProfileForm = ({ user }: { user: Models.Document }) => {
                     <SelectGroup>
                       <SelectLabel>Asian Countries</SelectLabel>
                       {asianCountries.map((country) => (
-                        <SelectItem key={country.value} value={country.value}>
+                        <SelectItem key={country.value} value={country.name}>
                           {country.name}
                         </SelectItem>
                       ))}
@@ -231,7 +231,7 @@ const UserProfileForm = ({ user }: { user: Models.Document }) => {
                     <SelectGroup>
                       <SelectLabel>European Countries</SelectLabel>
                       {europeanCountries.map((country) => (
-                        <SelectItem key={country.value} value={country.value}>
+                        <SelectItem key={country.value} value={country.name}>
                           {country.name}
                         </SelectItem>
                       ))}
