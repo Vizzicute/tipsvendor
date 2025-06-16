@@ -46,6 +46,14 @@ export default function WalletPage() {
     return exchangeRates.find((rate) => rate.currency === currency)?.rate || 1;
   };
 
+  if (isLoading || !settings) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <span>Loading wallet settings...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex justify-between items-center">

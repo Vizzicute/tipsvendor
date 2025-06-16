@@ -44,7 +44,7 @@ const DeleteBlogCategoryDialog = ({
     try {
       await deleteBlogCategory(blogCategoryId);
       toast.success("Blog Category Deleted");
-      queryClient.invalidateQueries({ queryKey: ["documents"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       setOpen(false);
     } catch {
       toast("Failed. Please try again.");

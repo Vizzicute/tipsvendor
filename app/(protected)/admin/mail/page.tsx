@@ -194,7 +194,9 @@ export default function MailPage() {
 
       // Send predictions to each subscriber based on their subscription type
       const sendPromises = validSubscriptions.map(async (subscription) => {
-        const subscriptionTypes = subscription.subscriptionType.split("&");
+        const subscriptionTypes = subscription.subscriptionType === "all"
+          ? ["investment", "vip", "mega"]
+          : subscription.subscriptionType.split("&");
         const subscriberPredictions = subscriptionTypes.flatMap(
           (type: string) => predictionsByType[type] || []
         );
