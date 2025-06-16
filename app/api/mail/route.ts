@@ -98,7 +98,9 @@ export async function POST(request: Request) {
         return predDate === today;
       });
 
-      const subscriptionTypes = subscriptionType.split("&");
+      const subscriptionTypes = subscriptionType === "all"
+        ? ["investment", "vip", "mega"]
+        : subscriptionType.split("&");
       const tablesHtml = subscriptionTypes
         .map((type: string) => {
           const typePredictions = todayPredictions.filter(
