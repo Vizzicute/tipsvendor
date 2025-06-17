@@ -4,6 +4,9 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { QueryProvider } from "@/lib/react-query/QueryProvider";
 import AuthProvider from "@/context/AuthContext";
+import { Analytics } from "@/components/google/Analytics";
+import AdScript from "@/components/google/AdScript";
+import GtmScript from "@/components/google/GtmScript";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,17 +40,17 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/logo.jpg",
-      }
+      },
     ],
-    siteName: "Tipsvendor"
+    siteName: "Tipsvendor",
   },
   icons: [
     {
       rel: "icon",
       url: "/logo.jpg",
       sizes: "800x600",
-      type: "image/jpeg"
-    }
+      type: "image/jpeg",
+    },
   ],
   publisher: "Tipsvendor",
   category: "Sports",
@@ -60,9 +63,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <QueryProvider>
+          <AdScript />
+          <GtmScript />
+        </QueryProvider>
+      </head>
       <body className={inter.className}>
         <QueryProvider>
           <AuthProvider>
+            <Analytics />
             {children}
             <Toaster />
           </AuthProvider>

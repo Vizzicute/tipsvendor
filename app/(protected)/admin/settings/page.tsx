@@ -20,18 +20,18 @@ import { toast } from "sonner";
 import {
   Mail,
   Globe,
-  Shield,
   Bell,
   CreditCard,
   Settings,
   Share2,
+  Tag,
 } from "lucide-react";
 import LoadingButton from "@/components/LoadingButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   getEmailSettings,
   getSiteSettings,
-  getSecuritySettings,
+  getGoogleTagSettings,
   getNotificationSettings,
   getSubscriptionSettings,
   getSocialSettings,
@@ -52,12 +52,6 @@ const siteSettingsSchema = z.object({
   siteUrl: z.string().url("Invalid URL"),
   siteDescription: z.string().min(1, "Site description is required"),
   maintenanceMode: z.boolean().default(false),
-});
-
-const securitySettingsSchema = z.object({
-  twoFactorAuth: z.boolean().default(false),
-  sessionTimeout: z.number().min(5).max(120),
-  maxLoginAttempts: z.number().min(3).max(10),
 });
 
 const notificationSettingsSchema = z.object({
@@ -89,6 +83,15 @@ const socialLinksSchema = z.object({
   advertEmail: z.string().email("Invalid advert email"),
 });
 
+// Add Google Tag settings schema
+const googleTagSettingsSchema = z.object({
+  gaMeasurementId: z
+    .string()
+    .min(1, "Google Analytics Measurement ID is required"),
+  gtmId: z.string().min(1, "Google Tag Manager ID is required"),
+  adsenseId: z.string().optional(),
+});
+
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("email");
@@ -116,15 +119,6 @@ export default function SettingsPage() {
       siteUrl: "",
       siteDescription: "",
       maintenanceMode: false,
-    },
-  });
-
-  const securityForm = useForm<z.infer<typeof securitySettingsSchema>>({
-    resolver: zodResolver(securitySettingsSchema),
-    defaultValues: {
-      twoFactorAuth: false,
-      sessionTimeout: 30,
-      maxLoginAttempts: 5,
     },
   });
 
@@ -169,6 +163,15 @@ export default function SettingsPage() {
     },
   });
 
+  const googleTagForm = useForm<z.infer<typeof googleTagSettingsSchema>>({
+    resolver: zodResolver(googleTagSettingsSchema),
+    defaultValues: {
+      gaMeasurementId: "",
+      gtmId: "",
+      adsenseId: "",
+    },
+  });
+
   // Fetch settings on component mount
   useEffect(() => {
     const fetchSettings = async () => {
@@ -179,9 +182,10 @@ export default function SettingsPage() {
         } else if (activeTab === "site") {
           const settings = await getSiteSettings();
           siteForm.reset(settings);
-        } else if (activeTab === "security") {
-          const settings = await getSecuritySettings();
-          securityForm.reset(settings);
+        } else if (activeTab === "google-tags") {
+          // Fetch Google Tag settings
+          const settings = await getGoogleTagSettings();
+          googleTagForm.reset(settings);
         } else if (activeTab === "notifications") {
           const settings = await getNotificationSettings();
           notificationForm.reset(settings);
@@ -203,7 +207,7 @@ export default function SettingsPage() {
     activeTab,
     emailForm,
     siteForm,
-    securityForm,
+    googleTagForm,
     notificationForm,
     subscriptionForm,
     socialLinksForm,
@@ -240,26 +244,6 @@ export default function SettingsPage() {
     } catch (error) {
       console.error("Error updating site settings:", error);
       toast.error("Failed to update site settings");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const onSecuritySubmit = async (
-    data: z.infer<typeof securitySettingsSchema>
-  ) => {
-    try {
-      setIsLoading(true);
-      const success = await updateSettings("security", data);
-      if (success) {
-        queryClient.invalidateQueries({ queryKey: ["securitySettings"] });
-        toast.success("Security settings updated successfully");
-      } else {
-        throw new Error("Failed to update security settings");
-      }
-    } catch (error) {
-      console.error("Error updating security settings:", error);
-      toast.error("Failed to update security settings");
     } finally {
       setIsLoading(false);
     }
@@ -355,14 +339,35 @@ export default function SettingsPage() {
     }
   };
 
+  // Add submit handler for Google Tag settings
+  const onGoogleTagSubmit = async (
+    data: z.infer<typeof googleTagSettingsSchema>
+  ) => {
+    try {
+      setIsLoading(true);
+      const success = await updateSettings("google-tags", data);
+      if (success) {
+        queryClient.invalidateQueries({ queryKey: ["googleTagSettings"] });
+        toast.success("Google Tag settings updated successfully");
+      } else {
+        throw new Error("Failed to update Google Tag settings");
+      }
+    } catch (error) {
+      console.error("Error updating Google Tag settings:", error);
+      toast.error("Failed to update Google Tag settings");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
       </div>
 
-      <Tabs 
-        defaultValue="email" 
+      <Tabs
+        defaultValue="email"
         className="space-y-4"
         onValueChange={(value) => setActiveTab(value)}
       >
@@ -375,9 +380,9 @@ export default function SettingsPage() {
             <Globe className="h-4 w-4 mr-2" />
             Site
           </TabsTrigger>
-          <TabsTrigger value="security">
-            <Shield className="h-4 w-4 mr-2" />
-            Security
+          <TabsTrigger value="google-tags">
+            <Tag className="h-4 w-4 mr-2" />
+            Google Tags
           </TabsTrigger>
           <TabsTrigger value="notifications">
             <Bell className="h-4 w-4 mr-2" />
@@ -566,32 +571,25 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="security">
+        <TabsContent value="google-tags">
           <Card>
             <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
+              <CardTitle>Google Tag Settings</CardTitle>
             </CardHeader>
             <CardContent>
-              <Form {...securityForm}>
+              <Form {...googleTagForm}>
                 <form
-                  onSubmit={securityForm.handleSubmit(onSecuritySubmit)}
+                  onSubmit={googleTagForm.handleSubmit(onGoogleTagSubmit)}
                   className="space-y-4"
                 >
                   <FormField
-                    control={securityForm.control}
-                    name="sessionTimeout"
+                    control={googleTagForm.control}
+                    name="gaMeasurementId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Session Timeout (minutes)</FormLabel>
+                        <FormLabel>GA Measurement ID</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -599,19 +597,27 @@ export default function SettingsPage() {
                   />
 
                   <FormField
-                    control={securityForm.control}
-                    name="maxLoginAttempts"
+                    control={googleTagForm.control}
+                    name="gtmId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Max Login Attempts</FormLabel>
+                        <FormLabel>GTM ID</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={googleTagForm.control}
+                    name="adsenseId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Adsense ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -623,14 +629,13 @@ export default function SettingsPage() {
                     type="submit"
                     className="w-full"
                   >
-                    Save Security Settings
+                    Save Google Tag Settings
                   </LoadingButton>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </TabsContent>
-
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -672,7 +677,7 @@ export default function SettingsPage() {
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                        <FormLabel>Push Notifications</FormLabel>
+                          <FormLabel>Push Notifications</FormLabel>
                         </div>
                       </FormItem>
                     )}
@@ -1062,4 +1067,4 @@ export default function SettingsPage() {
       </Tabs>
     </div>
   );
-} 
+}

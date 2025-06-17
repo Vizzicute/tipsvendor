@@ -25,7 +25,9 @@ import {
   americanCountries,
   asianCountries,
   europeanCountries,
+  internationalCompetitions,
   topleagues,
+  uefaClubCompetitions,
 } from "@/data";
 import { useEditPrediction } from "@/lib/react-query/queriesAndMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -217,6 +219,18 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
                     <SelectGroup>
                       <SelectLabel>Top Leagues</SelectLabel>
                       {topleagues.map((data) => (
+                        <SelectItem key={data.name} value={data.value}>
+                          {data.name}
+                        </SelectItem>
+                      ))}
+                      <SelectLabel>UEFA Club Competitions</SelectLabel>
+                      {uefaClubCompetitions.map((data) => (
+                        <SelectItem key={data.name} value={data.value}>
+                          {data.name}
+                        </SelectItem>
+                      ))}
+                      <SelectLabel>International Competitions</SelectLabel>
+                      {internationalCompetitions.map((data) => (
                         <SelectItem key={data.name} value={data.value}>
                           {data.name}
                         </SelectItem>

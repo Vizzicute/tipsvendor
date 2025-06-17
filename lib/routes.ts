@@ -1,13 +1,13 @@
 export const routeAccess: Record<string, string[]> = {
-  "/admin": [
+  "/admin": ["admin"],
+  "/admin/blog": ["admin", "blog_manager", "blog_staff"],
+  "/admin/seo": ["admin", "seo_manager", "seo_staff"],
+  "/admin/predictions": [
     "admin",
     "football_manager",
-    "basketball_manager",
-    "blog_manager",
-    "seo_manager",
     "football_staff",
+    "basketball_manager",
     "basketball_staff",
-    "blog_staff",
   ],
   "/dashboard": ["admin", "user"],
 };

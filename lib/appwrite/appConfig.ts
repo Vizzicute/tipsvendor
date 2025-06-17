@@ -24,10 +24,10 @@ export const DEFAULT_SETTINGS: Record<string, any> = {
     siteDescription: "Your trusted source for sports predictions",
     maintenanceMode: false,
   },
-  security: {
-    twoFactorAuth: false,
-    sessionTimeout: 30,
-    maxLoginAttempts: 5,
+  google: {
+    gaMeasurementId: "",
+    gtmId: "",
+    adsenseId: "",
   },
   notifications: {
     emailNotifications: true,
@@ -240,9 +240,9 @@ export async function getSiteSettings() {
   return settings?.settings || DEFAULT_SETTINGS.site;
 }
 
-export async function getSecuritySettings() {
-  const settings = await getSettingsByCategory('security');
-  return settings?.settings || DEFAULT_SETTINGS.security;
+export async function getGoogleTagSettings() {
+  const settings = await getSettingsByCategory('google-tags');
+  return settings?.settings || DEFAULT_SETTINGS.google;
 }
 
 export async function getNotificationSettings() {

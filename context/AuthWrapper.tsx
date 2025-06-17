@@ -19,7 +19,7 @@ export default function AuthWrapper({
     const protectRoute = async () => {
       const user = await getCurrentUser();
 
-      if(!user && pathname === "/dashboard") {
+      if (!user && pathname === "/dashboard") {
         router.replace("/login");
         return;
       }
@@ -34,9 +34,41 @@ export default function AuthWrapper({
         const allowedRoles = routeAccess[pathname];
 
         if (allowedRoles && !allowedRoles.includes(role)) {
-          role === "user"
-            ? router.replace("/dashboard")
-            : router.replace("/admin");
+          switch (role) {
+            case "user":
+              router.replace("/dashboard");
+              break;
+            case "blog_manager":
+              router.replace("/admin/blog");
+              break;
+            case "blog_staff":
+              router.replace("/admin/blog");
+              break;
+            case "seo_manager":
+              router.replace("/admin/seo");
+              break;
+            case "seo_staff":
+              router.replace("/admin/seo");
+              break;
+            case "football_manager":
+              router.replace("/admin/predictions");
+              break;
+            case "football_staff":
+              router.replace("/admin/predictions");
+              break;
+            case "basketball_manager":
+              router.replace("/admin/predictions");
+              break;
+            case "basketball_staff":
+              router.replace("/admin/predictions");
+              break;
+            case "admin":
+              router.replace("/admin");
+              break;
+            default:
+              router.replace("/admin");
+              break;
+          }
           return;
         }
 

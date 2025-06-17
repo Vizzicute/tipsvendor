@@ -98,10 +98,50 @@ export const advert = [
 ];
 
 export const topleagues = [
+  // Top European Domestic Leagues
   { name: "Premier League", value: "epl" },
-  { name: "Laliga", value: "spn"},
-  { name: "Bundesliga", value: "ger"},
-]
+  { name: "La Liga", value: "lal" },
+  { name: "Bundesliga", value: "bun" },
+  { name: "Serie A", value: "ser" },
+  { name: "Ligue 1", value: "lig" },
+  { name: "Eredivisie", value: "erd" },
+  { name: "Primeira Liga", value: "pri" },
+  { name: "Belgian Pro League", value: "bel" },
+  { name: "Scottish Premiership", value: "sco" },
+  { name: "Swiss Super League", value: "sui" },
+  { name: "Russian Premier League", value: "rus" },
+  { name: "Turkish Süper Lig", value: "tur" },
+  { name: "Greek Super League", value: "gre" },
+  { name: "Ukrainian Premier League", value: "ukr" },
+  { name: "Austrian Bundesliga", value: "aut" },
+  { name: "Czech First League", value: "cze" },
+  { name: "Polish Ekstraklasa", value: "pol" },
+  { name: "Danish Superliga", value: "den" },
+  { name: "Norwegian Eliteserien", value: "nor" },
+  { name: "Swedish Allsvenskan", value: "swe" },
+  { name: "Romanian Liga I", value: "rom" },
+  { name: "Croatian First League", value: "cro" },
+  { name: "Serbian SuperLiga", value: "srb" },
+];
+
+export const uefaClubCompetitions = [
+  { name: "UEFA Champions League", value: "ucl" },
+  { name: "UEFA Europa League", value: "uel" },
+  { name: "UEFA Europa Conference League", value: "uec" },
+  { name: "UEFA Super Cup", value: "usc" },
+];
+
+export const internationalCompetitions = [
+  { name: "FIFA World Cup", value: "fwc" },
+  { name: "UEFA European Championship", value: "euc" },
+  { name: "Copa América", value: "cop" },
+  { name: "Africa Cup of Nations", value: "afcon" }, // 5 letters, as requested
+  { name: "AFC Asian Cup", value: "asi" },
+  { name: "CONCACAF Gold Cup", value: "cgc" },
+  { name: "OFC Nations Cup", value: "onc" },
+  { name: "FIFA Club World Cup", value: "cwc" },
+  { name: "UEFA Nations League", value: "unl" },
+];
 
 export const europeanCountries = [
   // Europe
@@ -116,7 +156,7 @@ export const europeanCountries = [
   { name: "Cyprus", value: "cyp" },
   { name: "Czech Republic", value: "cze" },
   { name: "Denmark", value: "dnk" },
-  { name: "England", value: "eng"},
+  { name: "England", value: "eng" },
   { name: "Estonia", value: "est" },
   { name: "Finland", value: "fin" },
   { name: "France", value: "fra" },
@@ -252,7 +292,7 @@ export const americanCountries = [
   { name: "United States", value: "usa" },
   { name: "Uruguay", value: "ury" },
   { name: "Venezuela", value: "ven" },
-]
+];
 
 export const asianCountries = [
   // Asia
@@ -302,7 +342,7 @@ export const asianCountries = [
   { name: "United Arab Emirates", value: "are" },
   { name: "Uzbekistan", value: "uzb" },
   { name: "Vietnam", value: "vnm" },
-  { name: "Yemen", value: "yem" }
+  { name: "Yemen", value: "yem" },
 ];
 
 export const roles = [

@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { africanCountries, americanCountries, asianCountries, europeanCountries, topleagues } from "@/data";
+import { africanCountries, americanCountries, asianCountries, europeanCountries, internationalCompetitions, topleagues, uefaClubCompetitions } from "@/data";
 import { useAddPrediction } from "@/lib/react-query/queriesAndMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -200,6 +200,14 @@ const AddPredictionForm = () => {
                     <SelectGroup>
                       <SelectLabel>Top Leagues</SelectLabel>
                       {topleagues.map((data) => (
+                        <SelectItem key={data.name} value={data.value}>{data.name}</SelectItem>
+                      ))}
+                      <SelectLabel>UEFA Club Competitions</SelectLabel>
+                      {uefaClubCompetitions.map((data) => (
+                        <SelectItem key={data.name} value={data.value}>{data.name}</SelectItem>
+                      ))}
+                      <SelectLabel>International Competitions</SelectLabel>
+                      {internationalCompetitions.map((data) => (
                         <SelectItem key={data.name} value={data.value}>{data.name}</SelectItem>
                       ))}
                       <SelectLabel>Europe</SelectLabel>

@@ -41,7 +41,7 @@ const Sidebar = ({ open }: SidebarProps) => {
       name: "Dashboard",
       href: "/admin",
       icon: Home,
-      roles: ["admin", "football_manager", "basketball_manager"],
+      roles: ["admin"],
     },
     {
       name: "Predictions",
@@ -101,7 +101,7 @@ const Sidebar = ({ open }: SidebarProps) => {
       name: "Settings",
       href: "/admin/settings",
       icon: Settings,
-      roles: ["admin", "football_manager", "football_staff", "user"],
+      roles: ["admin"],
     },
   ];
 
