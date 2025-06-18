@@ -168,7 +168,7 @@ const SubscriptionCard = ({ className }: Props) => {
       <CardHeader>
         <CardTitle>Subscription Counter</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4">
+      <CardContent className="flex flex-col items-center justify-center gap-4 p-2">
         {isAllOptionSelected() && <div className="flex flex-col p-2 items-center justify-start">
           <h2 className="text-lg font-semibold">Benefits of Subscription</h2>
           <ul className="list-disc pl-5 text-sm">
@@ -184,7 +184,7 @@ const SubscriptionCard = ({ className }: Props) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-2 items-center justify-center"
           >
-            <div className="w-full flex flex-row justify-around items-center gap-2">
+            <div className="w-full flex flex-row justify-around items-center">
               <FormField
                 control={form.control}
                 name="plan"
