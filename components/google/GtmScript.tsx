@@ -12,7 +12,6 @@ const GtmScript = () => {
   });
 
   const googleTagManagerId: string = googleTags?.gtmId;
-  console.log("Google Tag Manager ID:", googleTagManagerId);
 
   if (!googleTagManagerId) return null;
 

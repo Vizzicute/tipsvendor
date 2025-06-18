@@ -8,6 +8,7 @@ import { Analytics } from "@/components/google/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next"
 import AdScript from "@/components/google/AdScript";
 import GtmScript from "@/components/google/GtmScript";
+import AnalyticScript from "@/components/google/AnalyticScript";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
         <QueryProvider>
           <AdScript />
           <GtmScript />
+          <AnalyticScript />
         </QueryProvider>
       </head>
       <body className={inter.className}>
