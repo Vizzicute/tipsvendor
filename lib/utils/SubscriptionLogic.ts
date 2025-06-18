@@ -37,7 +37,6 @@ export async function checkAndUpdateSubscription(
   if (currentDate.getTime() > expiryDate) {
     await editSubscription({
       subscription: {
-        ...subscription,
         isValid: false,
       },
       subscriptionId: subscription.$id,
