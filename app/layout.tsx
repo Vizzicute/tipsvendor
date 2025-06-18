@@ -9,6 +9,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/next"
 import AdScript from "@/components/google/AdScript";
 import GtmScript from "@/components/google/GtmScript";
 import AnalyticScript from "@/components/google/AnalyticScript";
+import { AdSenseManager } from "@/components/google/Adsense";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -76,6 +77,7 @@ export default function RootLayout({
         <QueryProvider>
           <AuthProvider>
             <Analytics />
+            <AdSenseManager />
             <VercelAnalytics />
             {children}
             <Toaster />

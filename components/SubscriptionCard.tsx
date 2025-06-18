@@ -189,7 +189,7 @@ const SubscriptionCard = ({ className }: Props) => {
                 control={form.control}
                 name="plan"
                 render={({ field }) => (
-                  <FormItem className="w-[45%]">
+                  <FormItem className="w-[45%] me-1">
                     <FormControl>
                       <Select
                         value={field.value}
@@ -227,7 +227,7 @@ const SubscriptionCard = ({ className }: Props) => {
                 control={form.control}
                 name="duration"
                 render={({ field }) => (
-                  <FormItem className="w-[45%]">
+                  <FormItem className="w-[45%] ms-1">
                     <FormControl>
                       <Select
                         value={field.value}
