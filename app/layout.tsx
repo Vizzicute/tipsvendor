@@ -5,7 +5,7 @@ import "./globals.css";
 import { QueryProvider } from "@/lib/react-query/QueryProvider";
 import AuthProvider from "@/context/AuthContext";
 import { Analytics } from "@/components/google/Analytics";
-import { Analytics as VercelAnalytics } from "@vercel/analytics/next"
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import AdScript from "@/components/google/AdScript";
 import GtmScript from "@/components/google/GtmScript";
 import AnalyticScript from "@/components/google/AnalyticScript";
@@ -67,21 +67,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <QueryProvider>
-          <AdScript />
-          <GtmScript />
-          <AnalyticScript />
-        </QueryProvider>
-      </head>
       <body className={inter.className}>
         <QueryProvider>
           <AuthProvider>
+            {children}
             <Analytics />
             <AdSenseManager />
             <GTMManager />
             <VercelAnalytics />
-            {children}
+            <AdScript />
+            <GtmScript />
+            <AnalyticScript />
             <Toaster />
           </AuthProvider>
         </QueryProvider>

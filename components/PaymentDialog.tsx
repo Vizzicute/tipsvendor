@@ -95,7 +95,6 @@ const PaymentDialog = ({
   const exchangeRate = getNGNExchangeRate(currency);
   const usdRate = getNGNExchangeRate("USD");
   const amountInNGN = (Number(amount) / exchangeRate).toFixed(2);
-  const amountInUSD = (Number(amountInNGN) * usdRate).toFixed(2);
 
   useEffect(() => {
     setSuccess(false);
