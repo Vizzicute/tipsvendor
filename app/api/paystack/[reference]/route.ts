@@ -2,7 +2,6 @@ import { getWalletSettings } from "@/lib/appwrite/appConfig";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: NextRequest,
   { params }: { params: { reference: string } }
 ) {
   const wallet = await getWalletSettings();
