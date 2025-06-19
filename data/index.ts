@@ -141,6 +141,7 @@ export const internationalCompetitions = [
   { name: "OFC Nations Cup", value: "onc" },
   { name: "FIFA Club World Cup", value: "cwc" },
   { name: "UEFA Nations League", value: "unl" },
+  { name: "Friendly Match", value: "frdly"},
 ];
 
 export const europeanCountries = [

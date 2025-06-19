@@ -41,6 +41,7 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
   const queryClient = useQueryClient();
   const originalDate = prediction.datetime;
   const date = new Date(originalDate);
+  date.setHours(date.getHours() + 1);
 
   // Get components with padding
   const year = date.getFullYear();
@@ -96,8 +97,15 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
     useEditPrediction();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+     // Subtract 1 hour from the datetime
+    const date = new Date(values.datetime);
+    date.setHours(date.getHours() - 1);
+    const adjustedValues = {
+      ...values,
+      datetime: date.toISOString(),
+    };
     const newPrediction = await editPrediction({
-      prediction: values,
+      prediction: adjustedValues,
       gameId: prediction.$id,
     });
 

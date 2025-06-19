@@ -9,36 +9,27 @@ import { truncate } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { countryDiscounts } from "@/lib/config/countryDiscount";
-import { africanCountries, americanCountries, asianCountries, europeanCountries } from "@/data";
 import { getExchangeRate, calculateSubscriptionPrice as calcPriceUtil } from "@/lib/utils/exchangeRates";
 
 
 function getCurrency(country: string) {
   switch (country?.toLowerCase()) {
-    case "nga": return "NGN";
-    case "gha": return "GHS";
-    case "ken": return "KES";
-    case "cmr": return "XAF";
-    case "zaf": return "ZAR";
-    case "uga": return "UGX";
+    case "nigeria": return "NGN";
+    case "ghana": return "GHS";
+    case "kenya": return "KES";
+    case "cameroon": return "XAF";
+    case "south africa": return "ZAR";
+    case "uganda": return "UGX";
     default: return "USD";
   }
 }
 
 // Use the exchangeRates util for price calculation
 function getDiscountedPriceUSD(sub: any) {
-  const allCountries = [
-    ...africanCountries,
-    ...asianCountries,
-    ...europeanCountries,
-    ...americanCountries,
-  ];
-  const subscriberCountry = allCountries.find(
-    (country) => country.name.toLowerCase() === sub.user?.country?.toLowerCase()
-  );
-  const currency = getCurrency(subscriberCountry?.value || "USD");
+
+  const currency = getCurrency(sub.user?.country || "USD");
   let price = calcPriceUtil(30, sub.subscriptionType, sub.duration, "USD");
-  const discount = subscriberCountry?.value ? countryDiscounts[subscriberCountry.value] || 0 : 0;
+  const discount = sub.user?.country ? countryDiscounts[sub.user.country?.toLowerCase()] || 0 : 0;
   if (discount > 0) {
     price = price - price * discount;
   }
@@ -79,6 +70,7 @@ export default function AnalyticsPage() {
   });
 
   // Calculate subscription stats
+  const allSubscriptions = subscriptions || [];
   const activeSubscriptions = subscriptions?.filter(sub => sub.isValid) || [];
   const expiredSubscriptions = subscriptions?.filter(sub => !sub.isValid) || [];
   const subscriptionTypes = subscriptions?.reduce((acc, sub) => {
@@ -86,9 +78,9 @@ export default function AnalyticsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  const totalEarnings = calculateEarningsUSD(activeSubscriptions);
+  const totalEarnings = calculateEarningsUSD(allSubscriptions);
   const thisMonthEarnings = calculateEarningsUSD(
-    activeSubscriptions.filter(sub => {
+    allSubscriptions.filter(sub => {
       const subDate = new Date(sub.$createdAt);
       const now = new Date();
       return subDate.getMonth() === now.getMonth() && subDate.getFullYear() === now.getFullYear();

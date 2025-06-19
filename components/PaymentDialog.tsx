@@ -6,8 +6,17 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { Copy, Check } from "lucide-react";
 import { getWalletSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
-import { IUser } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PaystackButton } from "react-paystack";
+import { PaystackProps } from "react-paystack/dist/types";
+import {
+  fetchExchangeRates,
+  getNGNExchangeRate,
+} from "@/lib/utils/ngnExchangeRates";
+import { toast } from "sonner";
+import { getCurrentUser } from "@/lib/appwrite/api";
+import { editSubscription } from "@/lib/appwrite/update";
+import { addSubscription } from "@/lib/appwrite/create";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -15,9 +24,17 @@ interface PaymentDialogProps {
   currency: string;
   duration: string;
   plan: string;
-  user: IUser;
   onClose: () => void;
 }
+
+type referenceObj = {
+  message: string;
+  reference: string;
+  status: "sucess" | "failure";
+  trans: string;
+  transaction: string;
+  trxref: string;
+};
 
 const PaymentDialog = ({
   open,
@@ -25,12 +42,17 @@ const PaymentDialog = ({
   currency,
   duration,
   plan,
-  user,
   onClose,
 }: PaymentDialogProps) => {
+  const queryClient = useQueryClient();
   const { data: settings, isLoading } = useQuery({
     queryKey: ["wallet-settings"],
     queryFn: getWalletSettings,
+  });
+
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: getCurrentUser,
   });
 
   const [copied, setCopied] = useState<string | null>(null);
@@ -49,6 +71,136 @@ const PaymentDialog = ({
       maximumFractionDigits: 2,
     }
   )}`;
+
+  // paystack integration
+  useEffect(() => {
+    const loadExchangeRates = async () => {
+      try {
+        await fetchExchangeRates();
+      } catch (error) {
+        console.error("Error loading exchange rates:", error);
+        toast.error("Failed to load exchange rates");
+      }
+    };
+
+    loadExchangeRates();
+    // Refresh rates every hour
+    const interval = setInterval(loadExchangeRates, 3600000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const [ref, setRef] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const exchangeRate = getNGNExchangeRate(currency);
+  const usdRate = getNGNExchangeRate("USD");
+  const amountInNGN = (Number(amount) / exchangeRate).toFixed(2);
+  const amountInUSD = (Number(amountInNGN) * usdRate).toFixed(2);
+
+  useEffect(() => {
+    setSuccess(false);
+    setRef("" + Math.floor(Math.random() * 1000000000 + 1));
+  }, [success]);
+
+  const config: PaystackProps = {
+    reference: ref,
+    email: user?.email,
+    amount: (Number(amountInNGN) * 100) | 0,
+    publicKey: settings?.paystack?.publicKey || "",
+    currency: "NGN",
+  };
+
+  const { mutateAsync: editSubscriptionMutation, isPending: isEditing } =
+    useMutation({
+      mutationKey: ["edit-subscription"],
+      mutationFn: async ({ sub, duration, plan }: any) => {
+        await editSubscription(
+          {
+            isValid: true,
+            duration,
+            subscriptionType: plan,
+            updatedAt: new Date(),
+          },
+          sub.$id
+        );
+      },
+    });
+
+  const { mutateAsync: addSubscriptionMutation, isPending: isAdding } =
+    useMutation({
+      mutationKey: ["add-subscription"],
+      mutationFn: async ({ userId, duration, plan }: any) => {
+        await addSubscription({
+          subscriptionType: plan,
+          duration,
+          user: userId,
+        });
+      },
+    });
+
+  const onSuccess = async (reference: referenceObj) => {
+    setLoading(true);
+    const res = await fetch(`/api/paystack/${reference.reference}`);
+    const verifyData = await res.json();
+
+    // Defensive check
+    if (!verifyData || !verifyData.success) {
+      toast.error("Payment verification failed: Invalid response from server.");
+      return;
+    }
+
+    if (verifyData.success) {
+      try {
+        setSuccess(true);
+        const initialSubscription = Array.isArray(user?.subscription)
+          ? user?.subscription
+          : [user?.subscription];
+        let found = false;
+        for (const sub of initialSubscription) {
+          if (sub?.plan === plan && !sub.isValid) {
+            found = true;
+            await editSubscriptionMutation({ sub, duration, plan });
+          }
+        }
+        if (!found) {
+          await addSubscriptionMutation({
+            userId: user?.$id,
+            duration,
+            plan,
+          });
+        }
+        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        toast.success(
+          "Payment successful! Subscription updated. Go to dashboard"
+        );
+      } catch (error) {
+        console.error(error);
+        toast.error("Payment verification failed");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+      toast.error("Payment verification failed: Payment not successful.");
+    }
+  };
+
+  const onPaystackClose = () => {
+    alert("Payment cancelled.");
+  };
+
+  const paystackButtonText =
+    isEditing || isAdding || loading
+      ? "Processing..."
+      : `Pay ${formattedAmount || "0"}`;
+
+  const componentProps = {
+    ...config,
+    text: paystackButtonText,
+    // onSuccess,
+    onSuccess: onSuccess,
+    onClose: onPaystackClose,
+  };
 
   function useIsMobile() {
     const [isMobile, setIsMobile] = useState(false);
@@ -78,7 +230,7 @@ const PaymentDialog = ({
       </div>
       <div className="w-full flex justify-between items-center mb-2">
         <span className="font-semibold text-base">User:</span>
-        <span className="font-mono text-sm">{user.email}</span>
+        <span className="font-mono text-sm">{user?.email}</span>
       </div>
       {isLoading && (
         <div className="text-center py-8">Loading payment methods...</div>
@@ -94,9 +246,11 @@ const PaymentDialog = ({
               <div className="text-xs text-muted-foreground">
                 Pay securely with Paystack (Nigeria, Ghana, South Africa, etc.)
               </div>
-              <Button className="w-full bg-green-600 text-white mt-2">
-                Pay with Paystack
-              </Button>
+              <PaystackButton
+                {...componentProps}
+                disabled={isEditing || isAdding || loading}
+                className="w-full bg-[#0ba4db] text-white mt-2 rounded-md p-2"
+              />
             </div>
           )}
 

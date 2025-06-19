@@ -34,13 +34,20 @@ import { useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
 import PaymentDialog from "./PaymentDialog";
 import { countryDiscounts } from "@/lib/config/countryDiscount";
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUser } from "@/lib/appwrite/api";
+import { Models } from "appwrite";
 
 interface Props {
   className?: string;
 }
 
 const SubscriptionCard = ({ className }: Props) => {
-  const { user, isAuthenticated } = useUserContext();
+  const { isAuthenticated } = useUserContext();
+  const { data: user } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: getCurrentUser,
+  });
   const formSchema = z.object({
     plan: z.string(),
     duration: z.string(),
@@ -53,23 +60,34 @@ const SubscriptionCard = ({ className }: Props) => {
     defaultValues: {
       plan: "",
       duration: "",
-      country: user.country || "",
+      country: "",
       amount: "",
     },
   });
 
+  useEffect(() => {
+    if (user) {
+      const expiredSub = user?.subscription?.filter((sub: Models.Document) => sub.isValid === false)[0];
+      const userCountry: string = user?.country;
+      form.reset({
+        plan: expiredSub?.subscriptionType || "",
+        duration: expiredSub?.duration || "",
+        country: userCountry || "",
+        amount: "",
+      });
+    }
+  }, [user, form]);
+
   const basePrice = 30;
   const [isLoading, setIsLoading] = useState(false);
   const [isRatesLoading, setIsRatesLoading] = useState(true);
-  const [exchangeRates, setExchangeRates] = useState<any[]>([]);
   const [openPaymentDialog, setOpenPaymentDialog] = useState(false);
 
   useEffect(() => {
     const loadExchangeRates = async () => {
       try {
         setIsRatesLoading(true);
-        const rates = await fetchExchangeRates();
-        setExchangeRates(rates);
+        await fetchExchangeRates();
       } catch (error) {
         console.error("Error loading exchange rates:", error);
         toast.error("Failed to load exchange rates");
@@ -114,17 +132,17 @@ const SubscriptionCard = ({ className }: Props) => {
   // Improved: get currency code based on country value
   const getCurrency = (country: string) => {
     switch (country.toLowerCase()) {
-      case "Nigeria":
+      case "nigeria":
         return "NGN";
-      case "Ghana":
+      case "ghana":
         return "GHS";
-      case "Kenya":
+      case "kenya":
         return "KES";
-      case "Cameroon":
+      case "cameroon":
         return "XAF";
-      case "South Africa":
+      case "south africa":
         return "ZAR";
-      case "Uganda":
+      case "uganda":
         return "UGX";
       default:
         return "USD";
@@ -168,7 +186,7 @@ const SubscriptionCard = ({ className }: Props) => {
       <CardHeader>
         <CardTitle>Subscription Counter</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4 p-2">
+      <CardContent className="w-full flex flex-col items-center justify-center gap-4 p-2">
         {isAllOptionSelected() && <div className="flex flex-col p-2 items-center justify-start">
           <h2 className="text-lg font-semibold">Benefits of Subscription</h2>
           <ul className="list-disc pl-5 text-sm">
@@ -182,7 +200,7 @@ const SubscriptionCard = ({ className }: Props) => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-2 items-center justify-center"
+            className="w-full flex flex-col gap-2 items-center justify-center"
           >
             <div className="w-full flex flex-row justify-around items-center">
               <FormField
@@ -327,7 +345,6 @@ const SubscriptionCard = ({ className }: Props) => {
         {openPaymentDialog && isAuthenticated && (
           <PaymentDialog
             open={openPaymentDialog}
-            user={user}
             currency={getCurrency(form.getValues().country)}
             amount={form.getValues().amount}
             plan={form.getValues().plan}
