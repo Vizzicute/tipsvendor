@@ -11,6 +11,7 @@ import GtmScript from "@/components/google/GtmScript";
 import AnalyticScript from "@/components/google/AnalyticScript";
 import { AdSenseManager } from "@/components/google/Adsense";
 import { GTMManager } from "@/components/google/TagManager";
+import AdPopupModal from "@/components/AdPopupModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
             {children}
             <Analytics />
             <AdSenseManager />
+            <AdPopupModal />
             <GTMManager />
             <VercelAnalytics />
             <AdScript />

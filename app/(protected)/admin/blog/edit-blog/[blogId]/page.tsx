@@ -6,8 +6,7 @@ import { notFound } from 'next/navigation'
 import EditBlogForm from '../EditBlogForm'
 import { useParams } from 'next/navigation'
 export default async function Page() {
-    const params = useParams();
-    const blogId = params?.blogId;
+    const { blogId } = useParams();
 
     if (typeof blogId !== 'string') {
       notFound();

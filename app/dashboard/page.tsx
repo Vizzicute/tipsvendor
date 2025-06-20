@@ -3,6 +3,7 @@
 import BlogCard from "@/components/BlogCard";
 import BlogHeadingTextWrapper from "@/components/BlogHeadingTextWrapper";
 import LoadingButton from "@/components/LoadingButton";
+import NotificationsDropdown from "@/components/NotificationsDropdown";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -204,7 +205,12 @@ const Page = () => {
                 <p className="text-center text-lg text-black font-semibold my-2">
                   {currentUser?.name}
                 </p>
-                {currentUser && <UserProfileEdit user={currentUser} />}
+                {currentUser && (
+                  <div className="w-fit flex flex-row items-center gap-1 justify-center">
+                    <UserProfileEdit user={currentUser} />
+                    <NotificationsDropdown className="bg-black text-secondary" />
+                  </div>
+                )}
               </div>
               <div className="flex min-md:flex-1 max-md:w-full flex-col space-y-2 text-black font-semibold">
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">

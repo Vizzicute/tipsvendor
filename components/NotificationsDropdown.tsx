@@ -22,7 +22,23 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export default function NotificationsDropdown() {
+interface NotificationsDropdownProps {
+  variant?:
+    | "default"
+    | "outline"
+    | "ghost"
+    | "link"
+    | "destructive"
+    | "secondary"
+    | null
+    | undefined;
+    className?: string;
+}
+
+export default function NotificationsDropdown({
+  variant,
+  className,
+}: NotificationsDropdownProps) {
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
@@ -97,7 +113,7 @@ export default function NotificationsDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant={variant} size="icon" className={cn("relative", className)}>
           <Bell className="size-5" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full text-white text-[8px] text-center">
@@ -154,12 +170,14 @@ export default function NotificationsDropdown() {
                         new Date(notification.$createdAt),
                         "MMM d, h:mm a"
                       )}{" "}
-                      <Link
-                        href={`${getNotificationLink(notification.type)}`}
-                        className="text-blue-400 hover:underline"
-                      >
-                        View {notification.title}
-                      </Link>
+                      {user.role !== "user" && (
+                        <Link
+                          href={`${getNotificationLink(notification.type)}`}
+                          className="text-blue-400 hover:underline"
+                        >
+                          View {notification.title}
+                        </Link>
+                      )}
                     </p>
                   </div>
                 </div>

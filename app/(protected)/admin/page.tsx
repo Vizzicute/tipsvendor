@@ -137,7 +137,13 @@ const AdminDashboard = () => {
     },
   ];
 
-  const recentSubscriptions = subscriptions?.slice(0, 5);
+  const recentSubscriptions = subscriptions
+    ?.sort((a, b) => {
+      return (
+        new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()
+      );
+    })
+    .slice(0, 5);
   const recentUsers = users
     ?.sort(
       (a, b) =>

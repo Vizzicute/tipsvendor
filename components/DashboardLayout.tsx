@@ -69,7 +69,7 @@ const DashboardLayout = ({children}: {children: React.ReactNode;}) => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <NotificationsDropdown />
+                            <NotificationsDropdown variant={"ghost"} />
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>

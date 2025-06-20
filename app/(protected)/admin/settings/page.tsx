@@ -73,6 +73,8 @@ const appConfigSchema = z.object({
 });
 
 const socialLinksSchema = z.object({
+  telegram: z.string().url("Invalid Telegram URL").optional(),
+  whatsapp: z.string().url("Invalid WhatsApp URL").optional(),
   facebook: z.string().url("Invalid Facebook URL").optional(),
   twitter: z.string().url("Invalid Twitter URL").optional(),
   instagram: z.string().url("Invalid Instagram URL").optional(),
@@ -152,6 +154,8 @@ export default function SettingsPage() {
   const socialLinksForm = useForm<z.infer<typeof socialLinksSchema>>({
     resolver: zodResolver(socialLinksSchema),
     defaultValues: {
+      telegram: "",
+      whatsapp: "",
       facebook: "",
       twitter: "",
       instagram: "",
@@ -912,6 +916,40 @@ export default function SettingsPage() {
                   onSubmit={socialLinksForm.handleSubmit(onSocialLinksSubmit)}
                   className="space-y-4"
                 >
+                  <FormField
+                    control={socialLinksForm.control}
+                    name="telegram"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Telegram Channel</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://t.me/your-channel"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={socialLinksForm.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>WhatsApp Link</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://wa.me/your-number"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     control={socialLinksForm.control}
                     name="facebook"

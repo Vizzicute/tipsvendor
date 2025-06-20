@@ -5,8 +5,7 @@ import { notFound, useParams } from 'next/navigation'
 import EditPageForm from '../EditPageForm'
 
 export default async function Page() {
-  const params = useParams();
-  const pageId = params?.pageId;
+  const { pageId } = useParams();
 
   if (typeof pageId !== 'string') {
     notFound();

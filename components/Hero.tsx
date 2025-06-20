@@ -9,6 +9,8 @@ import { redirect, usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { getSocialSettings } from "@/lib/appwrite/appConfig";
 
 const Hero = ({
   h1tag,
@@ -20,6 +22,10 @@ const Hero = ({
   isSeoLoading: boolean;
 }) => {
   const pathname = usePathname();
+  const { data: settings, isLoading: isSettingsLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: getSocialSettings,
+  });
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
   const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading } =
     useUserContext();
@@ -72,7 +78,7 @@ const Hero = ({
             )}
           </div>
           <Link
-            href="/packages"
+            href="/dashboard"
             className="w-full flex justify-center items-center"
           >
             <GradientButton className="w-full">Vip Packages</GradientButton>
@@ -86,7 +92,7 @@ const Hero = ({
             </Link>
           )}
           <Link
-            href="https://t.me"
+            href={settings?.telegram || "#"}
             target="_blank"
             className="w-full justify-center items-center"
           >

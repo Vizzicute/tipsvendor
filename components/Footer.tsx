@@ -1,8 +1,28 @@
+"use client";
+
 import React from "react";
 import Logo from "./Logo";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
+import { getSocialSettings } from "@/lib/appwrite/appConfig";
 
 const Footer = () => {
+  const pathname = usePathname();
+  const { data: pageContent, isLoading } = useQuery({
+    queryKey: ["seo"],
+    queryFn: async () => getSingleSeoPageByUrl(pathname),
+  });
+
+  const { data: settings, isLoading: isSettingsLoading } = useQuery({
+    queryKey: ["settings"],
+    queryFn: getSocialSettings,
+  });
+
+  const advertEmail = settings?.advertEmail || "";
+  const infoEmail = settings?.infoEmail || "";
+
   const date = new Date();
   const year = date.getFullYear();
 
@@ -11,16 +31,17 @@ const Footer = () => {
       <div className="w-full justify-center md:w-[30%] flex flex-wrap p-2 gap-4">
         <Logo />
         <p className="font-light text-[13.5px] w-full text-wrap text-gray-400">
-          Tipsvendor is an Exclusive online platform that provides free football
-          prediction tips from all the leagues across the globe for football
-          overs, fans and punters.
+          {isLoading
+            ? "Loading..."
+            : pageContent?.description ||
+              "Tipsvendor is an Exclusive online platform that provides free football prediction tips from all the leagues across the globe for football overs, fans and punters."}
         </p>
       </div>
       <div className="w-full md:w-[30%] flex flex-nowrap p-2 gap-2">
-        <div className="w-1/2 text-start flex flex-wrap">
+        <div className="w-1/2 text-start flex flex-col">
           <p className="text-lg text-white capitalize">Useful Links</p>
           <Link
-            href={"dashboard"}
+            href={"/dashboard"}
             className="text-md text-secondary capitalize"
           >
             VIP Packages
@@ -35,18 +56,12 @@ const Footer = () => {
             football news
           </Link>
         </div>
-        <div className="w-1/2 text-start flex flex-wrap">
+        <div className="w-1/2 text-start flex flex-col">
           <p className="text-lg text-white capitalize">Navigations</p>
-          <Link
-            href={"about"}
-            className="text-md text-secondary capitalize"
-          >
+          <Link href={"about"} className="text-md text-secondary capitalize">
             About Us
           </Link>
-          <Link
-            href={"privacy"}
-            className="text-md text-secondary capitalize"
-          >
+          <Link href={"privacy"} className="text-md text-secondary capitalize">
             Privacy and Policy
           </Link>
           <Link href={"/info"} className="text-md text-secondary capitalize">
@@ -54,7 +69,7 @@ const Footer = () => {
           </Link>
         </div>
       </div>
-      <div className="w-full md:w-[30%] text-start flex flex-wrap p-2">
+      <div className="w-full md:w-[30%] text-start flex flex-col p-2">
         <p className="w-full text-lg text-white capitalize">Contact Us</p>
         <Link
           href={`${process.env.NEXT_PUBLIC_WHATSAPP_LINK}`}
@@ -67,22 +82,22 @@ const Footer = () => {
           +2349016760159
         </Link>
         <Link
-          href={`mailto:${process.env.NEXT_PUBLIC_INFO_EMAIL}`}
+          href={`mailto:${infoEmail}`}
           target="_blank"
           className="text-md text-secondary capitalize"
         >
-          <span className="text-md capitalize text-white">Email Us: </span> live
-          soccer scores
+          <span className="text-md capitalize text-white">Email Us: </span>{" "}
+          {infoEmail}
         </Link>
         <Link
-          href={`mailto:${process.env.NEXT_PUBLIC_ADVERT_EMAIL}`}
+          href={`mailto:${advertEmail}`}
           target="_blank"
           className="text-md text-secondary capitalize"
         >
           <span className="text-md capitalize text-slate-400">
             Advert Only:{" "}
           </span>{" "}
-          football news
+          {advertEmail}
         </Link>
       </div>
       <div className="w-full h-px bg-gray-600 my-10" />
