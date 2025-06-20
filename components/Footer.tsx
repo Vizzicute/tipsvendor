@@ -9,7 +9,7 @@ import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
 import { getSocialSettings } from "@/lib/appwrite/appConfig";
 
 const Footer = () => {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   const { data: pageContent, isLoading } = useQuery({
     queryKey: ["seo"],
     queryFn: async () => getSingleSeoPageByUrl(pathname),

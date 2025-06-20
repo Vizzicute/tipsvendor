@@ -331,6 +331,7 @@ const EditBlogForm = ({ blog }: EditBlogFormProps) => {
                 />
               </FormControl>
               <FormMessage />
+              <Label className="mt-0 pt-0">Content Size: {field.value.length.toString()}/10000</Label>
             </FormItem>
           )}
         />
