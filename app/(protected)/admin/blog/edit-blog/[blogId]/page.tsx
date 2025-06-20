@@ -10,13 +10,9 @@ import { useQuery } from "@tanstack/react-query";
 export default function Page() {
   const { blogId } = useParams();
 
-  if (typeof blogId !== "string") {
-    notFound();
-  }
-
   const { data: blog, isLoading } = useQuery({
     queryKey: ["blog"],
-    queryFn: async () => getSingleBlog(blogId),
+    queryFn: async () => getSingleBlog(blogId as string),
   });
 
   if (!blog) notFound();

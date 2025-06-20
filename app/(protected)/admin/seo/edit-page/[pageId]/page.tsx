@@ -8,13 +8,10 @@ import { useQuery } from "@tanstack/react-query";
 export default function Page() {
   const { pageId } = useParams();
 
-  if (typeof pageId !== "string") {
-    notFound();
-  }
 
   const { data: seoPage, isLoading } = useQuery({
     queryKey: ["seo"],
-    queryFn: async () => getSingleSeoPage(pageId),
+    queryFn: async () => getSingleSeoPage(pageId as string),
   });
 
   if (!seoPage) notFound();
