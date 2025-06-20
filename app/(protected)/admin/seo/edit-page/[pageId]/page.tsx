@@ -9,12 +9,14 @@ export default function Page() {
   const { pageId } = useParams();
 
 
-  const { data: seoPage, isLoading } = useQuery({
+  const { data: seoPage, isLoading, isError } = useQuery({
     queryKey: ["seo"],
     queryFn: async () => getSingleSeoPage(pageId as string),
+    enabled: !!pageId,
   });
 
-  if (!seoPage) notFound();
+  if (isLoading) return <div>Loading...</div>;
+  if (isError || !seoPage) return <div>SEO Page not found</div>;
   return (
     <div className="space-y-2">
       <div className="w-full flex items-center justify-start">
