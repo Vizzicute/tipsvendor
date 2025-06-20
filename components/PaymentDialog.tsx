@@ -476,7 +476,7 @@ const PaymentDialog = ({
   return (
     <>
       {isMobile ? (
-        <Drawer open={open} onOpenChange={onClose}>
+        <Drawer open={open} onOpenChange={onClose} modal={false}>
           <DrawerContent className="p-4">
             <DrawerHeader>
               <DrawerTitle>Payment Details</DrawerTitle>

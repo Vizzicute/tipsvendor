@@ -172,7 +172,6 @@ const SubscriptionCard = ({ className }: Props) => {
       if (!isAuthenticated || !user) {
         toast.error("Please log in to subscribe.");
         redirect("/login");
-        return;
       }
       setOpenPaymentDialog(true);
       setIsLoading(true);
