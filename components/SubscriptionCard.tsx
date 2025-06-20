@@ -32,7 +32,13 @@ import {
 import { toast } from "sonner";
 import { useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
-import PaymentDialog from "./PaymentDialog";
+import dynamic from "next/dynamic";
+
+// Dynamically import PaymentDialog with SSR disabled
+const PaymentDialog = dynamic(() => import("@/components/PaymentDialog"), {
+  ssr: false,
+});
+
 import { countryDiscounts } from "@/lib/config/countryDiscount";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/lib/appwrite/api";
