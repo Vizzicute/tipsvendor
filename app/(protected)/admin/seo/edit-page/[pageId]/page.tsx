@@ -1,26 +1,30 @@
 "use client";
 
-import { getSingleSeoPage } from '@/lib/appwrite/fetch'
-import { notFound, useParams } from 'next/navigation'
-import EditPageForm from '../EditPageForm'
+import { getSingleSeoPage } from "@/lib/appwrite/fetch";
+import { notFound, useParams } from "next/navigation";
+import EditPageForm from "../EditPageForm";
+import { useQuery } from "@tanstack/react-query";
 
-export default async function Page() {
+export default function Page() {
   const { pageId } = useParams();
 
-  if (typeof pageId !== 'string') {
+  if (typeof pageId !== "string") {
     notFound();
   }
 
-  const seoPage = await getSingleSeoPage(pageId);
+  const { data: seoPage, isLoading } = useQuery({
+    queryKey: ["seo"],
+    queryFn: async () => getSingleSeoPage(pageId),
+  });
 
-  if(!seoPage) notFound();
+  if (!seoPage) notFound();
   return (
-    <div className='space-y-2'>
-      <div className='w-full flex items-center justify-start'>
-      <h1 className="text-2xl font-bold tracking-tight">Edit Page Content</h1>
+    <div className="space-y-2">
+      <div className="w-full flex items-center justify-start">
+        <h1 className="text-2xl font-bold tracking-tight">Edit Page Content</h1>
       </div>
 
-      <EditPageForm page={seoPage}/>
+      <EditPageForm page={seoPage} />
     </div>
-  )
+  );
 }
