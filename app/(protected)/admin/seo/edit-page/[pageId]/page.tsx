@@ -1,7 +1,7 @@
 "use client";
 
 import { getSingleSeoPage } from "@/lib/appwrite/fetch";
-import { notFound, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import EditPageForm from "../EditPageForm";
 import { useQuery } from "@tanstack/react-query";
 
