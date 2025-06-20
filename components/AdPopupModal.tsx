@@ -24,7 +24,16 @@ const AdPopupModal = () => {
   }, [isLoading, socials]);
 
   useEffect(() => {
-    if (pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) return;
+    if (
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/admin-auth") ||
+      pathname.startsWith("/register") ||
+      pathname.startsWith("new-staff") ||
+      pathname.startsWith("reset-password")
+    )
+      return;
     const timer = setTimeout(() => setShow(true), 5000);
     return () => clearTimeout(timer);
   }, [pathname]);
