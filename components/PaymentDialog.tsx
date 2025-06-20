@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { getCurrentUser } from "@/lib/appwrite/api";
 import { editSubscription } from "@/lib/appwrite/update";
 import { addSubscription } from "@/lib/appwrite/create";
+import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -168,6 +169,12 @@ const PaymentDialog = ({
             plan,
           });
         }
+        notifyNewSubscription(
+          user?.$id || "",
+          plan,
+          parseInt(duration)
+        );
+        queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
         queryClient.invalidateQueries({ queryKey: ["currentUser"] });
         toast.success(
           "Payment successful! Subscription updated. Go to dashboard"

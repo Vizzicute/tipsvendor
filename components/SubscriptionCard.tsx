@@ -169,7 +169,7 @@ const SubscriptionCard = ({ className }: Props) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || !user) {
         toast.error("Please log in to subscribe.");
         redirect("/login");
         return;
