@@ -41,7 +41,7 @@ const PredictionTable = ({
   const filteredData = tableStat
     ?.filter((data) => getDateOnly(data.datetime) === day)
     .sort(
-      (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
     );
 
   return (

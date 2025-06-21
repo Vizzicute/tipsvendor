@@ -25,7 +25,7 @@ const DynamicContent = ({
   title: string;
   totalGoals?: string;
 }) => {
-  const [adlink, adimgurl] = advert;
+  // const [adlink, adimgurl] = advert;
 
   const {
     data: predictions,
@@ -136,8 +136,6 @@ const DynamicContent = ({
           title={title}
           tableStat={filteredPredictions}
           category={name}
-          adlink={adlink}
-          adimgurl={adimgurl}
           loading={isLoading || isSeoLoading}
         />
         <WBTLinks />

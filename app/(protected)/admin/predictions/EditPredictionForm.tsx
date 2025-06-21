@@ -330,6 +330,7 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
                       </SelectItem>
                       <SelectItem value="vip">Vip Tips</SelectItem>
                       <SelectItem value="mega">Mega Odds</SelectItem>
+                      <SelectItem value="n/a">n/a</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

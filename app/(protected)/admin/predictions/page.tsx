@@ -97,7 +97,7 @@ const page = () => {
 
   const totalPages = Math.ceil((predictions?.length || 0) / PAGE_SIZE);
 
-  const paginatedData = predictions?.slice(
+  const paginatedData = predictions?.sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   ) || [];
