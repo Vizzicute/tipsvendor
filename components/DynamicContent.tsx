@@ -8,7 +8,6 @@ import PageContent from "@/components/PageContent";
 import PredictionTable from "@/components/PredictionTable";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import WBTLinks from "@/components/WBTLinks";
-import { advert } from "@/data";
 import {
   getBlog,
   getPredictions,
