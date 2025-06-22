@@ -4,7 +4,26 @@ import { appwriteConfig, databases } from "./config";
 export async function getPredictions() {
   const predictions = await databases.listDocuments(
     `${appwriteConfig.databaseId}`,
-    `${appwriteConfig.predictionCollectionId}`
+    `${appwriteConfig.predictionCollectionId}`,
+    [Query.limit(1000), Query.orderDesc("$createdAt")]
+  );
+
+  if (!predictions) throw Error;
+
+  return predictions.documents;
+}
+
+export async function getFromYesterdaysPredictions() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const predictions = await databases.listDocuments(
+    `${appwriteConfig.databaseId}`,
+    `${appwriteConfig.predictionCollectionId}`,
+    [
+      Query.limit(100),
+      Query.greaterThanEqual("$createdAt", yesterday.toISOString()),
+    ]
   );
 
   if (!predictions) throw Error;
@@ -15,7 +34,8 @@ export async function getPredictions() {
 export async function getUsers() {
   const users = await databases.listDocuments(
     `${appwriteConfig.databaseId}`,
-    `${appwriteConfig.userCollectionId}`
+    `${appwriteConfig.userCollectionId}`,
+    [Query.limit(500), Query.orderDesc("$createdAt")]
   );
   if (!users) throw Error;
   return users.documents;
@@ -61,7 +81,8 @@ export async function getAdmin() {
 export async function getBlog() {
   const blogs = await databases.listDocuments(
     `${appwriteConfig.databaseId}`,
-    `${appwriteConfig.blogCollectionId}`
+    `${appwriteConfig.blogCollectionId}`,
+    [Query.limit(500), Query.orderDesc("$createdAt")]
   );
 
   if (!blogs) throw Error;
@@ -156,7 +177,8 @@ export async function getSingleSeoPageByUrl(pageUrl: string) {
 export async function getSubscriptions() {
   const subscriptions = await databases.listDocuments(
     appwriteConfig.databaseId,
-    appwriteConfig.subscriptionId
+    appwriteConfig.subscriptionId,
+    [Query.limit(500), Query.orderDesc("$createdAt")],
   );
 
   if (!subscriptions) throw Error;

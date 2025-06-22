@@ -10,7 +10,7 @@ import SubscriptionCard from "@/components/SubscriptionCard";
 import WBTLinks from "@/components/WBTLinks";
 import {
   getBlog,
-  getPredictions,
+  getFromYesterdaysPredictions,
   getSingleSeoPageByUrl,
 } from "@/lib/appwrite/fetch";
 import { useQuery } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ const DynamicContent = ({
     error: predictionsError,
   } = useQuery({
     queryKey: ["predictions"],
-    queryFn: getPredictions,
+    queryFn: getFromYesterdaysPredictions,
   });
 
   const {

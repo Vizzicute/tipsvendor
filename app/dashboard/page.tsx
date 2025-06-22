@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { getCurrentUser } from "@/lib/appwrite/api";
-import { getBlog, getPredictions } from "@/lib/appwrite/fetch";
+import { getBlog, getFromYesterdaysPredictions } from "@/lib/appwrite/fetch";
 import {
   useEditSubscription,
   useSignOutAccount,
@@ -62,7 +62,7 @@ const Page = () => {
 
   const { data: predictions } = useQuery({
     queryKey: ["predictions"],
-    queryFn: getPredictions,
+    queryFn: getFromYesterdaysPredictions,
   });
 
   const today = getDateOnly(new Date());
