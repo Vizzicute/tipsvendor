@@ -119,7 +119,7 @@ const PredictionTable = ({
                       ? data.htft
                       : category === "either"
                       ? data.either
-                      : category === "over"
+                      : category === "overs"
                       ? data.over
                       : category === "isBanker"
                       ? data.tip

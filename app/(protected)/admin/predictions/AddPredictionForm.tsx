@@ -77,15 +77,8 @@ const AddPredictionForm = () => {
     useAddPrediction();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Subtract 1 hour from the datetime
-    const date = new Date(values.datetime);
-    date.setHours(date.getHours() - 1);
-    const adjustedValues = {
-      ...values,
-      datetime: date.toISOString(),
-    };
-
-    const newPrediction = await addPrediction(adjustedValues);
+  
+    const newPrediction = await addPrediction(values);
 
     if (!newPrediction) {
       return toast("Failed. Please try again.");

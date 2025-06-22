@@ -9,7 +9,7 @@ export const NavbarLinks = [
   },
   {
     text: "Vip Packages",
-    link: "/packages",
+    link: "#",
   },
   {
     text: "Livescore",
@@ -52,7 +52,7 @@ export const SubnavLinks = [
   },
   {
     text: "Under 3.5",
-    link: "/under",
+    link: "/under3",
   },
   {
     text: "Under 2.5",
@@ -88,7 +88,7 @@ export const SubnavLinks = [
   },
   {
     text: "Vicverse",
-    link: "/https://vicverse",
+    link: "#",
   },
 ];
 

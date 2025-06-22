@@ -112,7 +112,7 @@ const Page = () => {
     statusColor = "bg-blue-400";
   } else if (anyExpiring) {
     status = "Expiring";
-    statusColor = "bg-yellow-500";
+    statusColor = "bg-yellow-600";
   } else if (anyValid) {
     status = "Active";
     statusColor = "bg-green-500";
