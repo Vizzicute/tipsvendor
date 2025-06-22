@@ -93,7 +93,8 @@ const AddPredictionForm = () => {
       toast.success("Prediction Added");
       form.reset();
       setSportTypeValue("");
-      queryClient.invalidateQueries({ queryKey: ["predictions"] });
+      await queryClient.invalidateQueries({ queryKey: ["predictions"] });
+      await queryClient.refetchQueries({ queryKey: ["predictions"] });
       return;
     }
   }
