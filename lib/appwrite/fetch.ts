@@ -139,7 +139,7 @@ export async function getSingleSeoPageByUrl(pageUrl: string) {
     [Query.equal("url", pageUrl)]
   );
 
-  if (!seoPage || !seoPage.documents || seoPage.documents.length === 0) {
+  if (!seoPage) {
     return {
       title: "Tipsvendor - Top Football Tips and Prediction Website",
       description: "Get the best football tips and predictions",

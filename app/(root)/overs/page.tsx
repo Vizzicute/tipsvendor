@@ -36,5 +36,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  return <DynamicContent name="over" title="Overs/Under Predictions" />;
+  return <DynamicContent name="overs" title="Overs/Under Predictions" />;
 }
