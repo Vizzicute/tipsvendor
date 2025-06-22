@@ -32,7 +32,7 @@ const BlogSection = ({ blog, isLoading }: blogDataProp) => {
                 src={data.featuredImage}
                 width={90}
                 height={90}
-                className="rounded-sm shadow-sm object-contain size-[95px] justify-self-start"
+                className="rounded-sm shadow-sm object-cover size-[95px] justify-self-start"
               />
             )}
             <div className="flex flex-wrap w-auto p-2 gap-2">
