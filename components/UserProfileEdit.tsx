@@ -21,7 +21,7 @@ const UserProfileEdit = ({ user }: { user: Models.Document }) => {
     <div>
       {/* Show Dialog on md and up */}
       <div className="hidden md:block">
-        <Dialog>
+        <Dialog modal={false}>
           <DialogTrigger asChild>
             <Button className="bg-black text-secondary rounded-md px-2">
               Update Profile
@@ -39,7 +39,7 @@ const UserProfileEdit = ({ user }: { user: Models.Document }) => {
       </div>
       {/* Show Drawer on small screens */}
       <div className="md:hidden">
-        <Drawer>
+        <Drawer modal={false}>
           <DrawerTrigger asChild>
             <Button className="bg-black text-secondary rounded-md px-2">
               Update Profile

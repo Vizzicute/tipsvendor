@@ -152,6 +152,7 @@ const UserProfileForm = ({ user }: { user: Models.Document }) => {
                           : user?.avatar || user?.imageUrl
                       }
                       alt={user?.name}
+                      className="object-contain"
                     />
                     <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
                   </Avatar>

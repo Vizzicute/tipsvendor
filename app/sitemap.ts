@@ -116,7 +116,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: Date()
         },
         ...(blogs?.map((blog) => ({
-            url: `${process.env.NEXT_PUBLIC_APP_URL}/${blog.slug}`,
+            url: `${process.env.NEXT_PUBLIC_APP_URL}/blog/${blog.slug}`,
             priority: 0.5,
             lastModified: Date()
         })) || []),

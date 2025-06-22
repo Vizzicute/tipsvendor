@@ -197,6 +197,7 @@ const Page = () => {
                   <AvatarImage
                     src={currentUser?.imageUrl}
                     alt={currentUser?.name}
+                    className="object-contain"
                   />
                   <AvatarFallback>
                     {currentUser?.name?.charAt(0)}

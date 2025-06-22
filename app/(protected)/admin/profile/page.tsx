@@ -196,6 +196,7 @@ export default function ProfilePage() {
                       : user?.avatar || user?.imageUrl
                   }
                   alt={user?.name}
+                  className="object-contain"
                 />
                 <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>

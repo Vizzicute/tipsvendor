@@ -71,7 +71,7 @@ const PredictionTable = ({
         's {title}
       </h2>
 
-      <div className="w-full flex items-center justify-center py-2">
+      <div className="w-full flex items-center justify-center py-2 px-1">
         {loading ? (
           <Loader2 className="size-10 animate-spin text-gray-600" />
         ) : filteredData?.length === 0 ? (
@@ -102,7 +102,7 @@ const PredictionTable = ({
                   className="text-[12px] odd:bg-white even:bg-gray-100 border-b"
                 >
                   <td className="py-2">{formattedTime(data.datetime)}</td>
-                  <td>{data.league}</td>
+                  <td className="uppercase">{data.league}</td>
                   <td>
                     {data.hometeam} <strong className="text-primary">VS</strong>{" "}
                     {data.awayteam}

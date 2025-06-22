@@ -93,7 +93,7 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="relative container mx-auto py-8 max-w-4xl">
+    <div className="relative container mx-auto py-8 px-2 max-w-4xl">
       <div className="w-full md:w-[65%]">
         <div className="mb-8 px-3">
           <h1 className="text-3xl font-semibold mb-4">{singleBlog.title}</h1>
@@ -171,7 +171,7 @@ const BlogPost = () => {
             <Button
               onClick={handleAddComment}
               disabled={isAddingComment}
-              className="w-full sm:w-auto rounded-[px]"
+              className="min-sm:px-2 max-sm:w-[80%] sm:w-auto rounded-[px]"
             >
               {isAddingComment ? (
                 <>

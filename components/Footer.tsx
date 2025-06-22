@@ -5,17 +5,25 @@ import Logo from "./Logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
+import { getSeoPages } from "@/lib/appwrite/fetch";
 import { getSocialSettings } from "@/lib/appwrite/appConfig";
 
 const Footer = () => {
-  const pathname = usePathname() || "";
-  const { data: pageContent, isLoading } = useQuery({
+  const pathname = usePathname();
+  const { data: pages, isLoading } = useQuery({
     queryKey: ["seo"],
-    queryFn: async () => getSingleSeoPageByUrl(pathname),
+    queryFn: async () => getSeoPages(),
   });
 
-  const { data: settings, isLoading: isSettingsLoading } = useQuery({
+  const pageSlug = pathname.startsWith("/blog")
+    ? "blog"
+    : pathname === "/"
+    ? ""
+    : pathname.split("/").pop() || "";
+
+  const pageContent = pages?.find((page) => page.url === pageSlug);
+
+  const { data: settings, } = useQuery({
     queryKey: ["settings"],
     queryFn: getSocialSettings,
   });

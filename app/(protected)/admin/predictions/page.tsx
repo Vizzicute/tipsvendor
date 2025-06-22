@@ -524,7 +524,7 @@ const page = () => {
                         ? "Tomorrow"
                         : formattedDate(new Date(data.datetime))}
                     </TableCell>
-                    <TableCell>{data.league}</TableCell>
+                    <TableCell className="uppercase">{data.league}</TableCell>
                     <TableCell>
                       {data.hometeam}{" "}
                       <span className="font-semibold text-primary">vs</span>{" "}
