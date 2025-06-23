@@ -1,21 +1,29 @@
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export function AdSenseManager() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (pathname.startsWith('/admin')) return
+    if (
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/login") ||
+      pathname.startsWith("/admin-auth") ||
+      pathname.startsWith("/register") ||
+      pathname.startsWith("/new-staff") ||
+      pathname.startsWith("/reset-password")
+    )
+      return;
     try {
-      if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
-        (window.adsbygoogle = window.adsbygoogle || []).push({})
+      if (typeof window !== "undefined" && (window as any).adsbygoogle) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
       }
     } catch (e) {
-      console.error('AdSense error:', e)
+      console.error("AdSense error:", e);
     }
-  }, [pathname])
+  }, [pathname]);
 
-  return null
+  return null;
 }
