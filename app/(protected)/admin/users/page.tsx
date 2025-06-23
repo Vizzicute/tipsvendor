@@ -104,21 +104,7 @@ const page = () => {
     }
   }, [startDate, endDate]);
 
-  const totalPages = Math.ceil(
-    (tab === "users"
-      ? users?.filter((data) => data.role === "user")?.length || 0
-      : subscriptions?.length || 0) / PAGE_SIZE
-  );
-
   const onlyUsers = users?.filter((data) => data.role === "user");
-
-  const paginatedData =
-    tab === "users"
-      ? onlyUsers?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-      : subscriptions?.slice(
-          (currentPage - 1) * PAGE_SIZE,
-          currentPage * PAGE_SIZE
-        );
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -126,7 +112,7 @@ const page = () => {
     }
   };
 
-  const searchedUsers = paginatedData?.filter(
+  const searchedUsers = onlyUsers?.filter(
     (data) =>
       data.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       data.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -190,7 +176,7 @@ const page = () => {
   });
 
   // Filter, search, and sort subscriptions
-  const searchedSubscriptions = paginatedData?.filter(
+  const searchedSubscriptions = subscriptions?.filter(
     (data) =>
       data.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       data.subscriptionType?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -209,7 +195,8 @@ const page = () => {
       const end = getDateOnly(endDate);
       return subDate >= start && subDate <= end;
     }
-    if (filterBy === "valid") return data.isValid === true && data.isFreeze === false;
+    if (filterBy === "valid")
+      return data.isValid === true && data.isFreeze === false;
     if (filterBy === "expired") return data.isValid === false;
     if (filterBy === "frozen") return data.isFreeze === true;
     return true;
@@ -218,13 +205,34 @@ const page = () => {
   const sortedSubscriptions = filteredSubscriptions?.sort((a, b) => {
     switch (sortBy) {
       case "subscription-asc":
-        return (a.subscriptionType || "").localeCompare(b.subscriptionType || "");
+        return (a.subscriptionType || "").localeCompare(
+          b.subscriptionType || ""
+        );
       case "subscription-desc":
-        return (b.subscriptionType || "").localeCompare(a.subscriptionType || "");
+        return (b.subscriptionType || "").localeCompare(
+          a.subscriptionType || ""
+        );
       default:
-        return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
+        return (
+          new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()
+        );
     }
   });
+  const totalPages = Math.ceil(
+    (tab === "users"
+      ? users?.filter((data) => data.role === "user")?.length || 0
+      : subscriptions?.length || 0) / PAGE_SIZE
+  );
+  const paginatedData =
+    tab === "users"
+      ? sortedUsers?.slice(
+          (currentPage - 1) * PAGE_SIZE,
+          currentPage * PAGE_SIZE
+        )
+      : sortedSubscriptions?.slice(
+          (currentPage - 1) * PAGE_SIZE,
+          currentPage * PAGE_SIZE
+        );
 
   const FilterButton = () => (
     <Popover>
@@ -423,7 +431,7 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedUsers?.map((user) => (
+                    {paginatedData?.map((user) => (
                       <TableRow key={user.$id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
@@ -581,9 +589,9 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortedSubscriptions?.map((subscription: any) => (
+                    {paginatedData?.map((subscription: any) => (
                       <TableRow key={subscription.$id}>
-                        <TableCell>{subscription.user.email}</TableCell>
+                        <TableCell>{subscription.user?.email}</TableCell>
                         <TableCell className="capitalize">
                           {subscription.subscriptionType}
                         </TableCell>

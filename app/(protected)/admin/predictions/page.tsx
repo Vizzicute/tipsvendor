@@ -95,20 +95,14 @@ const page = () => {
     }
   }, [startDate, endDate]);
 
-  const totalPages = Math.ceil((predictions?.length || 0) / PAGE_SIZE);
-
-  const paginatedData = predictions?.sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  ) || [];
-
+  
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
-  const searchedPredictions = paginatedData?.filter(
+  const searchedPredictions = predictions?.filter(
     (data) =>
       data.hometeam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       data.awayteam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -145,7 +139,7 @@ const page = () => {
 
     return true;
   });
-
+  
   const sortedPredictions = filteredPredictions?.sort((a, b) => {
     switch (sortBy) {
       case "":
@@ -154,18 +148,24 @@ const page = () => {
         return a.league.localeCompare(b.league);
       case "league-desc":
         return b.league.localeCompare(a.league);
-      case "hometeam-asc":
+        case "hometeam-asc":
         return a.hometeam.localeCompare(b.hometeam);
       case "hometeam-desc":
         return b.hometeam.localeCompare(a.hometeam);
-      case "awayteam-asc":
-        return a.awayteam.localeCompare(b.awayteam);
-      case "awayteam-desc":
-        return b.awayteam.localeCompare(a.awayteam);
-      default:
-        return 0;
-    }
-  });
+        case "awayteam-asc":
+          return a.awayteam.localeCompare(b.awayteam);
+          case "awayteam-desc":
+            return b.awayteam.localeCompare(a.awayteam);
+            default:
+              return 0;
+            }
+          });
+          const totalPages = Math.ceil((sortedPredictions?.length || 0) / PAGE_SIZE);
+        
+          const paginatedData = sortedPredictions?.sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(
+            (currentPage - 1) * PAGE_SIZE,
+            currentPage * PAGE_SIZE
+          ) || [];
 
   const formattedDate = (date: Date): string =>
     date.toISOString().split("T")[0];
@@ -477,13 +477,13 @@ const page = () => {
             </div>
           </div>
 
-          {sortedPredictions === undefined ? (
+          {paginatedData === undefined ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-500">
                 Loading predictions...
               </h3>
             </div>
-          ) : sortedPredictions?.length === 0 ? (
+          ) : paginatedData?.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-500">
                 No predictions found
@@ -507,7 +507,7 @@ const page = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedPredictions?.map((data) => (
+                {paginatedData?.map((data) => (
                   <TableRow key={data.gameId} className="text-center">
                     <TableCell className="font-normal">
                       {formattedTime(new Date(data.datetime))}
