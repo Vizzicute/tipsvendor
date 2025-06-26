@@ -14,10 +14,10 @@ export default function AuthWrapper({
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
+  const {data: user} = useCurrentUser();
 
   useEffect(() => {
     const protectRoute = async () => {
-      const {data: user} = useCurrentUser();
 
       if (!user && pathname === "/dashboard") {
         router.replace("/login");

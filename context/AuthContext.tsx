@@ -27,11 +27,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [ user, setUser ] = useState<IUser>(INITIAL_USER);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isAuthenticated, setIsAuthenticated ] = useState(false);
+    const {data: currentAccount} = useCurrentUser();
 
     const checkAuthUser = async () => {
         setIsLoading(true);
         try {
-            const {data: currentAccount} = useCurrentUser();
 
             if(currentAccount) {
                 setUser({
