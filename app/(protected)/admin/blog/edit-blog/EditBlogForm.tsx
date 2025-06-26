@@ -24,12 +24,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { getBlogCategories } from "@/lib/appwrite/fetch";
 import { deleteFile, fileUrl, uploadFile } from "@/lib/appwrite/media";
 import { useEditBlog } from "@/lib/react-query/queriesAndMutations";
 import { truncate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { CommandGroup } from "cmdk";
 import React, { useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -37,6 +36,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { Models } from "appwrite";
+import { useBlogCategories } from "@/lib/react-query/queries";
 
 interface EditBlogFormProps {
   blog: Models.Document;
@@ -132,10 +132,7 @@ const CategorySelect = React.memo(({ value, onChange, categories }: CategorySele
 CategorySelect.displayName = "CategorySelect";
 
 const EditBlogForm = ({ blog }: EditBlogFormProps) => {
-  const { data: blogCategories } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getBlogCategories,
-  });
+  const { data: blogCategories } = useBlogCategories();
 
   // Transform the blog categories data to match the expected format
   const transformedCategories = React.useMemo(() => {

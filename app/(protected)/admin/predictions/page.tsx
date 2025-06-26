@@ -21,8 +21,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getPredictions } from "@/lib/appwrite/fetch";
-import { useQuery } from "@tanstack/react-query";
 import {
   ArrowDownAZ,
   ArrowUpZA,
@@ -59,15 +57,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { usePredictions } from "@/lib/react-query/queries";
 
 
 const page = () => {
   const {
     data: predictions
-  } = useQuery({
-    queryKey: ["predictions"],
-    queryFn: getPredictions,
-  });
+  } = usePredictions();
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);

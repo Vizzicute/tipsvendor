@@ -1,19 +1,14 @@
 "use client";
 
 import React from "react";
-import { getSingleBlog } from "@/lib/appwrite/fetch";
 import EditBlogForm from "../EditBlogForm";
 import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { singleBlog } from "@/lib/react-query/queries";
 
 export default function Page() {
   const { blogId } = useParams();
 
-  const { data: blog, isLoading, isError } = useQuery({
-    queryKey: ["blog", blogId],
-    queryFn: async () => getSingleBlog(blogId as string),
-    enabled: !!blogId,
-  });
+  const { data: blog, isLoading, isError } = singleBlog(blogId as string);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !blog) return <div>Blog not found</div>;

@@ -11,9 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  getUserNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from "@/lib/appwrite/notifications";
@@ -21,6 +20,7 @@ import { useUserContext } from "@/context/AuthContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { userNotifications } from "@/lib/react-query/queries";
 
 interface NotificationsDropdownProps {
   variant?:
@@ -42,11 +42,7 @@ export default function NotificationsDropdown({
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = useQuery({
-    queryKey: ["notifications", user?.id],
-    queryFn: () => getUserNotifications(user?.id || ""),
-    enabled: !!user?.id,
-  });
+  const { data: notifications, isLoading } = userNotifications(user?.id || "");
 
   const markAsReadMutation = useMutation({
     mutationFn: markNotificationAsRead,

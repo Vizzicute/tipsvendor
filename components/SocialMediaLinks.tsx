@@ -1,7 +1,5 @@
 import Link from "next/link";
 import React from "react";
-import { getSocialSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
 import {
   Facebook,
   Twitter,
@@ -10,12 +8,10 @@ import {
   Youtube,
   Send,
 } from "lucide-react";
+import { useSocials } from "@/lib/react-query/queries";
 
 const SocialMediaLinks = () => {
-  const { data: socialSettings } = useQuery({
-    queryKey: ["socialSettings"],
-    queryFn: getSocialSettings,
-  });
+  const { data: socialSettings } = useSocials();
 
   const socialMediaLinks = {
     facebook: socialSettings?.facebook || "",

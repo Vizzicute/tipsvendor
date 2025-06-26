@@ -17,8 +17,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCurrentUser } from "@/lib/appwrite/api";
+import { useQueryClient } from "@tanstack/react-query";
 import { editUser } from "@/lib/appwrite/update";
 import { editAvatar } from "@/lib/appwrite/media";
 import LoadingButton from "@/components/LoadingButton";
@@ -28,6 +27,7 @@ import { sendMail } from "@/lib/utils/mail";
 import { useSignOutAllAccount } from "@/lib/react-query/queriesAndMutations";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
+import { useCurrentUser } from "@/lib/react-query/queries";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -42,10 +42,7 @@ export default function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
 
-  const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: getCurrentUser,
-  });
+  const { data: user, isLoading: isLoadingUser } = useCurrentUser();
 
   const { mutateAsync: signoutAllAccount, isPending: isSigningOut } =
     useSignOutAllAccount();

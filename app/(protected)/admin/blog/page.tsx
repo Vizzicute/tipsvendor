@@ -9,8 +9,7 @@ import BlogTabs from "@/components/BlogTabs";
 import { useBlogs } from "@/hooks/useBlogs";
 import { useSearchParams } from "next/navigation";
 import AddBlogCategory from "@/components/AddBlogCategory";
-import { useQuery } from "@tanstack/react-query";
-import { getBlogCategories, getComments } from "@/lib/appwrite/fetch";
+import { useBlogCategories, useComments } from "@/lib/react-query/queries";
 
 export default function BlogPage() {
   const searchParams = useSearchParams();
@@ -18,15 +17,9 @@ export default function BlogPage() {
   const [currentTab, setCurrentTab] = useState("content");
   const { data: blogs, isLoading } = useBlogs();
 
-  const { data: comments, isLoading: commentsLoading } = useQuery({
-    queryKey: ["comments"],
-    queryFn: () => getComments(),
-  });
+  const { data: comments, isLoading: commentsLoading } = useComments();
 
-  const { data: categories, isLoading: categoriesLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getBlogCategories(),
-  });
+  const { data: categories, isLoading: categoriesLoading } = useBlogCategories();
 
   const filteredBlogs = blogs ? blogs.filter((blog) => {
     if (status === "all") return true;

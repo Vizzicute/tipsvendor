@@ -1,15 +1,11 @@
 "use client";
 
-import { getGoogleTagSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useGoogleTags } from "@/lib/react-query/queries";
 import Script from "next/script";
 import React from "react";
 
 const GtmScript = () => {
-  const { data: googleTags } = useQuery({
-    queryKey: ["google-tags"],
-    queryFn: getGoogleTagSettings,
-  });
+  const { data: googleTags } = useGoogleTags();
 
   const googleTagManagerId: string = googleTags?.gtmId;
 

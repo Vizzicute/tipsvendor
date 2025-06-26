@@ -9,8 +9,7 @@ import { redirect, usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { getSocialSettings } from "@/lib/appwrite/appConfig";
+import { useSocials } from "@/lib/react-query/queries";
 
 const Hero = ({
   h1tag,
@@ -22,10 +21,7 @@ const Hero = ({
   isSeoLoading: boolean;
 }) => {
   const pathname = usePathname();
-  const { data: settings, isLoading: isSettingsLoading } = useQuery({
-    queryKey: ["settings"],
-    queryFn: getSocialSettings,
-  });
+  const { data: settings, isLoading: isSettingsLoading } = useSocials();
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
   const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading } =
     useUserContext();

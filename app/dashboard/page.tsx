@@ -9,15 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
-import { getCurrentUser } from "@/lib/appwrite/api";
-import { getBlog, getFromYesterdaysPredictions } from "@/lib/appwrite/fetch";
+import { useBlogs, useCurrentUser, usePredictions } from "@/lib/react-query/queries";
 import {
   useEditSubscription,
   useSignOutAccount,
 } from "@/lib/react-query/queriesAndMutations";
 import { checkAndUpdateSubscription } from "@/lib/utils/SubscriptionLogic";
 import { verificationMail } from "@/lib/utils/verificationMail";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Models } from "appwrite";
 import { formatDate } from "date-fns";
 import { CircleAlert } from "lucide-react";
@@ -54,16 +53,9 @@ const Page = () => {
   });
 
   // Only fetch user if authenticated to avoid Appwrite 401 error
-  const { data: currentUser } = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: getCurrentUser,
-    enabled: isAuthenticated,
-  });
+  const { data: currentUser } = useCurrentUser();
 
-  const { data: predictions } = useQuery({
-    queryKey: ["predictions"],
-    queryFn: getFromYesterdaysPredictions,
-  });
+  const { data: predictions } = usePredictions();
 
   const today = getDateOnly(new Date());
   const yesterday = getDateOnly(new Date(Date.now() - 86400000));
@@ -121,10 +113,7 @@ const Page = () => {
     statusColor = "bg-red-500";
   }
 
-  const { data: blogs, isLoading: isBlogsLoading } = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getBlog,
-  });
+  const { data: blogs, isLoading: isBlogsLoading } = useBlogs();
 
   const interestingBlogs = blogs
     ?.sort((a, b) => a.comments.length - b.comments.length)

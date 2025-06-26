@@ -1,8 +1,7 @@
 // components/TelegramModal.jsx
 "use client";
 
-import { getSocialSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useSocials } from "@/lib/react-query/queries";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -12,10 +11,7 @@ const AdPopupModal = () => {
   const [link, setLink] = useState("https://t.me/tipsvendor");
 
   // Move useQuery outside useEffect for correct React Query usage
-  const { data: socials, isLoading } = useQuery({
-    queryKey: ["settings"],
-    queryFn: getSocialSettings,
-  });
+  const { data: socials, isLoading } = useSocials();
 
   useEffect(() => {
     if (!isLoading && socials && socials.telegram) {

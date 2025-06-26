@@ -1,8 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSubscriptions, getUsers, getBlog, getPredictions } from "@/lib/appwrite/fetch";
-import { useQuery } from "@tanstack/react-query";
 import { CreditCard, Users, TrendingUp, DollarSign } from "lucide-react";
 import { format, subDays, startOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isToday, isYesterday } from "date-fns";
 import { truncate } from "@/lib/utils";
@@ -10,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import { countryDiscounts } from "@/lib/config/countryDiscount";
 import { getExchangeRate, calculateSubscriptionPrice as calcPriceUtil } from "@/lib/utils/exchangeRates";
+import { useBlogs, usePredictions, useSubscriptions, useUsers } from "@/lib/react-query/queries";
 
 
 function getCurrency(country: string) {
@@ -49,25 +48,13 @@ const calculateEarningsUSD = (subscriptions: any[]) => {
 export default function AnalyticsPage() {
   const [predictionTimeFilter, setPredictionTimeFilter] = useState("all");
 
-  const { data: subscriptions } = useQuery({
-    queryKey: ["subscriptions"],
-    queryFn: getSubscriptions,
-  });
+  const { data: subscriptions } = useSubscriptions();
 
-  const { data: users } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
+  const { data: users } = useUsers();
 
-  const { data: blogs } = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getBlog,
-  });
+  const { data: blogs } = useBlogs();
 
-  const { data: predictions } = useQuery({
-    queryKey: ["predictions"],
-    queryFn: getPredictions,
-  });
+  const { data: predictions } = usePredictions();
 
   // Calculate subscription stats
   const allSubscriptions = subscriptions || [];

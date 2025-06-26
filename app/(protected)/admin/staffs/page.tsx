@@ -18,10 +18,8 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { getUsers } from "@/lib/appwrite/fetch";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -57,15 +55,13 @@ import {
 import AddStaff from "./AddStaff";
 import EditStaffForm from "./EditStaffForm";
 import DeleteUserDialog from "@/components/DeleteUserDialog";
+import { useUsers } from "@/lib/react-query/queries";
 
 
 const page = () => {
   const {
     data: staffs,
-  } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getUsers,
-  });
+  } = useUsers();
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);

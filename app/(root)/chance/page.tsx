@@ -1,10 +1,11 @@
 import DynamicContent from "@/components/DynamicContent";
+import { getCached } from "@/lib/appwrite/cache";
 import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const seopage = await getSingleSeoPageByUrl("chance");
+    const seopage = await getCached("seoPage-1", () => getSingleSeoPageByUrl("chance"));
     
     return {
       title: seopage?.title || "Tipsvendor - Top Football Tips and Prediction Website",

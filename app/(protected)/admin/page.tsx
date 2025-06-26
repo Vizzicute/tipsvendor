@@ -13,11 +13,10 @@ import {
   PointElement,
   LineElement,
 } from "chart.js";
-import { useQuery } from "@tanstack/react-query";
-import { getUsers, getSubscriptions, getBlog } from "@/lib/appwrite/fetch";
 import { Activity, CreditCard, Newspaper, Users } from "lucide-react";
 import Link from "next/link";
 import { useUserContext } from "@/context/AuthContext";
+import { useBlogs, useSubscriptions, useUsers } from "@/lib/react-query/queries";
 
 // Register ChartJS components
 ChartJS.register(
@@ -37,24 +36,15 @@ const AdminDashboard = () => {
     data: users,
     isPending: isLoading,
     error,
-  } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getUsers,
-  });
+  } = useUsers();
 
   const {
     data: subscriptions,
     isPending: isSubscriptionsLoading,
     error: subscriptionsError,
-  } = useQuery({
-    queryKey: ["subscriptions"],
-    queryFn: getSubscriptions,
-  });
+  } = useSubscriptions();
 
-  const { data: blogs } = useQuery({
-    queryKey: ["blogs"],
-    queryFn: getBlog,
-  });
+  const { data: blogs } = useBlogs();
 
   // Calculate statistics
   const totalUsers = users?.filter((user) => user.role === "user").length || 0;

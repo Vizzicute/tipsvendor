@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getSingleBlogBySlug } from "@/lib/appwrite/fetch";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -20,6 +18,7 @@ import BlogHeadingTextWrapper from "@/components/BlogHeadingTextWrapper";
 import { useBlogs } from "@/hooks/useBlogs";
 import BlogCard from "@/components/BlogCard";
 import { notifyNewComment } from "@/lib/appwrite/notificationTriggers";
+import { singleBlogBySlug } from "@/lib/react-query/queries";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -30,10 +29,7 @@ const BlogPost = () => {
     useAddComment();
   const { user, isAuthenticated } = useUserContext();
 
-  const { data: singleBlog, isLoading } = useQuery({
-    queryKey: ["single-blog", slug],
-    queryFn: () => getSingleBlogBySlug(slug as string),
-  });
+  const { data: singleBlog, isLoading } = singleBlogBySlug(slug as string);
 
   const { data: blogs } = useBlogs();
 

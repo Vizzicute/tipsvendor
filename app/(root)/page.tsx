@@ -1,11 +1,12 @@
 import DynamicContent from "@/components/DynamicContent";
+import { getCached } from "@/lib/appwrite/cache";
 import { getSingleSeoPage } from "@/lib/appwrite/fetch";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const seopage = await getSingleSeoPage("1");
-    
+    const seopage = await getCached("seoPage-1", () => getSingleSeoPage("1"));
+
     return {
       description: seopage?.description || "Get the best football tips and predictions",
       keywords: seopage?.keywords || ["football tips", "predictions", "sports betting"],

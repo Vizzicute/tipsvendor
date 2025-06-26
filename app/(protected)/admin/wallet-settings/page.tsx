@@ -16,9 +16,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import LoadingButton from "@/components/LoadingButton";
-import { getWalletSettings, updateSettings } from "@/lib/appwrite/appConfig";
+import { updateSettings } from "@/lib/appwrite/appConfig";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSettings } from "@/lib/react-query/queries";
 
 const walletSettingsSchema = z.object({
   // Paystack Settings
@@ -76,10 +77,7 @@ export default function WalletSettingsPage() {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: settings, isLoading: isLoadingSettings } = useQuery({
-    queryKey: ["wallet-settings"],
-    queryFn: getWalletSettings,
-  });
+  const { data: settings, isLoading: isLoadingSettings } = useSettings();
 
   const updateSettingsMutation = useMutation({
     mutationFn: (data: z.infer<typeof walletSettingsSchema>) => updateSettings("wallet", data),

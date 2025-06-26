@@ -1,15 +1,11 @@
 "use client";
 
-import { getGoogleTagSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useGoogleTags } from "@/lib/react-query/queries";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function Analytics() {
-  const { data: googleTags } = useQuery({
-    queryKey: ["google-tags"],
-    queryFn: getGoogleTagSettings,
-  });
+  const { data: googleTags } = useGoogleTags();
 
   const GA_MEASUREMENT_ID: string = googleTags?.gaMeasurementId || "";
   const pathname = usePathname();

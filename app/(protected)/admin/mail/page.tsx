@@ -16,12 +16,8 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useQuery } from "@tanstack/react-query";
-import {
-  getUsers,
-  getSubscriptions,
-  getPredictions,
-} from "@/lib/appwrite/fetch";
+
+
 import { sendMail, sendBulkMail } from "@/lib/utils/mail";
 import { toast } from "sonner";
 import {
@@ -54,6 +50,7 @@ import {
 import { cn } from "@/lib/utils";
 import LoadingButton from "@/components/LoadingButton";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
+import { usePredictions, useSubscriptions, useUsers } from "@/lib/react-query/queries";
 
 const formSchema = z.object({
   recipientType: z.string(),
@@ -67,20 +64,11 @@ export default function MailPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [messageContent, setMessageContent] = useState("");
 
-  const { data: users } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
+  const { data: users } = useUsers();
 
-  const { data: subscriptions } = useQuery({
-    queryKey: ["subscriptions"],
-    queryFn: getSubscriptions,
-  });
+  const { data: subscriptions } = useSubscriptions();
 
-  const { data: predictions } = useQuery({
-    queryKey: ["predictions"],
-    queryFn: getPredictions,
-  });
+  const { data: predictions } = usePredictions();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

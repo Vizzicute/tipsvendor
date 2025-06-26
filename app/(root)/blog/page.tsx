@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getBlog, getBlogCategories } from "@/lib/appwrite/fetch";
 import React from "react";
 import BlogMiniNav from "@/components/BlogMiniNav";
 import BlogHero from "@/components/BlogHero";
@@ -10,17 +8,12 @@ import { Models } from "appwrite";
 import BlogCard from "@/components/BlogCard";
 import BlogHeadingTextWrapper from "@/components/BlogHeadingTextWrapper";
 import SocialMediaLinks from "@/components/SocialMediaLinks";
+import { useBlogCategories, useBlogs } from "@/lib/react-query/queries";
 
 const page = () => {
-  const { data: blogCategories, isLoading } = useQuery({
-    queryKey: ["blogCategories"],
-    queryFn: getBlogCategories,
-  });
+  const { data: blogCategories, isLoading } = useBlogCategories();
 
-  const { data: blog } = useQuery({
-    queryKey: ["blog"],
-    queryFn: getBlog,
-  });
+  const { data: blog } = useBlogs();
 
   const popularBlogs = blog?.sort((a, b) => b.comments.length - a.comments.length).slice(0, 7);
 

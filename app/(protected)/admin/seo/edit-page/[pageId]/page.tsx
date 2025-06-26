@@ -1,19 +1,14 @@
 "use client";
 
-import { getSingleSeoPage } from "@/lib/appwrite/fetch";
 import { useParams } from "next/navigation";
 import EditPageForm from "../EditPageForm";
-import { useQuery } from "@tanstack/react-query";
+import { singleSeoPage } from "@/lib/react-query/queries";
 
 export default function Page() {
   const { pageId } = useParams();
 
 
-  const { data: seoPage, isLoading, isError } = useQuery({
-    queryKey: ["seo"],
-    queryFn: async () => getSingleSeoPage(pageId as string),
-    enabled: !!pageId,
-  });
+  const { data: seoPage, isLoading, isError } = singleSeoPage(pageId as string);
 
   if (isLoading) return <div>Loading...</div>;
   if (isError || !seoPage) return <div>SEO Page not found</div>;

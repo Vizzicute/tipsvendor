@@ -3,16 +3,12 @@
 import CategorySection from "@/components/CategorySection";
 import Hero from "@/components/Hero";
 import { Button } from "@/components/ui/button";
-import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
-import { useQuery } from "@tanstack/react-query";
+import { singleSeoPageByUrl } from "@/lib/react-query/queries";
 import React, { useState } from "react";
 
 const Page = () => {
   const pageTitle = "free-predictions";
-  const { data: seopage, isPending: isSeoLoading } = useQuery({
-    queryKey: ["seo-page", pageTitle],
-    queryFn: () => getSingleSeoPageByUrl(pageTitle),
-  });
+  const { data: seopage, isPending: isSeoLoading } = singleSeoPageByUrl(pageTitle as string);
 
   const getDateOnly = (input: string | Date) => {
     const date = new Date(input);

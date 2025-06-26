@@ -5,14 +5,10 @@ import { Button } from "./ui/button";
 import { Landmark, Send } from "lucide-react";
 import Link from "next/link";
 import WhatsappIcon from "./WhatsappIcon";
-import { getSocialSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useSocials } from "@/lib/react-query/queries";
 
 const WBTLinks = () => {
-  const { data: settings, isLoading: isSettingsLoading } = useQuery({
-    queryKey: ["settings"],
-    queryFn: getSocialSettings,
-  });
+  const { data: settings, isLoading: isSettingsLoading } = useSocials();
   return (
     <div className="w-full p-2 gap-2 flex flex-wrap items-center justify-around">
       <Link

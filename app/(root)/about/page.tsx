@@ -1,10 +1,11 @@
 import PageContent from "@/components/PageContent";
+import { getCached } from "@/lib/appwrite/cache";
 import { getSingleSeoPageByUrl } from "@/lib/appwrite/fetch";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const seopage = await getSingleSeoPageByUrl("about");
+    const seopage = await getCached("seoPage-1", () => getSingleSeoPageByUrl("about"));
     
     return {
       description: seopage?.description || "Get the best football tips and predictions",

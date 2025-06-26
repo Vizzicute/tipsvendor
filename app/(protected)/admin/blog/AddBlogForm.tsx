@@ -24,26 +24,23 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { getBlogCategories } from "@/lib/appwrite/fetch";
 import { fileUrl, uploadFile } from "@/lib/appwrite/media";
 import { useAddBlog } from "@/lib/react-query/queriesAndMutations";
 import { truncate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { CommandGroup } from "cmdk";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
+import { useBlogCategories } from "@/lib/react-query/queries";
 
 const STORAGE_KEY = "draft-blog-post";
 
 const AddBlogForm = () => {
-  const { data: blogCategories } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getBlogCategories,
-  });
+  const { data: blogCategories } = useBlogCategories();
   const date = new Date();
 
   // Get components with padding

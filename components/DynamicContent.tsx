@@ -8,12 +8,7 @@ import PageContent from "@/components/PageContent";
 import PredictionTable from "@/components/PredictionTable";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import WBTLinks from "@/components/WBTLinks";
-import {
-  getBlog,
-  getFromYesterdaysPredictions,
-  getSingleSeoPageByUrl,
-} from "@/lib/appwrite/fetch";
-import { useQuery } from "@tanstack/react-query";
+import { singleSeoPageByUrl, useBlogs, usePredictions } from "@/lib/react-query/queries";
 
 const DynamicContent = ({
   name,
@@ -30,18 +25,12 @@ const DynamicContent = ({
     data: predictions,
     isPending: isLoading,
     error: predictionsError,
-  } = useQuery({
-    queryKey: ["predictions"],
-    queryFn: getFromYesterdaysPredictions,
-  });
+  } = usePredictions();
 
   const {
     data: blog,
     isPending: isBlogLoading,
-  } = useQuery({
-    queryKey: ["blog"],
-    queryFn: getBlog,
-  });
+  } = useBlogs();
 
   const sortedBlog = blog?.sort((a, b) => {
     return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
@@ -111,10 +100,7 @@ const DynamicContent = ({
     data: seopage,
     isPending: isSeoLoading,
     error: seoError,
-  } = useQuery({
-    queryKey: ["seo-page", pageTitle],
-    queryFn: () => getSingleSeoPageByUrl(pageTitle),
-  });
+  } = singleSeoPageByUrl(pageTitle);
 
   if (predictionsError || seoError) {
     console.error("Error loading data:", { predictionsError, seoError });
@@ -135,7 +121,7 @@ const DynamicContent = ({
           title={title}
           tableStat={filteredPredictions}
           category={name}
-          loading={isLoading || isSeoLoading}
+          loading={isLoading}
         />
         <WBTLinks />
         <InvestmentResult />

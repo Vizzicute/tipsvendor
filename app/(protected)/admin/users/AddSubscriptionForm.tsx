@@ -19,8 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { getUsers } from "@/lib/appwrite/fetch";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -40,6 +39,7 @@ import { useAddSubscription } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
 import LoadingButton from "@/components/LoadingButton";
 import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
+import { useUsers } from "@/lib/react-query/queries";
 
 const formSchema = z.object({
   user: z.string().min(1, "User is required"),
@@ -64,10 +64,7 @@ const durations = [
 ];
 
 const AddSubscriptionForm = () => {
-  const { data: users } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
-  });
+  const { data: users } = useUsers();
 
   const queryClient = useQueryClient();
 

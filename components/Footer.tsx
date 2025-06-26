@@ -4,16 +4,11 @@ import React from "react";
 import Logo from "./Logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getSeoPages } from "@/lib/appwrite/fetch";
-import { getSocialSettings } from "@/lib/appwrite/appConfig";
+import { useSeoPages, useSocials } from "@/lib/react-query/queries";
 
 const Footer = () => {
   const pathname = usePathname();
-  const { data: pages, isLoading } = useQuery({
-    queryKey: ["seo"],
-    queryFn: async () => getSeoPages(),
-  });
+  const { data: pages, isLoading } = useSeoPages();
 
   const pageSlug = pathname.startsWith("/blog")
     ? "blog"
@@ -23,10 +18,7 @@ const Footer = () => {
 
   const pageContent = pages?.find((page) => page.url === pageSlug);
 
-  const { data: settings, } = useQuery({
-    queryKey: ["settings"],
-    queryFn: getSocialSettings,
-  });
+  const { data: settings, } = useSocials();
 
   const advertEmail = settings?.advertEmail || "";
   const infoEmail = settings?.infoEmail || "";

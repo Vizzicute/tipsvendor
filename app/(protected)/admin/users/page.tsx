@@ -13,10 +13,8 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { getSubscriptions, getUsers } from "@/lib/appwrite/fetch";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -56,6 +54,7 @@ import CancelSubscription from "@/components/CancelSubscription";
 import FreezeSubscription from "@/components/FreezeSubscription";
 import UnfreezeSubscription from "@/components/UnfreezeSubscription";
 import EditSubscription from "./EditSubscription";
+import { useSubscriptions, useUsers } from "@/lib/react-query/queries";
 
 const page = () => {
   const searchParams = useSearchParams();
@@ -68,15 +67,9 @@ const page = () => {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const { data: users } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getUsers,
-  });
+  const { data: users } = useUsers();
 
-  const { data: subscriptions } = useQuery({
-    queryKey: ["subscriptions"],
-    queryFn: getSubscriptions,
-  });
+  const { data: subscriptions } = useSubscriptions();
 
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);

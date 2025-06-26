@@ -40,9 +40,8 @@ const PaymentDialog = dynamic(() => import("@/components/PaymentDialog"), {
 });
 
 import { countryDiscounts } from "@/lib/config/countryDiscount";
-import { useQuery } from "@tanstack/react-query";
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { Models } from "appwrite";
+import { useCurrentUser } from "@/lib/react-query/queries";
 
 interface Props {
   className?: string;
@@ -50,10 +49,7 @@ interface Props {
 
 const SubscriptionCard = ({ className }: Props) => {
   const { isAuthenticated } = useUserContext();
-  const { data: user } = useQuery({
-    queryKey: ["currentUser"],
-    queryFn: getCurrentUser,
-  });
+  const { data: user } = useCurrentUser();
   const formSchema = z.object({
     plan: z.string(),
     duration: z.string(),

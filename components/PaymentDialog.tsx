@@ -5,8 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
 import { Button } from "./ui/button";
 import { Copy, Check } from "lucide-react";
-import { getWalletSettings } from "@/lib/appwrite/appConfig";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PaystackButton } from "react-paystack";
 import { PaystackProps } from "react-paystack/dist/types";
 import {
@@ -14,10 +13,10 @@ import {
   getNGNExchangeRate,
 } from "@/lib/utils/ngnExchangeRates";
 import { toast } from "sonner";
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { editSubscription } from "@/lib/appwrite/update";
 import { addSubscription } from "@/lib/appwrite/create";
 import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
+import { useCurrentUser, useSettings } from "@/lib/react-query/queries";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -46,15 +45,9 @@ const PaymentDialog = ({
   onClose,
 }: PaymentDialogProps) => {
   const queryClient = useQueryClient();
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["wallet-settings"],
-    queryFn: getWalletSettings,
-  });
+  const { data: settings, isLoading } = useSettings();
 
-  const { data: user } = useQuery({
-    queryKey: ["user"],
-    queryFn: getCurrentUser,
-  });
+  const { data: user } = useCurrentUser();
 
   const [copied, setCopied] = useState<string | null>(null);
 

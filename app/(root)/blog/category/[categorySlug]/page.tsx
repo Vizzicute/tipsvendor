@@ -1,7 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getBlogCategories } from "@/lib/appwrite/fetch";
 import { Models } from "appwrite";
 import BlogCard from "@/components/BlogCard";
 import { useParams } from "next/navigation";
@@ -14,6 +12,7 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
+import { useBlogCategories } from "@/lib/react-query/queries";
 
 const BLOGS_PER_PAGE = 12;
 
@@ -21,10 +20,7 @@ const BlogCategoryPage = () => {
   const params = useParams();
   const categorySlug = params?.categorySlug as string;
 
-  const { data: blogCategories, isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ["blogCategories"],
-    queryFn: getBlogCategories,
-  });
+  const { data: blogCategories, isLoading: isCategoriesLoading } = useBlogCategories();
 
   // Find the category object by slug
   const category =

@@ -1,8 +1,7 @@
 "use client";
 
 import Logo from "@/components/Logo";
-import { verifyAccount } from "@/lib/utils/verification";
-import { useQuery } from "@tanstack/react-query";
+import { verifyUser } from "@/lib/react-query/queries";
 import { useParams } from "next/navigation";
 
 export default function VerificationPage() {
@@ -20,10 +19,7 @@ export default function VerificationPage() {
     );
   }
 
-  const { data, isPending, isSuccess, isError } = useQuery({
-    queryKey: ["verifyUser", userId],
-    queryFn: () => verifyAccount(userId),
-  });
+  const { data, isPending, isSuccess, isError } = verifyUser(userId);
 
   if (isSuccess && data) {
     setTimeout(() => {

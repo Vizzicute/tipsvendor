@@ -1,14 +1,10 @@
 "use client";
 
-import { getGoogleTagSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useGoogleTags } from "@/lib/react-query/queries";
 import { useEffect } from "react";
 
 export default function AdSlot() {
-  const { data: googleTags } = useQuery({
-    queryKey: ["google-tags"],
-    queryFn: getGoogleTagSettings,
-  });
+  const { data: googleTags } = useGoogleTags();
 
   const adClient: string = googleTags?.adsenseId;
 

@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { fetchExchangeRates } from "@/lib/utils/exchangeRates";
 import Link from "next/link";
-import { getWalletSettings } from "@/lib/appwrite/appConfig";
-import { useQuery } from "@tanstack/react-query";
+import { useSettings } from "@/lib/react-query/queries";
 
 interface ExchangeRate {
   currency: string;
@@ -18,10 +17,7 @@ interface ExchangeRate {
 }
 
 export default function WalletPage() {
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ["wallet-settings"],
-    queryFn: getWalletSettings,
-  });
+  const { data: settings, isLoading } = useSettings();
 
   const [exchangeRates, setExchangeRates] = useState<ExchangeRate[]>([]);
 

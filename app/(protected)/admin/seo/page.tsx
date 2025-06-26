@@ -5,8 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 
 
-import { getSeoPages } from "@/lib/appwrite/fetch";
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
 
@@ -14,14 +12,12 @@ import React from "react";
 
 import Link from "next/link";
 import { FilePlus2 } from "lucide-react";
+import { useSeoPages } from "@/lib/react-query/queries";
 
 const page = () => {
   const {
     data: seopages,
-  } = useQuery({
-    queryKey: ["documents"],
-    queryFn: getSeoPages,
-  });
+  } = useSeoPages();
 
 
   const sortedseopages = seopages ? seopages : [];
