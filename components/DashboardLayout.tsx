@@ -18,17 +18,22 @@ import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { redirect } from "next/navigation";
 import Sidebar from "./Sidebar";
 import NotificationsDropdown from "./NotificationsDropdown";
+import { useCurrentUser } from "@/lib/react-query/queries";
+import { useQueryClient } from "@tanstack/react-query";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const togglesidebar = () => setSidebarOpen(!sidebarOpen);
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
-  const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
+  const { setUser, setIsAuthenticated, isLoading } = useUserContext();
+  const { data: user} = useCurrentUser();
+  const queryClient = useQueryClient();
 
   const handleSignout = async () => {
     signOutAccount();
     setIsAuthenticated(false);
     setUser(INITIAL_USER);
+    queryClient.invalidateQueries({queryKey: ["currentUser"]});
     redirect("/admin-auth");
   };
 
@@ -78,7 +83,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     className="relative flex items-center space-x-2"
                   >
                     <Avatar className="h-8 w-8">
-                      {user.imageUrl ? (
+                      {user?.imageUrl ? (
                         <AvatarImage src={user?.imageUrl} className="object-contain" />
                       ) : (
                         <User2 />

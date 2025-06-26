@@ -16,7 +16,7 @@ import {
 } from "@/lib/react-query/queriesAndMutations";
 import { checkAndUpdateSubscription } from "@/lib/utils/SubscriptionLogic";
 import { verificationMail } from "@/lib/utils/verificationMail";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Models } from "appwrite";
 import { formatDate } from "date-fns";
 import { CircleAlert } from "lucide-react";
@@ -35,6 +35,7 @@ const getDateOnly = (input: string | Date) => {
 };
 
 const Page = () => {
+  const queryClient = useQueryClient();
   const { mutateAsync: signOutAccount, isPending: isSigningOut } =
     useSignOutAccount();
   const { user, setUser, isAuthenticated, setIsAuthenticated } =
@@ -77,6 +78,7 @@ const Page = () => {
     await signOutAccount();
     setIsAuthenticated(false);
     setUser(INITIAL_USER);
+    queryClient.invalidateQueries({queryKey: ["currentUser"]});
     redirect("/login");
   };
 
