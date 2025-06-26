@@ -14,11 +14,12 @@ export default function AuthWrapper({
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
-  const {data: user} = useCurrentUser();
+  const {data: user, isLoading} = useCurrentUser();
 
   useEffect(() => {
-    const protectRoute = async () => {
+    if (isLoading) return; // Wait until user is loaded
 
+    const protectRoute = async () => {
       if (!user && pathname === "/dashboard") {
         router.replace("/login");
         return;
@@ -39,32 +40,20 @@ export default function AuthWrapper({
               router.replace("/dashboard");
               break;
             case "blog_manager":
-              router.replace("/admin/blog");
-              break;
             case "blog_staff":
               router.replace("/admin/blog");
               break;
             case "seo_manager":
-              router.replace("/admin/seo");
-              break;
             case "seo_staff":
               router.replace("/admin/seo");
               break;
             case "football_manager":
-              router.replace("/admin/predictions");
-              break;
             case "football_staff":
-              router.replace("/admin/predictions");
-              break;
             case "basketball_manager":
-              router.replace("/admin/predictions");
-              break;
             case "basketball_staff":
               router.replace("/admin/predictions");
               break;
             case "admin":
-              router.replace("/admin");
-              break;
             default:
               router.replace("/admin");
               break;
@@ -72,7 +61,7 @@ export default function AuthWrapper({
           return;
         }
 
-        setAuthorized(true); // ✅ user is allowed
+        setAuthorized(true);
       } catch (err) {
         console.error(err);
         if (pathname !== "/admin-auth") {
@@ -80,12 +69,13 @@ export default function AuthWrapper({
           return;
         }
       } finally {
-        setChecking(false); // ✅ we're done checking
+        setChecking(false);
       }
     };
 
     protectRoute();
-  }, [pathname]);
+  }, [pathname, user, isLoading]); // <-- add user and isLoading
+
 
   if (checking || !authorized) {
     // ✅ Block UI while checking OR redirecting
