@@ -1,13 +1,13 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import AuthWrapper from "@/context/AuthWrapper";
-import { getCurrentUser } from "@/lib/appwrite/api";
+import { useCurrentUser } from "@/lib/react-query/queries";
 import { Metadata } from "next";
 import React from "react";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const currentUser = await getCurrentUser();
+    const {data: currentUser} = useCurrentUser();
 
     return {
       title: `${currentUser?.name || "User"} Dashboard`,

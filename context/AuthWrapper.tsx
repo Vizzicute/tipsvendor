@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { routeAccess } from "@/lib/routes";
-import { getCurrentUser } from "@/lib/appwrite/api";
+import { useCurrentUser } from "@/lib/react-query/queries";
 
 export default function AuthWrapper({
   children,
@@ -17,7 +17,7 @@ export default function AuthWrapper({
 
   useEffect(() => {
     const protectRoute = async () => {
-      const user = await getCurrentUser();
+      const {data: user} = useCurrentUser();
 
       if (!user && pathname === "/dashboard") {
         router.replace("/login");

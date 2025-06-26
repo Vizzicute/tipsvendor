@@ -22,8 +22,8 @@ import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { verificationMail } from "@/lib/utils/verificationMail";
 import { useMutation } from "@tanstack/react-query";
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { notifyNewUser } from "@/lib/appwrite/notificationTriggers";
+import { useCurrentUser } from "@/lib/react-query/queries";
 
 const RegisterForm = () => {
   const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
@@ -31,15 +31,10 @@ const RegisterForm = () => {
     useCreateUserAccount();
   const { mutateAsync: signInAccount, isPending: isSigningInUser } =
     useSignInAccount();
-    const { mutateAsync: currentUser, isPending: isFetchingUser } = useMutation({
-      mutationFn: async () => getCurrentUser(),
-    });
+  const { data: user, isLoading: isFetchingUser } = useCurrentUser();
 
   // Add mutation for verificationMail
-  const {
-    mutateAsync: verifyMail,
-    isPending: isVerifyingMail,
-  } = useMutation({
+  const { mutateAsync: verifyMail, isPending: isVerifyingMail } = useMutation({
     mutationFn: async ({
       email,
       name,
@@ -78,7 +73,6 @@ const RegisterForm = () => {
     }
 
     const isLoggedIn = await checkAuthUser();
-    const user = await currentUser();
 
     if (isLoggedIn && user) {
       await verifyMail({
@@ -87,7 +81,9 @@ const RegisterForm = () => {
         link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user.$id}`,
       });
       await notifyNewUser(user.$id, user.name);
-      toast.success("Registration successful! Please check your email for verification.");
+      toast.success(
+        "Registration successful! Please check your email for verification."
+      );
       form.reset();
       redirect("/dashboard");
     }

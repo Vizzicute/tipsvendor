@@ -1,8 +1,8 @@
 "use client";
 
-import { getCurrentUser } from '@/lib/appwrite/api';
 import { IContextType, IUser } from '@/types';
 import React, { createContext, useContext, useEffect, useState} from 'react'
+import { useCurrentUser } from '../lib/react-query/queries';
 
 export const INITIAL_USER = {
     id: '',
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuthUser = async () => {
         setIsLoading(true);
         try {
-            const currentAccount = await getCurrentUser();
+            const {data: currentAccount} = useCurrentUser();
 
             if(currentAccount) {
                 setUser({

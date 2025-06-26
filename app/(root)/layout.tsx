@@ -4,7 +4,7 @@ import React from "react";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="w-full h-screen flex bg-gray-200">
+    <div className="w-full max-h-screen flex bg-gray-200">
       <div className="w-full bg-slate-100 flex flex-col">
         <Navbar />
 

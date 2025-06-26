@@ -3,15 +3,15 @@
 import Logo from "@/components/Logo";
 import React, { useEffect } from "react";
 import AuthForm from "./AuthForm";
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { useRouter } from "next/navigation";
+import { useCurrentUser } from "@/lib/react-query/queries";
 
 const page = () => {
   const router = useRouter();
 
   useEffect(() => {
     const validRoute = async () => {
-      const user = await getCurrentUser();
+      const {data: user} = useCurrentUser();
       const role = user?.role;
 
       if (user && role !== "user") {
