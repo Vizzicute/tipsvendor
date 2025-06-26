@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
-import { useBlogs, useCurrentUser, usePredictions } from "@/lib/react-query/queries";
+import { useBlogs, usePredictions } from "@/lib/react-query/queries";
 import {
   useEditSubscription,
   useSignOutAccount,
@@ -53,9 +53,6 @@ const Page = () => {
     }) => verificationMail(email, name, link),
   });
 
-  // Only fetch user if authenticated to avoid Appwrite 401 error
-  const { data: currentUser } = useCurrentUser();
-
   const { data: predictions } = usePredictions();
 
   const today = getDateOnly(new Date());
@@ -78,15 +75,15 @@ const Page = () => {
     await signOutAccount();
     setIsAuthenticated(false);
     setUser(INITIAL_USER);
-    queryClient.invalidateQueries({queryKey: ["currentUser"]});
+    queryClient.invalidateQueries({queryKey: ["user"]});
     redirect("/login");
   };
 
   // Get all subscriptions as array
-  const subscriptions: Models.Document[] = currentUser?.subscription
-    ? Array.isArray(currentUser.subscription)
-      ? currentUser.subscription
-      : [currentUser.subscription]
+  const subscriptions: Models.Document[] = user?.subscription
+    ? Array.isArray(user.subscription)
+      ? user.subscription
+      : [user.subscription]
     : [];
 
   // Helper functions
@@ -124,23 +121,23 @@ const Page = () => {
   const { mutateAsync: editSubscription } = useEditSubscription();
 
   useEffect(() => {
-    if (currentUser?.subscription) {
+    if (user?.subscription) {
       // If subscription is an array, check all; else, check the single subscription
-      const subs = Array.isArray(currentUser.subscription)
-        ? currentUser.subscription
-        : [currentUser.subscription];
+      const subs = Array.isArray(user.subscription)
+        ? user.subscription
+        : [user.subscription];
       subs.forEach((sub) => {
         checkAndUpdateSubscription(sub, editSubscription);
       });
     }
-  }, [currentUser, editSubscription]);
+  }, [user, editSubscription]);
 
   async function ResendMail() {
     try {
       await verifyMail({
-      email: currentUser?.email,
-      name: currentUser?.name ? currentUser.name : "",
-      link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${currentUser?.$id}`,
+      email: user?.email,
+      name: user?.name ? user.name : "",
+      link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user?.id}`,
     });
 
     toast.success("Verification sent. Please check your Mailbox!");
@@ -152,7 +149,7 @@ const Page = () => {
   }
 
   // Early return: block unverified users from seeing dashboard content
-  if (isAuthenticated && currentUser && currentUser.isVerified === false) {
+  if (isAuthenticated && user && user.isVerified === false) {
     return (
       <div className="text-lg flex flex-col gap-4 size-full justify-center items-center">
         <CircleAlert size={100} className="text-amber-500" />
@@ -186,20 +183,20 @@ const Page = () => {
               <div className="min-md:size-auto max-md:w-full flex flex-col py-5 px-10 rounded-md bg-stone-500 items-center">
                 <Avatar className="h-24 w-24">
                   <AvatarImage
-                    src={currentUser?.imageUrl}
-                    alt={currentUser?.name}
+                    src={user?.imageUrl}
+                    alt={user?.name}
                     className="object-contain"
                   />
                   <AvatarFallback>
-                    {currentUser?.name?.charAt(0)}
+                    {user?.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <p className="text-center text-lg text-black font-semibold my-2">
-                  {currentUser?.name}
+                  {user?.name}
                 </p>
-                {currentUser && (
+                {user && (
                   <div className="w-fit flex flex-row items-center gap-1 justify-center">
-                    <UserProfileEdit user={currentUser} />
+                    <UserProfileEdit user={user} />
                     <NotificationsDropdown className="bg-black text-secondary" />
                   </div>
                 )}
@@ -207,19 +204,19 @@ const Page = () => {
               <div className="flex min-md:flex-1 max-md:w-full flex-col space-y-2 text-black font-semibold">
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Email:</span>
-                  <span>{currentUser?.email}</span>
+                  <span>{user?.email}</span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Country:</span>
                   <span>
-                    {currentUser?.country ? currentUser.country : "N/A"}
+                    {user?.country ? user.country : "N/A"}
                   </span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Registered:</span>
                   <span>
-                    {currentUser?.$createdAt
-                      ? formatDate(currentUser.$createdAt, "PPP")
+                    {user?.$createdAt
+                      ? formatDate(user.$createdAt, "PPP")
                       : "N/A"}
                   </span>
                 </div>

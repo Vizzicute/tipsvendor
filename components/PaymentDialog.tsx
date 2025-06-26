@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { editSubscription } from "@/lib/appwrite/update";
 import { addSubscription } from "@/lib/appwrite/create";
 import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
-import { useCurrentUser, useSettings } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
+import { useSettings } from "@/lib/react-query/queries";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -47,7 +48,7 @@ const PaymentDialog = ({
   const queryClient = useQueryClient();
   const { data: settings, isLoading } = useSettings();
 
-  const { data: user } = useCurrentUser();
+  const { user } = useUserContext();
 
   const [copied, setCopied] = useState<string | null>(null);
 
@@ -157,13 +158,13 @@ const PaymentDialog = ({
         }
         if (!found) {
           await addSubscriptionMutation({
-            userId: user?.$id,
+            userId: user?.id,
             duration,
             plan,
           });
         }
         notifyNewSubscription(
-          user?.$id || "",
+          user?.id || "",
           plan,
           parseInt(duration)
         );

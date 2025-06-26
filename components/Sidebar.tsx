@@ -19,7 +19,7 @@ import Link from "next/link";
 import Logo from "./Logo";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import MiniLogo from "./MiniLogo";
-import { useCurrentUser } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
 
 interface SidebarProps {
   open: boolean;
@@ -33,7 +33,7 @@ interface SidebarItem {
 }
 
 const Sidebar = ({ open }: SidebarProps) => {
-  const { data: user } = useCurrentUser();
+  const { user } = useUserContext();
   const pathname = usePathname();
 
   const sidebarItems: SidebarItem[] = [

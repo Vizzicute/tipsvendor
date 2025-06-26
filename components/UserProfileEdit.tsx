@@ -15,8 +15,13 @@ import {
   DrawerContent,
   DrawerHeader,
 } from "./ui/drawer";
+import { IUser } from "@/types";
 
-const UserProfileEdit = ({ user }: { user: Models.Document }) => {
+interface UserProfileEditProps {
+  user: Models.Document | IUser;
+}
+
+const UserProfileEdit = ({ user }: UserProfileEditProps) => {
   return (
     <div>
       {/* Show Dialog on md and up */}

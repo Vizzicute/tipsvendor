@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { routeAccess } from "@/lib/routes";
-import { useCurrentUser } from "@/lib/react-query/queries";
+import { useUserContext } from "./AuthContext";
 
 export default function AuthWrapper({
   children,
@@ -14,24 +14,24 @@ export default function AuthWrapper({
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
   const [checking, setChecking] = useState(true);
-  const {data: user, isLoading} = useCurrentUser();
+  const { user, isAuthenticated, isLoading } = useUserContext();
 
   useEffect(() => {
     if (isLoading) return; // Wait until user is loaded
 
     const protectRoute = async () => {
-      if (!user && pathname === "/dashboard") {
+      if (!isAuthenticated && pathname.startsWith("/dashboard")) {
         router.replace("/login");
         return;
       }
 
-      if (!user && pathname !== "/admin-auth") {
+      if (!isAuthenticated && pathname.startsWith("/admin")) {
         router.replace("/admin-auth");
         return;
       }
 
       try {
-        const role = user?.role || "user";
+        const role = user.role || "user";
         const allowedRoles = routeAccess[pathname];
 
         if (allowedRoles && !allowedRoles.includes(role)) {
@@ -74,7 +74,7 @@ export default function AuthWrapper({
     };
 
     protectRoute();
-  }, [pathname, user, isLoading]); // <-- add user and isLoading
+  }, [pathname, isAuthenticated, user, isLoading]); // <-- add user and isLoading
 
 
   if (checking || !authorized) {

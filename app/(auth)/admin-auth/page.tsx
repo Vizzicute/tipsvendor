@@ -4,21 +4,21 @@ import Logo from "@/components/Logo";
 import React, { useEffect } from "react";
 import AuthForm from "./AuthForm";
 import { useRouter } from "next/navigation";
-import { useCurrentUser } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
 
 const page = () => {
   const router = useRouter();
+  const { user, isAuthenticated } = useUserContext();
 
   useEffect(() => {
     const validRoute = async () => {
-      const {data: user} = useCurrentUser();
       const role = user?.role;
 
-      if (user && role !== "user") {
+      if (isAuthenticated && role !== "user") {
         router.replace("/admin");
       }
 
-      if (user && role === "user") {
+      if (isAuthenticated && role === "user") {
         router.replace("/dashboard");
       }
     };

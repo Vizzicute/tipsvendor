@@ -41,7 +41,6 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
   const queryClient = useQueryClient();
   const originalDate = prediction.datetime;
   const date = new Date(originalDate);
-  date.setHours(date.getHours() + 1);
 
   // Get components with padding
   const year = date.getFullYear();

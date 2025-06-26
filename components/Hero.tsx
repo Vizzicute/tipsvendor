@@ -9,8 +9,7 @@ import { redirect, usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useCurrentUser, useSocials } from "@/lib/react-query/queries";
-import { useQueryClient } from "@tanstack/react-query";
+import { useSocials } from "@/lib/react-query/queries";
 
 const Hero = ({
   h1tag,
@@ -22,19 +21,15 @@ const Hero = ({
   isSeoLoading: boolean;
 }) => {
   const pathname = usePathname();
-  const queryClient = useQueryClient();
   const { data: settings, isLoading: isSettingsLoading } = useSocials();
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
   const { setUser, isAuthenticated, setIsAuthenticated, isLoading } =
     useUserContext();
 
-  const { data: user } = useCurrentUser();
-
   const handleSignout = async () => {
     signOutAccount();
     setIsAuthenticated(false);
     setUser(INITIAL_USER);
-    queryClient.invalidateQueries({queryKey: ["currentUser"]});
     redirect("/login");
   };
   return (
@@ -57,14 +52,14 @@ const Hero = ({
         <div className="w-full md:w-[35%] flex flex-wrap items-center justify-center gap-2">
           <div className="w-full flex flex-nowrap justify-center items-center gap-2">
             <Link
-              href={`${user ? "/dashboard" : "/register"}`}
+              href={`${isAuthenticated ? "/dashboard" : "/register"}`}
               className="w-1/2"
             >
               <GradientButton className="w-full">
-                {user ? "Dashboard" : "Register"}
+                {isAuthenticated ? "Dashboard" : "Register"}
               </GradientButton>
             </Link>
-            {user ? (
+            {isAuthenticated ? (
               <GradientButton
                 loading={isPending || isLoading}
                 onClick={handleSignout}

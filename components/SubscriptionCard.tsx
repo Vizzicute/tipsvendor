@@ -41,15 +41,13 @@ const PaymentDialog = dynamic(() => import("@/components/PaymentDialog"), {
 
 import { countryDiscounts } from "@/lib/config/countryDiscount";
 import { Models } from "appwrite";
-import { useCurrentUser } from "@/lib/react-query/queries";
 
 interface Props {
   className?: string;
 }
 
 const SubscriptionCard = ({ className }: Props) => {
-  const { isAuthenticated } = useUserContext();
-  const { data: user } = useCurrentUser();
+  const { user, isAuthenticated } = useUserContext();
   const formSchema = z.object({
     plan: z.string(),
     duration: z.string(),
@@ -68,13 +66,12 @@ const SubscriptionCard = ({ className }: Props) => {
   });
 
   useEffect(() => {
-    if (user) {
-      const expiredSub = user?.subscription?.filter((sub: Models.Document) => sub.isValid === false)[0];
-      const userCountry: string = user?.country;
+    if (isAuthenticated) {
+      const expiredSub = user.subscription?.filter((sub: Models.Document) => sub.isValid === false)[0];
       form.reset({
         plan: expiredSub?.subscriptionType || "",
         duration: expiredSub?.duration || "",
-        country: userCountry || "",
+        country: user.country || "",
         amount: "",
       });
     }

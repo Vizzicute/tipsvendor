@@ -1,25 +1,34 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import LoginForm from "./LoginForm";
 import Link from "next/link";
 import GoogleButton from "../GoogleButton";
 import Logo from "@/components/Logo";
-import { Metadata } from "next";
 import ForgotPasswordDialog from "@/components/ForgotPasswordDialog";
+import { useRouter } from "next/navigation";
+import { useUserContext } from "@/context/AuthContext";
 
-export const metadata: Metadata = {
-  title: "Login"
-}
 
 const date = new Date();
 const year = date.getFullYear();
 
 const page = () => {
+  const router = useRouter();
+  const { isAuthenticated } = useUserContext();
+
+  useEffect(() => {
+    const validRoute = async () => {
+      if (isAuthenticated) {
+        router.replace("/dashboard");
+      }
+    };
+
+    validRoute();
+  }, [isAuthenticated]);
   return (
     <div className="flex flex-wrap justify-center items-center mt-8 space-y-4">
-      <Link
-        href={"/"}
-        className="w-full flex items-center justify-center"
-      >
+      <Link href={"/"} className="w-full flex items-center justify-center">
         <Logo width={100} />
       </Link>
       <h2 className="font-lilita-one w-full text-center text-lg text-stone-500">

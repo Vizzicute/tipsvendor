@@ -6,6 +6,9 @@ export type IUser = {
   country?: string;
   imageUrl: string;
   role: string;
+  address: string;
+  subscription: any;
+  createdAt: string;
 };
 
 export type INewUser = {

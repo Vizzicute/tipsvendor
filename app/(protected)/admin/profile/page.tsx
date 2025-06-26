@@ -27,7 +27,6 @@ import { sendMail } from "@/lib/utils/mail";
 import { useSignOutAllAccount } from "@/lib/react-query/queriesAndMutations";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
-import { useCurrentUser } from "@/lib/react-query/queries";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -41,12 +40,9 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-
-  const { data: user, isLoading: isLoadingUser } = useCurrentUser();
-
   const { mutateAsync: signoutAllAccount, isPending: isSigningOut } =
     useSignOutAllAccount();
-  const { setUser, isAuthenticated, setIsAuthenticated } =
+  const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading: isUserLoading } =
     useUserContext();
 
   const handleSignout = async () => {
@@ -147,7 +143,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (isLoadingUser) {
+  if (isUserLoading) {
     return <div>Loading...</div>;
   }
 

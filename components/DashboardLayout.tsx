@@ -18,15 +18,13 @@ import { useSignOutAccount } from "@/lib/react-query/queriesAndMutations";
 import { redirect } from "next/navigation";
 import Sidebar from "./Sidebar";
 import NotificationsDropdown from "./NotificationsDropdown";
-import { useCurrentUser } from "@/lib/react-query/queries";
 import { useQueryClient } from "@tanstack/react-query";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const togglesidebar = () => setSidebarOpen(!sidebarOpen);
   const { mutateAsync: signOutAccount, isPending } = useSignOutAccount();
-  const { setUser, setIsAuthenticated, isLoading } = useUserContext();
-  const { data: user} = useCurrentUser();
+  const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
   const queryClient = useQueryClient();
 
   const handleSignout = async () => {

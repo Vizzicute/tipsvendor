@@ -1,15 +1,19 @@
 "use client";
 
+import { getCurrentUser } from '@/lib/appwrite/api';
 import { IContextType, IUser } from '@/types';
 import React, { createContext, useContext, useEffect, useState} from 'react'
-import { useCurrentUser } from '../lib/react-query/queries';
 
 export const INITIAL_USER = {
     id: '',
     name: '',
     email: '',
+    country: '',
+    address: '',
     imageUrl: '',
     role: '',
+    subscription: [],
+    createdAt: '',
 };
 
 const INITIAL_STATE = {
@@ -27,11 +31,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [ user, setUser ] = useState<IUser>(INITIAL_USER);
     const [ isLoading, setIsLoading ] = useState(false);
     const [ isAuthenticated, setIsAuthenticated ] = useState(false);
-    const {data: currentAccount} = useCurrentUser();
 
     const checkAuthUser = async () => {
         setIsLoading(true);
         try {
+            const currentAccount = await getCurrentUser();
 
             if(currentAccount) {
                 setUser({
@@ -39,8 +43,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     name: currentAccount.name,
                     email: currentAccount.email,
                     country: currentAccount.country,
+                    address: currentAccount.address,
                     imageUrl: currentAccount.imageUrl,
-                    role: currentAccount.role
+                    role: currentAccount.role,
+                    subscription: currentAccount.subscription,
+                    createdAt: currentAccount.$createdAt
                 });
 
                 setIsAuthenticated(true);
