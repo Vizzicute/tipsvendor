@@ -75,7 +75,7 @@ const SubscriptionCard = ({ className }: Props) => {
         amount: "",
       });
     }
-  }, [user, form]);
+  }, [user, isAuthenticated, form]);
 
   const basePrice = 30;
   const [isLoading, setIsLoading] = useState(false);

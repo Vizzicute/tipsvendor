@@ -13,9 +13,10 @@ const year = date.getFullYear();
 
 const page = () => {
   const router = useRouter();
-  const { isAuthenticated } = useUserContext();
+  const { isAuthenticated, isLoading } = useUserContext();
 
   useEffect(() => {
+    if(isLoading) return;
     const validRoute = async () => {
       if (isAuthenticated) {
         router.replace("/dashboard");
@@ -23,7 +24,7 @@ const page = () => {
     };
 
     validRoute();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isLoading]);
   return (
     <div className="flex flex-wrap justify-center items-center mt-8 space-y-4">
       <Link href={"/"}>

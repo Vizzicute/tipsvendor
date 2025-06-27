@@ -209,13 +209,13 @@ const Page = () => {
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Country:</span>
                   <span>
-                    {user?.country ? user.country : "N/A"}
+                    {user.country ? user.country : "N/A"}
                   </span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Registered:</span>
                   <span>
-                    {user?.$createdAt
+                    {user?.createdAt
                       ? formatDate(user.$createdAt, "PPP")
                       : "N/A"}
                   </span>

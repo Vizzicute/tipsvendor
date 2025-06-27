@@ -8,9 +8,10 @@ import { useUserContext } from "@/context/AuthContext";
 
 const page = () => {
   const router = useRouter();
-  const { user, isAuthenticated } = useUserContext();
+  const { user, isAuthenticated, isLoading } = useUserContext();
 
   useEffect(() => {
+    if (isLoading) return;
     const validRoute = async () => {
       const role = user?.role;
 
@@ -24,7 +25,7 @@ const page = () => {
     };
 
     validRoute();
-  }, []);
+  }, [isAuthenticated, isLoading]);
   return (
     <div className="flex flex-col items-center justify-center h-[100dvh] gap-3">
       <Logo width={90} />
