@@ -160,7 +160,7 @@ const AddBlogForm = () => {
           localStorage.removeItem(STORAGE_KEY);
           setStatus("published");
           setPreviewUrl("/featuredImagePlaceholder.jpeg");
-          queryClient.invalidateQueries({ queryKey: ["documents"] });
+          await queryClient.setQueryData(["documents"], (oldData: any) => [...oldData, newBlog]);
 
           toast.success(
             status === "draft"

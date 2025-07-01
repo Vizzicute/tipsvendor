@@ -265,7 +265,7 @@ const EditBlogForm = ({ blog }: EditBlogFormProps) => {
       if (!updatedBlog) {
         toast.error("Failed to update blog post. Please try again.");
       } else {
-        queryClient.invalidateQueries({ queryKey: ["documents"] });
+        await queryClient.setQueryData(["documents"], (oldData: any) => [...oldData, updatedBlog]);
         toast.success("Blog post updated successfully");
       }
     } catch (error) {

@@ -62,7 +62,7 @@ const AddResult = ({ prediction }: AddResultProps) => {
       if (!predictionResult) {
         return toast("Failed. Please try again.");
       } else {
-        queryClient.invalidateQueries({ queryKey: ["predictions"] });
+        await queryClient.setQueryData(["predictions"], (oldData: any) => [...oldData, predictionResult]);
         toast.success("Result Added");
       }
     }

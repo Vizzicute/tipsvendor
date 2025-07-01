@@ -11,12 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAddBlogCategory } from "@/lib/react-query/queriesAndMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const AddBlogCategoryForm = () => {
+  const queryClient = useQueryClient();
   const formSchema = z.object({
     name: z.string().nonempty("Add Post Title."),
     slug: z.string(),
@@ -50,6 +52,7 @@ const AddBlogCategoryForm = () => {
         toast("Failed. Please try again.");
       } else {
         toast("Category added successfully.");
+        await queryClient.setQueryData(["categories"], (oldData: any) => [...oldData, newBlogCategory]);
       }
     } catch (error) {
       console.error("Error adding blog category:", error);

@@ -56,7 +56,7 @@ const EditBlogCategoryForm = ({category}: {category: Models.Document}) => {
         toast("Failed. Please try again.");
       } else {
         toast("Category added successfully.");
-        queryClient.invalidateQueries({ queryKey: ["categories"] });
+        await queryClient.setQueryData(["categories"], (oldData: any) => [...oldData, updatedBlogCategory]);
       }
     } catch (error) {
       console.error("Error adding blog category:", error);

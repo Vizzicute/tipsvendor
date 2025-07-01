@@ -105,7 +105,7 @@ const EditPredictionForm = ({ prediction }: { prediction: any }) => {
     if (!newPrediction) {
       return toast("Failed. Please try again.");
     } else {
-      queryClient.invalidateQueries({ queryKey: ["predictions"] });
+      await queryClient.setQueryData(["predictions"], (oldData: any) => [...oldData, newPrediction]);
       toast.success("Prediction Updated");
     }
   }
