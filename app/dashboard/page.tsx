@@ -216,7 +216,7 @@ const Page = () => {
                   <span>Registered:</span>
                   <span>
                     {user?.createdAt
-                      ? formatDate(user.$createdAt, "PPP")
+                      ? formatDate(user.createdAt, "PPP")
                       : "N/A"}
                   </span>
                 </div>
