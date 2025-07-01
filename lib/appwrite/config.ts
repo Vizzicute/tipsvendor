@@ -4,7 +4,7 @@ export const appwriteConfig = {
     projectId1: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_1 || "",
     projectId2: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_2 || "",
     projectId3: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_3 || "",
-    endpoint1: process.env.NEXT_PUBLIC_APPWRITE_URL_2 || "",
+    endpoint1: process.env.NEXT_PUBLIC_APPWRITE_URL_1 || "",
     endpoint2: process.env.NEXT_PUBLIC_APPWRITE_URL_2 || "",
     databaseId1: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID_1 || "",
     databaseId2: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID_2 || "",

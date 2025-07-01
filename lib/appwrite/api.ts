@@ -78,36 +78,26 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    const currentAccount = await account.get();
-
-    if (!currentAccount) {
-      const session = await account.createEmailPasswordSession(
-        user.email,
-        user.password
-      );
-
-      await getCurrentUser();
-
-      return session;
+    // First, check if user is already signed in
+    const existingUser = await checkIfUserIsSignedIn();
+    
+    if (existingUser) {
+      return existingUser;
     }
-    const currentUser = await databases1.listDocuments(
-      appwriteConfig.databaseId1,
-      appwriteConfig.userCollectionId,
-      [Query.equal("accountId", currentAccount.$id)]
+
+    // If not signed in, create a new session with the provided credentials
+    const session = await account.createEmailPasswordSession(
+      user.email,
+      user.password
     );
 
-    if (!currentUser) throw Error;
+    // If successful, get the current user and store in localStorage
+    const currentUser = await getCurrentUser();
 
-    if (currentUser.documents[0]) {
-      localStorage.setItem(
-        "authUser",
-        JSON.stringify(currentUser.documents[0])
-      );
-    }
-
-    return currentUser.documents[0];
+    return currentUser;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 }
 
@@ -133,6 +123,43 @@ export async function getCurrentUser() {
     }
 
     return currentUser.documents[0];
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function checkIfUserIsSignedIn() {
+  try {
+    const currentAccount = await account.get();
+    
+    if (!currentAccount) {
+      return null;
+    }
+
+    // Check if user data exists in localStorage
+    const storedUser = localStorage.getItem("authUser");
+    
+    if (storedUser) {
+      return JSON.parse(storedUser);
+    }
+
+    // If no localStorage data but session exists, fetch from database
+    const currentUser = await databases1.listDocuments(
+      appwriteConfig.databaseId1,
+      appwriteConfig.userCollectionId,
+      [Query.equal("accountId", currentAccount.$id)]
+    );
+
+    if (currentUser.documents[0]) {
+      localStorage.setItem(
+        "authUser",
+        JSON.stringify(currentUser.documents[0])
+      );
+      return currentUser.documents[0];
+    }
+
+    return null;
   } catch (error) {
     console.log(error);
     return null;
