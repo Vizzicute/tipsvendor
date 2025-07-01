@@ -32,6 +32,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 const EditStaffForm = ({ staff }: { staff: any }) => {
   const queryClient = useQueryClient();
@@ -64,6 +65,7 @@ const EditStaffForm = ({ staff }: { staff: any }) => {
       return toast("Failed. Please try again.");
     } else {
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      await getCurrentUser();
       toast.success("staff Updated");
     }
   }

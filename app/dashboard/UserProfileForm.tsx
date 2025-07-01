@@ -35,6 +35,7 @@ import {
 } from "@/data";
 import { editAvatar } from "@/lib/appwrite/media";
 import { IUser } from "@/types";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 // Define schema with zod
 const profileSchema = z
@@ -105,6 +106,7 @@ const UserProfileForm = ({ user }: { user: Models.Document | IUser }) => {
       }
       form.reset(data);
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      await getCurrentUser();
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);

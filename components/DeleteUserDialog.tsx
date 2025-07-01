@@ -13,6 +13,7 @@ import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { useDeleteUser } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 interface DeleteUserDialogProps {
   accountId: string;
@@ -45,6 +46,7 @@ const DeleteUserDialog = ({
       await deleteUser(accountId);
       toast.success("User Deleted");
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      await getCurrentUser();
       setOpen(false);
     } catch {
       toast("Failed. Please try again.");

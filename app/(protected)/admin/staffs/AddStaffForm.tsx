@@ -33,6 +33,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 const AddStaffForm = () => {
   const queryClient = useQueryClient();
@@ -71,6 +72,7 @@ const AddStaffForm = () => {
       );
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      await getCurrentUser();
       return;
     }
   }

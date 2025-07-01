@@ -23,7 +23,7 @@ export async function createUserAccount(user: INewUser) {
       imageId: null, // Initialize with null since we're using initials avatar
     });
 
-    localStorage.setItem('authUser', JSON.stringify(newUser));
+    localStorage.setItem("authUser", JSON.stringify(newUser));
 
     return newUser;
   } catch (error) {
@@ -39,14 +39,11 @@ export async function createStaffAccount(
   password: string
 ): Promise<Models.User<Models.Preferences>> {
   try {
-    const newAccount = await account.create(
-      accountId,
-      email,
-      password,
-      name
-    );
+    const newAccount = await account.create(accountId, email, password, name);
 
     if (!newAccount) throw new Error("Failed to create account");
+
+    await getCurrentUser();
 
     return newAccount;
   } catch (error) {
@@ -81,17 +78,34 @@ export async function saveUserToDB(user: {
 
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    const session = await account.createEmailPasswordSession(
-      user.email,
-      user.password
+    const currentAccount = await account.get();
+
+    if (!currentAccount) {
+      const session = await account.createEmailPasswordSession(
+        user.email,
+        user.password
+      );
+
+      await getCurrentUser();
+
+      return session;
+    }
+    const currentUser = await databases1.listDocuments(
+      appwriteConfig.databaseId1,
+      appwriteConfig.userCollectionId,
+      [Query.equal("accountId", currentAccount.$id)]
     );
 
-    const currentUser = await getCurrentUser();
-    if (currentUser) {
-      localStorage.setItem('authUser', JSON.stringify(currentUser));
+    if (!currentUser) throw Error;
+
+    if (currentUser.documents[0]) {
+      localStorage.setItem(
+        "authUser",
+        JSON.stringify(currentUser.documents[0])
+      );
     }
 
-    return session;
+    return currentUser.documents[0];
   } catch (error) {
     console.log(error);
   }
@@ -111,6 +125,13 @@ export async function getCurrentUser() {
 
     if (!currentUser) throw Error;
 
+    if (currentUser.documents[0]) {
+      localStorage.setItem(
+        "authUser",
+        JSON.stringify(currentUser.documents[0])
+      );
+    }
+
     return currentUser.documents[0];
   } catch (error) {
     console.log(error);
@@ -121,7 +142,7 @@ export async function getCurrentUser() {
 export async function signOutAccount() {
   try {
     const session = await account.deleteSession("current");
-    localStorage.removeItem('authUser');
+    localStorage.removeItem("authUser");
     return session;
   } catch (error) {
     console.log(error);
@@ -132,7 +153,7 @@ export async function signOutAllAccount() {
   try {
     const session = await account.deleteSessions();
 
-    localStorage.removeItem('authUser');
+    localStorage.removeItem("authUser");
 
     return session;
   } catch (error) {

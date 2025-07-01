@@ -18,6 +18,7 @@ import { addSubscription } from "@/lib/appwrite/create";
 import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
 import { useUserContext } from "@/context/AuthContext";
 import { useSettings } from "@/lib/react-query/queries";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -168,6 +169,7 @@ const PaymentDialog = ({
           plan,
           parseInt(duration)
         );
+        await getCurrentUser();
         queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
         queryClient.invalidateQueries({ queryKey: ["currentUser"] });
         toast.success(

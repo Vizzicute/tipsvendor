@@ -1,6 +1,7 @@
 "use client"
 
 import { Models } from "appwrite";
+import { getCurrentUser } from "../appwrite/api";
 
 export async function checkAndUpdateSubscription(
   subscription: Models.Document,
@@ -41,5 +42,6 @@ export async function checkAndUpdateSubscription(
       },
       subscriptionId: subscription.$id,
     });
+    await getCurrentUser();
   }
 }

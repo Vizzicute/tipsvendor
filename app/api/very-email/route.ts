@@ -3,6 +3,7 @@ import { Client, Users } from "node-appwrite";
 import { databases1 } from "@/lib/appwrite/config"; // adjust import as needed
 import { appwriteConfig } from "@/lib/appwrite/config"; // adjust import as needed
 import { getSingleUserByUserId } from "@/lib/appwrite/fetch";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 
 export async function POST(request: Request) {
@@ -31,6 +32,8 @@ export async function POST(request: Request) {
       userId,
       { isVerified: true }
     );
+
+    await getCurrentUser();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

@@ -27,6 +27,7 @@ import { sendMail } from "@/lib/utils/mail";
 import { useSignOutAllAccount } from "@/lib/react-query/queriesAndMutations";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -135,6 +136,7 @@ export default function ProfilePage() {
 
       toast.success("Profile updated successfully");
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      await getCurrentUser();
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile");

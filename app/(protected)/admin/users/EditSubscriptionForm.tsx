@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import LoadingButton from "@/components/LoadingButton";
 import { Models } from "appwrite";
 import { useUsers } from "@/lib/react-query/queries";
+import { getCurrentUser } from "@/lib/appwrite/api";
 
 const formSchema = z.object({
   user: z.string().min(1, "User is required"),
@@ -95,6 +96,7 @@ const EditSubscriptionForm = ({ sub }: { sub: Models.Document }) => {
         subscriptionId: sub?.$id,
       });
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
+      await getCurrentUser();
       toast.success("Subscription Edited");
     } catch (error) {
       console.error("Error editing subscription:", error);
