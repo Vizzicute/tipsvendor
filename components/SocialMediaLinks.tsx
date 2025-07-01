@@ -34,7 +34,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#229ed9] text-white">
           <Send className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">187 followers</span>
+        <span className="text-sm">join us on</span>
         <span className="font-semibold">Telegram</span>
       </Link>
       <Link
@@ -45,7 +45,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#1877f2] text-white">
           <Facebook className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">20k followers</span>
+        <span className="text-sm">like our page on</span>
         <span className="font-semibold">FaceBook</span>
       </Link>
       <Link
@@ -56,7 +56,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#1da1f2] text-white">
           <Twitter className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">20k followers</span>
+        <span className="text-sm">follow us on</span>
         <span className="font-semibold">Twitter</span>
       </Link>
       <Link
@@ -67,7 +67,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#c32aa3] text-white">
           <Instagram className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">20k followers</span>
+        <span className="text-sm">connect with us on</span>
         <span className="font-semibold">Instagram</span>
       </Link>
       <Link
@@ -78,7 +78,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#0077b5] text-white">
           <Linkedin className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">20k followers</span>
+        <span className="text-sm">connect with us on</span>
         <span className="font-semibold">LinkedIn</span>
       </Link>
       <Link
@@ -89,7 +89,7 @@ const SocialMediaLinks = () => {
         <span className="p-2 rounded-sm  bg-[#ff0000] text-white">
           <Youtube className="w-4 h-4" />{" "}
         </span>
-        <span className="text-sm">20k followers</span>
+        <span className="text-sm">subscribe to our channel on</span>
         <span className="font-semibold">YouTube</span>
       </Link>
     </div>
