@@ -20,7 +20,7 @@ export default function AuthWrapper({
     if (isLoading) return; // Wait until user is loaded
 
     const protectRoute = async () => {
-      if (!isAuthenticated && pathname.startsWith("/dashboard")) {
+      if (!isAuthenticated  && pathname.startsWith("/dashboard")) {
         router.replace("/login");
         return;
       }
@@ -73,7 +73,7 @@ export default function AuthWrapper({
       }
     };
 
-    protectRoute();
+    if(!isLoading) protectRoute();
   }, [pathname, isAuthenticated, user, isLoading]); // <-- add user and isLoading
 
 

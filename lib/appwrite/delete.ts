@@ -1,11 +1,11 @@
-import { appwriteConfig, databases } from "./config";
+import { appwriteConfig, databases1 } from "./config";
 
 export async function deletePrediction(
   gameId: string
 ) {
   try {
-    const newPrediction = await databases.deleteDocument(
-      `${appwriteConfig.databaseId}`,
+    const newPrediction = await databases1.deleteDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.predictionCollectionId}`,
       `${gameId}`
     );
@@ -20,8 +20,8 @@ export async function deleteUser(
   accountId: string
 ) {
   try {
-    const newUser = await databases.deleteDocument(
-      `${appwriteConfig.databaseId}`,
+    const newUser = await databases1.deleteDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.userCollectionId}`,
       `${accountId}`
     );
@@ -36,8 +36,8 @@ export async function deleteBlog(
   blogId: string
 ) {
   try {
-    const newBlog = await databases.deleteDocument(
-      `${appwriteConfig.databaseId}`,
+    const newBlog = await databases1.deleteDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.blogCollectionId}`,
       `${blogId}`
     );
@@ -52,8 +52,8 @@ export async function deleteBlogCategory(
   blogCategoryId: string
 ) {
   try {
-    const newBlog = await databases.deleteDocument(
-      `${appwriteConfig.databaseId}`,
+    const newBlog = await databases1.deleteDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.blogCategoriesCollectionId}`,
       `${blogCategoryId}`
     );
@@ -68,8 +68,8 @@ export async function deleteSubscription(
   subscriptionId: string
 ) {
   try {
-    const newSubscription = await databases.deleteDocument(
-      appwriteConfig.databaseId,
+    const newSubscription = await databases1.deleteDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.subscriptionId,
       subscriptionId
     );
@@ -84,8 +84,8 @@ export async function deleteComment(
   commentId: string
 ) {
   try {
-    const newComment = await databases.deleteDocument(
-      `${appwriteConfig.databaseId}`,
+    const newComment = await databases1.deleteDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.commentCollectionId}`,
       `${commentId}`
     );

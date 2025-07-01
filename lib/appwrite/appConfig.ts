@@ -1,4 +1,4 @@
-import { appwriteConfig, databases } from "./config";
+import { appwriteConfig, databases3 } from "./config";
 import { ID, Query } from "appwrite";
 
 // Define the settings types
@@ -120,15 +120,15 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 export async function initializeSettings() {
   try {
     for (const [category, defaultSettings] of Object.entries(DEFAULT_SETTINGS)) {
-      const existingSettings = await databases.listDocuments(
-        appwriteConfig.databaseId,
+      const existingSettings = await databases3.listDocuments(
+        appwriteConfig.databaseId3,
         appwriteConfig.settingsId,
         [Query.equal("category", category)]
       );
 
       if (existingSettings.documents.length === 0) {
-        await databases.createDocument(
-          appwriteConfig.databaseId,
+        await databases3.createDocument(
+          appwriteConfig.databaseId3,
           appwriteConfig.settingsId,
           ID.unique(),
           {
@@ -153,8 +153,8 @@ export async function getAllSettings(): Promise<Record<string, AppSettings>> {
   }
 
   try {
-    const response = await databases.listDocuments(
-      appwriteConfig.databaseId,
+    const response = await databases3.listDocuments(
+      appwriteConfig.databaseId3,
       appwriteConfig.settingsId
     );
 
@@ -197,8 +197,8 @@ export async function updateSettings(category: string, newSettings: Record<strin
     
     if (!currentSettings) {
       // Create new settings if they don't exist
-      await databases.createDocument(
-        appwriteConfig.databaseId,
+      await databases3.createDocument(
+        appwriteConfig.databaseId3,
         appwriteConfig.settingsId,
         ID.unique(),
         {
@@ -208,8 +208,8 @@ export async function updateSettings(category: string, newSettings: Record<strin
       );
     } else {
       // Update existing settings
-      await databases.updateDocument(
-        appwriteConfig.databaseId,
+      await databases3.updateDocument(
+        appwriteConfig.databaseId3,
         appwriteConfig.settingsId,
         currentSettings.id,
         {

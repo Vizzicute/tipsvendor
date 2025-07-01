@@ -1,4 +1,4 @@
-import { appwriteConfig, databases } from "./config";
+import { appwriteConfig, databases1 } from "./config";
 import { ID, Query } from "appwrite";
 
 export interface Notification {
@@ -15,8 +15,8 @@ export interface Notification {
 // Create a new notification
 export async function createNotification(notification: Omit<Notification, 'id'>) {
   try {
-    const response = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const response = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.notificationId,
       ID.unique(),
       notification,
@@ -31,8 +31,8 @@ export async function createNotification(notification: Omit<Notification, 'id'>)
 // Get notifications for a user
 export async function getUserNotifications(user: string) {
   try {
-    const response = await databases.listDocuments(
-      appwriteConfig.databaseId,
+    const response = await databases1.listDocuments(
+      appwriteConfig.databaseId1,
       appwriteConfig.notificationId,
       [
         Query.equal('user', user),
@@ -60,8 +60,8 @@ export async function getUserNotifications(user: string) {
 // Mark notification as read
 export async function markNotificationAsRead(notificationId: string) {
   try {
-    const response = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const response = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.notificationId,
       notificationId,
       {
@@ -96,8 +96,8 @@ export async function markAllNotificationsAsRead(user: string) {
 // Get unread notifications count
 export async function getUnreadNotificationsCount(user: string) {
   try {
-    const response = await databases.listDocuments(
-      appwriteConfig.databaseId,
+    const response = await databases1.listDocuments(
+      appwriteConfig.databaseId1,
       appwriteConfig.notificationId,
       [
         Query.equal('user', user),

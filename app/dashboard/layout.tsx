@@ -1,14 +1,18 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import AuthWrapper from "@/context/AuthWrapper";
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { getCached } from "@/lib/appwrite/cache";
 import { Metadata } from "next";
 import React from "react";
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
-    const currentUser = await getCached("seoPage-1", () => getCurrentUser());
+    const currentUser = await getCached("seoPage-1", async () => {
+      const user = localStorage.getItem('authUser');
+      if(!user) return null;
+      const parsedUser = JSON.parse(user);
+      return parsedUser;
+    });
 
     return {
       title: `${currentUser?.name || "User"} Dashboard`,

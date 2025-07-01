@@ -1,6 +1,5 @@
 import { ID } from "appwrite";
-import { appwriteConfig, avatars, databases } from "./config";
-import { getCurrentUser } from "./api";
+import { appwriteConfig, avatars, databases1 } from "./config";
 
 export type addPredictionType = {
   datetime: string;
@@ -55,17 +54,19 @@ export type AddCommentType = {
 
 export async function addPrediction(prediction: addPredictionType) {
   try {
-    const user = await getCurrentUser();
+    const user = localStorage.getItem('authUser');
+    if(!user) throw Error;
+    const parsedUser = JSON.parse(user);
 
     if (!user) throw Error;
 
-    const newPrediction = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newPrediction = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.predictionCollectionId,
       ID.unique(),
       {
         ...prediction,
-        user: user.$id,
+        user: parsedUser.$id,
         gameId: ID.unique(),
         createdAt: new Date(),
       }
@@ -80,8 +81,8 @@ export async function addPrediction(prediction: addPredictionType) {
 export async function addUser(user: addUserType) {
   const avatarUrl = avatars.getInitials(user.name).toString();
   try {
-    const newUser = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newUser = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.userCollectionId,
       ID.unique(),
       {
@@ -99,17 +100,18 @@ export async function addUser(user: addUserType) {
 
 export async function addBlog(blog: addBlogType, fileId: string) {
   try {
-    const user = await getCurrentUser();
+    const user = localStorage.getItem('authUser');
+    if(!user) throw Error;
+    const parsedUser = JSON.parse(user);
 
-    if (!user) throw Error;
 
-    const newBlog = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newBlog = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       `${appwriteConfig.blogCollectionId}`,
       ID.unique(),
       {
         ...blog,
-        user: user.$id,
+        user: parsedUser.$id,
         featuredImageId: fileId,
         createdAt: new Date(),
       }
@@ -123,8 +125,8 @@ export async function addBlog(blog: addBlogType, fileId: string) {
 
 export async function addBlogCategory(blogCategory: addBlogCategoryType) {
   try {
-    const newBlogCategory = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newBlogCategory = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.blogCategoriesCollectionId,
       ID.unique(),
       blogCategory,
@@ -138,8 +140,8 @@ export async function addBlogCategory(blogCategory: addBlogCategoryType) {
 
 export async function addSubscription(subscription: addSubscriptionType) {
   try {
-    const newSubscription = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newSubscription = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.subscriptionId,
       ID.unique(),
       subscription,
@@ -161,9 +163,11 @@ export const createComment = async ({ blogId, content, guestUser }: AddCommentTy
 
     try {
       // Try to get the current user
-      const currentUser = await getCurrentUser();
-      if (currentUser) {
-        commentData.user = currentUser.$id;
+      const user = localStorage.getItem('authUser');
+      if(!user) throw Error;
+      const parsedUser = JSON.parse(user);
+      if (parsedUser) {
+        commentData.user = parsedUser.$id;
       } else if (guestUser) {
         // If no logged-in user, use guest user data
         commentData.guestName = guestUser.name;
@@ -183,8 +187,8 @@ export const createComment = async ({ blogId, content, guestUser }: AddCommentTy
     // Add blog relationship
     commentData.blog = blogId;
 
-    const comment = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const comment = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.commentCollectionId,
       ID.unique(),
       commentData

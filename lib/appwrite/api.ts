@@ -1,5 +1,5 @@
 import { INewUser } from "@/types";
-import { account, appwriteConfig, avatars, databases } from "./config";
+import { account, appwriteConfig, avatars, databases1 } from "./config";
 import { ID, Models, OAuthProvider, Query } from "appwrite";
 
 export async function createUserAccount(user: INewUser) {
@@ -22,6 +22,8 @@ export async function createUserAccount(user: INewUser) {
       imageUrl: avatarUrl,
       imageId: null, // Initialize with null since we're using initials avatar
     });
+
+    localStorage.setItem('authUser', JSON.stringify(newUser));
 
     return newUser;
   } catch (error) {
@@ -61,8 +63,8 @@ export async function saveUserToDB(user: {
   imageId?: string | null;
 }) {
   try {
-    const newUser = await databases.createDocument(
-      appwriteConfig.databaseId,
+    const newUser = await databases1.createDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.userCollectionId,
       ID.unique(),
       {
@@ -84,6 +86,11 @@ export async function signInAccount(user: { email: string; password: string }) {
       user.password
     );
 
+    const currentUser = await getCurrentUser();
+    if (currentUser) {
+      localStorage.setItem('authUser', JSON.stringify(currentUser));
+    }
+
     return session;
   } catch (error) {
     console.log(error);
@@ -96,8 +103,8 @@ export async function getCurrentUser() {
 
     if (!currentAccount) throw Error;
 
-    const currentUser = await databases.listDocuments(
-      appwriteConfig.databaseId,
+    const currentUser = await databases1.listDocuments(
+      appwriteConfig.databaseId1,
       appwriteConfig.userCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
@@ -114,7 +121,7 @@ export async function getCurrentUser() {
 export async function signOutAccount() {
   try {
     const session = await account.deleteSession("current");
-
+    localStorage.removeItem('authUser');
     return session;
   } catch (error) {
     console.log(error);
@@ -124,6 +131,8 @@ export async function signOutAccount() {
 export async function signOutAllAccount() {
   try {
     const session = await account.deleteSessions();
+
+    localStorage.removeItem('authUser');
 
     return session;
   } catch (error) {

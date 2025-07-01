@@ -1,4 +1,4 @@
-import { account, appwriteConfig, databases } from "./config";
+import { account, appwriteConfig, databases1, databases2 } from "./config";
 
 export type editPredictionType = {
   datetime: string;
@@ -78,8 +78,8 @@ export async function editPrediction(
   gameId: string
 ) {
   try {
-    const newPrediction = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newPrediction = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.predictionCollectionId,
       gameId,
       {
@@ -96,8 +96,8 @@ export async function editPrediction(
 
 export async function addResult(prediction: addResultType, gameId: string) {
   try {
-    const newPrediction = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newPrediction = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.predictionCollectionId,
       gameId,
       prediction
@@ -111,8 +111,8 @@ export async function addResult(prediction: addResultType, gameId: string) {
 
 export async function editUser(user: editUserType, userId: string) {
   try {
-    const newUser = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newUser = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.userCollectionId,
       userId,
       user
@@ -126,8 +126,8 @@ export async function editUser(user: editUserType, userId: string) {
 
 export async function editStaff(staff: editStaffType, accountId: string) {
   try {
-    const newPrediction = await databases.updateDocument(
-      `${appwriteConfig.databaseId}`,
+    const newPrediction = await databases1.updateDocument(
+      `${appwriteConfig.databaseId1}`,
       `${appwriteConfig.userCollectionId}`,
       `${accountId}`,
       staff
@@ -153,8 +153,8 @@ export async function editBlog(blog: editBlogType, blogId: string, fileId: strin
       updatedAt: new Date(),
     };
 
-    const newBlog = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newBlog = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.blogCollectionId,
       blogId,
       updateData
@@ -173,8 +173,8 @@ export async function editBlog(blog: editBlogType, blogId: string, fileId: strin
 
 export async function editBlogCategory(blog: editBlogCategoryType, blogCategoryId: string) {
   try {
-    const newBlog = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newBlog = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.blogCollectionId,
       blogCategoryId,
       {
@@ -196,8 +196,8 @@ export async function editBlogCategory(blog: editBlogCategoryType, blogCategoryI
 
 export async function updateBlogStatus(status: string, blogId: string, publishedAt: Date) {
   try {
-    const newBlog = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newBlog = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.blogCollectionId,
       blogId,
       {
@@ -214,8 +214,8 @@ export async function updateBlogStatus(status: string, blogId: string, published
 
 export async function editSeoPage(blog: editSeoPageType, pageId: string) {
   try {
-    const newBlog = await databases.updateDocument(
-      `${`${appwriteConfig.databaseId}`}`,
+    const newBlog = await databases2.updateDocument(
+      `${`${appwriteConfig.databaseId1}`}`,
       `${appwriteConfig.seoCollectionId}`,
       `${pageId}`,
       {
@@ -232,8 +232,8 @@ export async function editSeoPage(blog: editSeoPageType, pageId: string) {
 
 export async function editSubscription(subscription: editSubscriptionType, subscriptionId: string) {
   try {
-    const newSubscription = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newSubscription = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.subscriptionId,
       subscriptionId,
       subscription
@@ -257,8 +257,8 @@ export async function freezeSubscription(subscriptionId: string, freeze: boolean
       updateData.freezeEnd = new Date();
     }
 
-    const newSubscription = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newSubscription = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.subscriptionId,
       subscriptionId,
       updateData
@@ -272,8 +272,8 @@ export async function freezeSubscription(subscriptionId: string, freeze: boolean
 
 export async function updateSubscriptionStatus(status: string, subscriptionId: string) {
   try {
-    const newSubscription = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newSubscription = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.subscriptionId,
       subscriptionId,
       {
@@ -289,8 +289,8 @@ export async function updateSubscriptionStatus(status: string, subscriptionId: s
 
 export async function updateCommentStatus(status: string, commentId: string) {
   try {
-    const newComment = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const newComment = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.commentCollectionId,
       commentId,
       {
@@ -306,8 +306,8 @@ export async function updateCommentStatus(status: string, commentId: string) {
 
 export async function verifyUser(userId: string) {
   try {
-    const user = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const user = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.userCollectionId,
       userId,
       {

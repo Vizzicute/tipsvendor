@@ -1,9 +1,9 @@
 import { Query } from "appwrite";
-import { appwriteConfig, databases } from "./config";
+import { appwriteConfig, databases1, databases2 } from "./config";
 
 export async function getPredictions() {
-  const predictions = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const predictions = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.predictionCollectionId}`,
     [Query.limit(1000), Query.orderDesc("$createdAt")]
   );
@@ -17,8 +17,8 @@ export async function getFromYesterdaysPredictions() {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
-  const predictions = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const predictions = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.predictionCollectionId}`,
     [
       Query.limit(100),
@@ -32,8 +32,8 @@ export async function getFromYesterdaysPredictions() {
 }
 
 export async function getUsers() {
-  const users = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const users = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.userCollectionId}`,
     [Query.limit(500), Query.orderDesc("$createdAt")]
   );
@@ -42,8 +42,8 @@ export async function getUsers() {
 }
 
 export async function getSingleUserByEmail(email: string) {
-  const user = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const user = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.userCollectionId}`,
     [Query.equal("email", email)]
   );
@@ -54,8 +54,8 @@ export async function getSingleUserByEmail(email: string) {
 }
 
 export async function getSingleUserByUserId(userId: string) {
-  const user = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const user = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.userCollectionId}`,
     [Query.equal("$id", userId)]
   );
@@ -66,8 +66,8 @@ export async function getSingleUserByUserId(userId: string) {
 }
 
 export async function getAdmin() {
-  const admin = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const admin = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.userCollectionId}`,
     [Query.equal("role", "admin")]
   );
@@ -79,8 +79,8 @@ export async function getAdmin() {
 
 
 export async function getBlog() {
-  const blogs = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const blogs = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.blogCollectionId}`,
     [Query.limit(500), Query.orderDesc("$createdAt")]
   );
@@ -92,8 +92,8 @@ export async function getBlog() {
 
 export async function getSingleBlog(blogId: string) {
   try {
-    const blog = await databases.getDocument(
-      appwriteConfig.databaseId,
+    const blog = await databases1.getDocument(
+      appwriteConfig.databaseId1,
       appwriteConfig.blogCollectionId,
       blogId
     );
@@ -108,8 +108,8 @@ export async function getSingleBlog(blogId: string) {
 }
 
 export async function getSingleBlogBySlug(slug: string) {
-  const blog = await databases.listDocuments(
-    appwriteConfig.databaseId,
+  const blog = await databases1.listDocuments(
+    appwriteConfig.databaseId1,
     appwriteConfig.blogCollectionId,
     [Query.equal("slug", slug)]
   );
@@ -120,8 +120,8 @@ export async function getSingleBlogBySlug(slug: string) {
 }
 
 export async function getBlogCategories() {
-  const blogs = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const blogs = await databases1.listDocuments(
+    `${appwriteConfig.databaseId1}`,
     `${appwriteConfig.blogCategoriesCollectionId}`
   );
 
@@ -131,8 +131,8 @@ export async function getBlogCategories() {
 }
 
 export async function getSeoPages() {
-  const seo = await databases.listDocuments(
-    appwriteConfig.databaseId,
+  const seo = await databases2.listDocuments(
+    appwriteConfig.databaseId2,
     appwriteConfig.seoCollectionId
   );
 
@@ -142,8 +142,8 @@ export async function getSeoPages() {
 }
 
 export async function getSingleSeoPage(pageId: string) {
-  const seoPage = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const seoPage = await databases2.listDocuments(
+    `${appwriteConfig.databaseId2}`,
     `${appwriteConfig.seoCollectionId}`,
     [Query.equal("$id", pageId)]
   );
@@ -154,8 +154,8 @@ export async function getSingleSeoPage(pageId: string) {
 }
 
 export async function getSingleSeoPageByUrl(pageUrl: string) {
-  const seoPage = await databases.listDocuments(
-    `${appwriteConfig.databaseId}`,
+  const seoPage = await databases2.listDocuments(
+    `${appwriteConfig.databaseId2}`,
     `${appwriteConfig.seoCollectionId}`,
     [Query.equal("url", pageUrl)]
   );
@@ -175,8 +175,8 @@ export async function getSingleSeoPageByUrl(pageUrl: string) {
 }
 
 export async function getSubscriptions() {
-  const subscriptions = await databases.listDocuments(
-    appwriteConfig.databaseId,
+  const subscriptions = await databases1.listDocuments(
+    appwriteConfig.databaseId1,
     appwriteConfig.subscriptionId,
     [Query.limit(500), Query.orderDesc("$createdAt")],
   );
@@ -187,8 +187,8 @@ export async function getSubscriptions() {
 }
 
 export async function getComments() {
-  const comments = await databases.listDocuments(
-    appwriteConfig.databaseId,
+  const comments = await databases1.listDocuments(
+    appwriteConfig.databaseId1,
     appwriteConfig.commentCollectionId
   );
 
@@ -198,8 +198,8 @@ export async function getComments() {
 }
 
 export async function getSingleComment(commentId: string) {
-  const comment = await databases.getDocument(
-    appwriteConfig.databaseId,
+  const comment = await databases1.getDocument(
+    appwriteConfig.databaseId1,
     appwriteConfig.commentCollectionId,
     commentId
   );

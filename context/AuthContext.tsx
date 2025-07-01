@@ -1,6 +1,5 @@
 "use client";
 
-import { getCurrentUser } from '@/lib/appwrite/api';
 import { IContextType, IUser } from '@/types';
 import React, { createContext, useContext, useEffect, useState} from 'react'
 
@@ -35,19 +34,21 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuthUser = async () => {
         setIsLoading(true);
         try {
-            const currentAccount = await getCurrentUser();
+            const currentAccount = localStorage.getItem('authUser');
+            if(!currentAccount) return false;
+            const parsedUser = JSON.parse(currentAccount);
 
-            if(currentAccount) {
+            if(parsedUser) {
                 setUser({
-                    id: currentAccount.$id,
-                    name: currentAccount.name,
-                    email: currentAccount.email,
-                    country: currentAccount.country,
-                    address: currentAccount.address,
-                    imageUrl: currentAccount.imageUrl,
-                    role: currentAccount.role,
-                    subscription: currentAccount.subscription,
-                    createdAt: currentAccount.$createdAt
+                    id: parsedUser.$id,
+                    name: parsedUser.name,
+                    email: parsedUser.email,
+                    country: parsedUser.country,
+                    address: parsedUser.address,
+                    imageUrl: parsedUser.imageUrl,
+                    role: parsedUser.role,
+                    subscription: parsedUser.subscription,
+                    createdAt: parsedUser.$createdAt
                 });
 
                 setIsAuthenticated(true);
@@ -64,17 +65,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        const cookieFallback = localStorage.getItem('cookieFallback');
-        // cookieFallback === null ||
-        // cookieFallback === undefined
-        // redirect("/login")
-        if(
-            cookieFallback === '[]'
-        )  {
+        const storedUser = localStorage.getItem('authUser');
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            setIsAuthenticated(true);
+            setIsLoading(false);
+            return;
         }
-
         checkAuthUser();
     }, []);
+
+    const signOut = () => {
+        localStorage.removeItem('authUser');
+        setUser(INITIAL_USER);
+        setIsAuthenticated(false);
+    };
 
     const value = {
         user,
@@ -82,7 +88,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         isAuthenticated,
         setIsAuthenticated,
-        checkAuthUser
+        checkAuthUser,
+        signOut,
     };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

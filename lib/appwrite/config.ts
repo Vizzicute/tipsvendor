@@ -1,9 +1,14 @@
 import { Client, Account, Databases, Storage, Avatars } from 'appwrite'
 
 export const appwriteConfig = {
-    projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID || "",
-    endpoint: process.env.NEXT_PUBLIC_APPWRITE_URL || "",
-    databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || "",
+    projectId1: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_1 || "",
+    projectId2: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_2 || "",
+    projectId3: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_3 || "",
+    endpoint1: process.env.NEXT_PUBLIC_APPWRITE_URL_2 || "",
+    endpoint2: process.env.NEXT_PUBLIC_APPWRITE_URL_2 || "",
+    databaseId1: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID_1 || "",
+    databaseId2: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID_2 || "",
+    databaseId3: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID_3 || "",
     storageId: process.env.NEXT_PUBLIC_APPWRITE_STORAGE_ID || "",
     userCollectionId: process.env.NEXT_PUBLIC_APPWRITE_USER_COLLECTION_ID || "",
     predictionCollectionId: process.env.NEXT_PUBLIC_APPWRITE_PREDICTION_COLLECTION_ID || "",
@@ -16,12 +21,20 @@ export const appwriteConfig = {
     commentCollectionId: process.env.NEXT_PUBLIC_APPWRITE_COMMENT_COLLECTION_ID || "",
 }
 
-export const client = new Client();
+export const client1 = new Client();
+export const client2 = new Client();
+export const client3 = new Client();
 
-client.setProject(`${appwriteConfig.projectId}`);
-client.setEndpoint(`${appwriteConfig.endpoint}`);
+client1.setProject(`${appwriteConfig.projectId1}`);
+client1.setEndpoint(`${appwriteConfig.endpoint1}`);
+client2.setProject(`${appwriteConfig.projectId2}`);
+client2.setEndpoint(`${appwriteConfig.endpoint2}`);
+client3.setProject(`${appwriteConfig.projectId3}`);
+client3.setEndpoint(`${appwriteConfig.endpoint2}`);
 
-export const account = new Account(client);
-export const databases = new Databases(client);
-export const storage = new Storage(client);
-export const avatars = new Avatars(client);
+export const account = new Account(client1);
+export const databases1 = new Databases(client1);
+export const databases2 = new Databases(client2);
+export const databases3 = new Databases(client3);
+export const storage = new Storage(client1);
+export const avatars = new Avatars(client1);

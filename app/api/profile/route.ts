@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { databases, storage, account, appwriteConfig } from "@/lib/appwrite/config";
+import { databases1, storage, account, appwriteConfig } from "@/lib/appwrite/config";
 import { ID } from "appwrite";
 
 export async function POST(req: Request) {
@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     if (avatar) {
       try {
         // Delete old avatar if exists
-        const user = await databases.getDocument(
-          appwriteConfig.databaseId,
+        const user = await databases1.getDocument(
+          appwriteConfig.databaseId1,
           "users",
           userId
         );
@@ -62,8 +62,8 @@ export async function POST(req: Request) {
     }
 
     // Update user profile in Appwrite
-    const updatedUser = await databases.updateDocument(
-      appwriteConfig.databaseId,
+    const updatedUser = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
       "users",
       userId,
       {
@@ -90,8 +90,8 @@ export async function GET() {
     const currentUser = await account.get();
     const userId = currentUser.$id;
 
-    const user = await databases.getDocument(
-      appwriteConfig.databaseId,
+    const user = await databases1.getDocument(
+      appwriteConfig.databaseId1,
       "users",
       userId
     );
