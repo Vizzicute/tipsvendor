@@ -78,7 +78,6 @@ export async function getFromYesterdaysPredictions(filters = {}) {
   const queries = [
     Query.limit(100),
     Query.greaterThanEqual("datetime", startOfYesterday.toISOString()),
-    Query.lessThan("datetime", startOfToday.toISOString()),
   ];
 
   const { tip, isBtts, chance, isBanker, either, htft, overs } = filters as PredictionFilters;
