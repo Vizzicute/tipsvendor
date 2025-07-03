@@ -329,3 +329,18 @@ export async function resetUserPassword(password: string, oldPassword: string) {
     console.log(error);
   }
 }
+
+export async function updateCollectionCounts(counts: Record<string, number>, docId: string) {
+  try {
+    const collectionCounts = await databases1.updateDocument(
+      appwriteConfig.databaseId1,
+      appwriteConfig.collectionCountsId,
+      docId,
+      counts
+    );
+
+    return collectionCounts;
+  } catch (error) {
+    console.log(error);
+  }
+}

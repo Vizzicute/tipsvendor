@@ -2,9 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
+  get4MostRecentBlogs,
   getBlog,
   getBlogCategories,
   getComments,
+  getFromYesterdaysPredictions,
   getPredictions,
   getSeoPages,
   getSingleBlog,
@@ -22,6 +24,7 @@ import {
 } from "../appwrite/appConfig";
 import { verifyAccount } from "../utils/verification";
 import { getUserNotifications } from "../appwrite/notifications";
+import { getAnalyticsDoc } from "../appwrite/analytic";
 
 export function useCurrentUser() {
   return useQuery({
@@ -32,34 +35,50 @@ export function useCurrentUser() {
   });
 }
 
-export function useUsers() {
+export function useUsers(filters = {}, page = 1, pageSize = 15) {
   return useQuery({
-    queryKey: ["users"],
-    queryFn: getUsers,
+    queryKey: ["users", filters, page, pageSize],
+    queryFn: () => getUsers(filters, page, pageSize),
     staleTime: 1000 * 60 * 5,
   });
 }
 
-export function useSubscriptions() {
+export function useSubscriptions(page = 1, pageSize = 15) {
   return useQuery({
     queryKey: ["subscriptions"],
-    queryFn: getSubscriptions,
+    queryFn: () => getSubscriptions(page, pageSize),
     staleTime: 1000 * 60 * 10,
   });
 }
 
-export function usePredictions() {
+export function usePredictions(filters = {}, page = 1, pageSize = 15) {
   return useQuery({
-    queryKey: ["predictions"],
-    queryFn: getPredictions,
+    queryKey: ["predictions", filters, page, pageSize],
+    queryFn: () => getPredictions(filters, page, pageSize),
     staleTime: 1000 * 60 * 10,
   });
 }
 
-export function useBlogs() {
+export function usePredictionFromYesterday() {
+  return useQuery({
+    queryKey: ["predictions-from-yesterday"],
+    queryFn: () => getFromYesterdaysPredictions(),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function useBlogs(filters = {}, page = 1, pageSize = 15) {
   return useQuery({
     queryKey: ["blog"],
-    queryFn: getBlog,
+    queryFn: () => getBlog(filters, page, pageSize),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function use4MostRecentBlogs() {
+  return useQuery({
+    queryKey: ["4-most-recent-blogs"],
+    queryFn: get4MostRecentBlogs,
     staleTime: 1000 * 60 * 10,
   });
 }
@@ -72,10 +91,10 @@ export function useBlogCategories() {
   });
 }
 
-export function useComments() {
+export function useComments(page = 1, pageSize = 15) {
   return useQuery({
-    queryKey: ["comments"],
-    queryFn: getComments,
+    queryKey: ["comments", page, pageSize],
+    queryFn: () => getComments(page, pageSize),
     staleTime: 1000 * 60 * 10,
   });
 }
@@ -156,4 +175,10 @@ export const userNotifications = (userId: string) =>
     queryFn: async () => getUserNotifications(userId),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
+  });
+
+export const useAnalyticsDoc = () =>
+  useQuery({
+    queryKey: ["analyticsDoc"],
+    queryFn: async () => getAnalyticsDoc(),
   });

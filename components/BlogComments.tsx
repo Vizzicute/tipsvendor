@@ -36,33 +36,22 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { truncate } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+
 interface BlogCommentsProps {
   comments: Models.Document[];
   isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
+  handlePageChange: (page: number) => void;
 }
 
-const BlogComments = ({ comments, isLoading }: BlogCommentsProps) => {
+const BlogComments = ({ comments, isLoading, currentPage, totalPages, handlePageChange }: BlogCommentsProps) => {
   const queryClient = useQueryClient();
-  const PAGE_SIZE = 10;
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
 
-  const totalPages = Math.ceil((comments?.length || 0) / PAGE_SIZE);
-
-  const paginatedData = comments?.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
-
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const searchedComments = paginatedData?.filter(
+  const searchedComments = comments?.filter(
     (comment) =>
       comment.content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       comment.author?.toLowerCase().includes(searchTerm.toLowerCase())

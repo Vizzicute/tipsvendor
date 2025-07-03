@@ -68,7 +68,7 @@ export default function MailPage() {
 
   const { data: subscriptions } = useSubscriptions();
 
-  const { data: predictions } = usePredictions();
+  const { data: predictions } = usePredictions({ startDate: new Date().toISOString().split("T")[0] });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

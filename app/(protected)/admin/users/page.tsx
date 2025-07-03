@@ -55,6 +55,7 @@ import FreezeSubscription from "@/components/FreezeSubscription";
 import UnfreezeSubscription from "@/components/UnfreezeSubscription";
 import EditSubscription from "./EditSubscription";
 import { useSubscriptions, useUsers } from "@/lib/react-query/queries";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 const page = () => {
   const searchParams = useSearchParams();
@@ -67,165 +68,71 @@ const page = () => {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const { data: users } = useUsers();
-
-  const { data: subscriptions } = useSubscriptions();
-
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);
-
   const [searchTerm, setSearchTerm] = useState("");
-  const [, setOpenDropdown1] = useState(false);
-  const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
-    setOpenDropdown1(v);
-
   const [sortBy, setSortBy] = useState("");
   const [filterBy, setFilterBy] = useState("");
-  const [startDate, setStartDate] = React.useState<Date>();
-  const [endDate, setEndDate] = React.useState<Date>();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [totalUserCount, setTotalUserCount] = useState(0);
+  const [totalSubCount, setTotalSubCount] = useState(0);
 
-  const getDateOnly = (input: string | Date) => {
-    const date = new Date(input);
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate())
-      .toISOString()
-      .split("T")[0];
-  };
+  const filters: any = {};
+  if (searchTerm) {
+    filters.name = searchTerm;
+    filters.email = searchTerm;
+    filters.country = searchTerm;
+  }
+  if (filterBy === "today") {
+    const today = new Date().toISOString().split("T")[0];
+    filters.startDate = today;
+    filters.endDate = today;
+  }
+  if (filterBy === "yesterday") {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    const yest = d.toISOString().split("T")[0];
+    filters.startDate = yest;
+    filters.endDate = yest;
+  }
+  if (filterBy === "custom-date" && startDate && endDate) {
+    filters.startDate = startDate.toISOString().split("T")[0];
+    filters.endDate = endDate.toISOString().split("T")[0];
+  }
+  if (tab === "subscriptions") {
+    if (filterBy === "valid") filters.status = "active";
+    if (filterBy === "expired") filters.status = "expired";
+    if (filterBy === "frozen") filters.status = "frozen";
+  }
+
+  const { data: users, isLoading: usersLoading } = useUsers(filters, currentPage, PAGE_SIZE);
+  const { data: subscriptions, isLoading: subsLoading } = useSubscriptions(currentPage, PAGE_SIZE);
 
   useEffect(() => {
-    if (startDate && endDate) {
-      setFilterBy("custom-date");
+    async function fetchCounts() {
+      try {
+        const userCountDoc = await getCollectionCounts("user");
+        setTotalUserCount(userCountDoc.counts || 0);
+        const subCountDoc = await getCollectionCounts("subscription");
+        setTotalSubCount(subCountDoc.counts || 0);
+      } catch (e) {
+        setTotalUserCount(0);
+        setTotalSubCount(0);
+      }
     }
-  }, [startDate, endDate]);
+    fetchCounts();
+  }, [filters, tab]);
 
-  const onlyUsers = users?.filter((data) => data.role === "user");
+  const totalPages = tab === "users"
+    ? Math.ceil(totalUserCount / PAGE_SIZE)
+    : Math.ceil(totalSubCount / PAGE_SIZE);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
-  const searchedUsers = onlyUsers?.filter(
-    (data) =>
-      data.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.country?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.subscriptionType?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredUsers = searchedUsers?.filter((data) => {
-    const today = getDateOnly(new Date());
-    const yesterday = getDateOnly(new Date(Date.now() - 86400000));
-
-    if (filterBy === "") return true;
-
-    const usersDate = getDateOnly(data.$createdAt);
-
-    if (filterBy === "today") return usersDate === today;
-    if (filterBy === "yesterday") return usersDate === yesterday;
-
-    if (filterBy === "custom-date" && startDate && endDate) {
-      const start = getDateOnly(startDate);
-      const end = getDateOnly(endDate);
-      return usersDate >= start && usersDate <= end;
-    }
-
-    if (tab === "subscriptions") {
-      if (filterBy === "valid") return data.status === "active";
-      if (filterBy === "expired") return data.status === "expired";
-      if (filterBy === "frozen") return data.status === "frozen";
-    }
-
-    return true;
-  });
-
-  const sortedUsers = filteredUsers?.sort((a, b) => {
-    switch (sortBy) {
-      case "":
-        return b.$createdAt.localeCompare(a.$createdAt);
-      case "name-asc":
-        return (a.name || "").localeCompare(b.name || "");
-      case "name-desc":
-        return (b.name || "").localeCompare(a.name || "");
-      case "email-asc":
-        return (a.email || "").localeCompare(b.email || "");
-      case "email-desc":
-        return (b.email || "").localeCompare(a.email || "");
-      case "country-asc":
-        return (a.country || "").localeCompare(b.country || "");
-      case "country-desc":
-        return (b.country || "").localeCompare(a.country || "");
-      case "subscription-asc":
-        return (a.subscriptionType || "").localeCompare(
-          b.subscriptionType || ""
-        );
-      case "subscription-desc":
-        return (b.subscriptionType || "").localeCompare(
-          a.subscriptionType || ""
-        );
-      default:
-        return 0;
-    }
-  });
-
-  // Filter, search, and sort subscriptions
-  const searchedSubscriptions = subscriptions?.filter(
-    (data) =>
-      data.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.subscriptionType?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredSubscriptions = searchedSubscriptions?.filter((data) => {
-    const today = getDateOnly(new Date());
-    const yesterday = getDateOnly(new Date(Date.now() - 86400000));
-    const subDate = getDateOnly(data.$createdAt);
-
-    if (filterBy === "") return true;
-    if (filterBy === "today") return subDate === today;
-    if (filterBy === "yesterday") return subDate === yesterday;
-    if (filterBy === "custom-date" && startDate && endDate) {
-      const start = getDateOnly(startDate);
-      const end = getDateOnly(endDate);
-      return subDate >= start && subDate <= end;
-    }
-    if (filterBy === "valid")
-      return data.isValid === true && data.isFreeze === false;
-    if (filterBy === "expired") return data.isValid === false;
-    if (filterBy === "frozen") return data.isFreeze === true;
-    return true;
-  });
-
-  const sortedSubscriptions = filteredSubscriptions?.sort((a, b) => {
-    switch (sortBy) {
-      case "subscription-asc":
-        return (a.subscriptionType || "").localeCompare(
-          b.subscriptionType || ""
-        );
-      case "subscription-desc":
-        return (b.subscriptionType || "").localeCompare(
-          a.subscriptionType || ""
-        );
-      default:
-        return (
-          new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime()
-        );
-    }
-  });
-  const totalPages = Math.ceil(
-    (tab === "users"
-      ? users?.filter((data) => data.role === "user")?.length || 0
-      : subscriptions?.length || 0) / PAGE_SIZE
-  );
-  const paginatedData =
-    tab === "users"
-      ? sortedUsers?.slice(
-          (currentPage - 1) * PAGE_SIZE,
-          currentPage * PAGE_SIZE
-        )
-      : sortedSubscriptions?.slice(
-          (currentPage - 1) * PAGE_SIZE,
-          currentPage * PAGE_SIZE
-        );
 
   const FilterButton = () => (
     <Popover>
@@ -251,8 +158,8 @@ const page = () => {
                   Filter By: Date Range
                 </span>
                 <span className="flex flex-col text-end">
-                  <span>from: {getDateOnly(startDate)}</span>
-                  <span>to: {getDateOnly(endDate)}</span>
+                  <span>from: {startDate.toISOString().split("T")[0]}</span>
+                  <span>to: {endDate.toISOString().split("T")[0]}</span>
                 </span>
               </span>
             </>
@@ -424,28 +331,28 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedData?.map((user) => (
-                      <TableRow key={user.$id}>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
+                    {(tab === "users" ? users : subscriptions)?.map((item) => (
+                      <TableRow key={item.$id}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.email}</TableCell>
                         <TableCell>
-                          {user.country ? user.country : "N/A"}
+                          {item.country ? item.country : "N/A"}
                         </TableCell>
                         <TableCell>
                           <span
                             className={`rounded-full text-center ${
-                              user.isVerified === true
+                              item.isVerified === true
                                 ? "text-green-500 bg-green-100"
                                 : "text-red-500 bg-red-100"
                             }`}
                           >
-                            {user.isVerified === true
+                            {item.isVerified === true
                               ? "verified"
                               : "not verified"}
                           </span>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(user.$createdAt), "PPP")}
+                          {format(new Date(item.$createdAt), "PPP")}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -458,7 +365,7 @@ const page = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <Dialog onOpenChange={closeDropdown1}>
+                              <Dialog>
                                 <DialogTrigger asChild>
                                   <DropdownMenuItem
                                     onSelect={(e) => e.preventDefault()}
@@ -472,13 +379,13 @@ const page = () => {
                                       Edit User
                                     </DialogTitle>
                                   </DialogHeader>
-                                  <EditUserForm user={user} />
+                                  <EditUserForm user={item} />
                                 </DialogContent>
                               </Dialog>
                               <DropdownMenuItem>View Details</DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DeleteUserDialog
-                                accountId={user.$id}
+                                accountId={item.$id}
                                 text="User"
                               />
                             </DropdownMenuContent>
@@ -489,17 +396,16 @@ const page = () => {
                   </TableBody>
                 </Table>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col gap-2">
+                <div className="w-full text-center font-light">
+                  Page {currentPage.toString().padStart(2, "0")} of {totalPages.toString().padStart(2, "0")}
+                </div>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -517,11 +423,7 @@ const page = () => {
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                   </PaginationContent>
@@ -582,34 +484,34 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {paginatedData?.map((subscription: any) => (
-                      <TableRow key={subscription.$id}>
-                        <TableCell>{subscription.user?.email}</TableCell>
+                    {(tab === "users" ? users : subscriptions)?.map((item) => (
+                      <TableRow key={item.$id}>
+                        <TableCell>{item.user?.email}</TableCell>
                         <TableCell className="capitalize">
-                          {subscription.subscriptionType}
+                          {item.subscriptionType}
                         </TableCell>
-                        <TableCell>{subscription.duration} days</TableCell>
+                        <TableCell>{item.duration} days</TableCell>
                         <TableCell>
                           <span
                             className={`px-2 py-1 rounded-full text-xs ${
-                              subscription.isValid === true &&
-                              subscription.isFreeze === false
+                              item.isValid === true &&
+                              item.isFreeze === false
                                 ? "bg-green-100 text-green-800"
-                                : subscription.isValid === false
+                                : item.isValid === false
                                 ? "bg-red-100 text-red-800"
                                 : "bg-yellow-100 text-yellow-800"
                             }`}
                           >
-                            {subscription.isValid === true &&
-                            subscription.isFreeze === false
+                            {item.isValid === true &&
+                            item.isFreeze === false
                               ? "Valid"
-                              : subscription.isValid === false
+                              : item.isValid === false
                               ? "Expired"
                               : "Freezed"}
                           </span>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(subscription.$createdAt), "PPP")}
+                          {format(new Date(item.$createdAt), "PPP")}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu modal={false}>
@@ -621,21 +523,21 @@ const page = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <EditSubscription subscription={subscription} />
+                              <EditSubscription subscription={item} />
                               <DropdownMenuSeparator />
-                              {subscription.isFreeze === true ? (
+                              {item.isFreeze === true ? (
                                 <UnfreezeSubscription
-                                  subscriptionId={subscription.$id}
+                                  subscriptionId={item.$id}
                                   text="Subscription"
                                 />
                               ) : (
                                 <FreezeSubscription
-                                  subscriptionId={subscription.$id}
+                                  subscriptionId={item.$id}
                                   text="Subscription"
                                 />
                               )}
                               <CancelSubscription
-                                subscriptionId={subscription.$id}
+                                subscriptionId={item.$id}
                                 text="Subscription"
                               />
                             </DropdownMenuContent>
@@ -646,17 +548,16 @@ const page = () => {
                   </TableBody>
                 </Table>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col gap-2">
+                <div className="w-full text-center font-light">
+                  Page {currentPage.toString().padStart(2, "0")} of {totalPages.toString().padStart(2, "0")}
+                </div>
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -674,11 +575,7 @@ const page = () => {
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                   </PaginationContent>

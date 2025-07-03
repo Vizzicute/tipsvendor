@@ -58,110 +58,60 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { usePredictions } from "@/lib/react-query/queries";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 
 const page = () => {
-  const {
-    data: predictions
-  } = usePredictions();
-
   const PAGE_SIZE = 15;
   const [currentPage, setCurrentPage] = useState(1);
-
   const [searchTerm, setSearchTerm] = useState("");
-  const [, setOpenDropdown1] = useState(false);
-  const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
-    setOpenDropdown1(v);
-
   const [sortBy, setSortBy] = useState("");
   const [filterBy, setFilterBy] = useState("");
   const [startDate, setStartDate] = React.useState<Date>();
   const [endDate, setEndDate] = React.useState<Date>();
+  const [totalCount, setTotalCount] = useState(0);
 
-  const getDateOnly = (input: string | Date) => {
-    const date = new Date(input);
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate())
-      .toISOString()
-      .split("T")[0];
-  };
+  const filters: any = {};
+  if (searchTerm) filters.tip = searchTerm; // You may want to expand this to search other fields server-side
+  if (["win", "loss", "void", "N/A"].includes(filterBy)) filters.status = filterBy;
+  if (["free", "investment", "vip", "mega"].includes(filterBy)) filters.subscriptionType = filterBy;
+  if (filterBy === "today") filters.startDate = filters.endDate = new Date().toISOString().split("T")[0];
+  if (filterBy === "yesterday") {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    filters.startDate = filters.endDate = d.toISOString().split("T")[0];
+  }
+  if (filterBy === "tomorrow") {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    filters.startDate = filters.endDate = d.toISOString().split("T")[0];
+  }
+  if (filterBy === "custom-date" && startDate && endDate) {
+    filters.startDate = startDate.toISOString().split("T")[0];
+    filters.endDate = endDate.toISOString().split("T")[0];
+  }
+
+  const { data: predictions, isLoading } = usePredictions(filters, currentPage, PAGE_SIZE);
 
   useEffect(() => {
-    if (startDate && endDate) {
-      setFilterBy("custom-date");
+    async function fetchCount() {
+      try {
+        const countDoc = await getCollectionCounts("prediction");
+        setTotalCount(countDoc.counts || 0);
+      } catch (e) {
+        setTotalCount(0);
+      }
     }
-  }, [startDate, endDate]);
+    fetchCount();
+  }, [filters]);
 
-  
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
+    if (page >= 1) {
       setCurrentPage(page);
     }
   };
-
-  const searchedPredictions = predictions?.filter(
-    (data) =>
-      data.hometeam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.awayteam?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.league?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      data.tip?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredPredictions = searchedPredictions?.filter((data) => {
-    const today = getDateOnly(new Date());
-    const yesterday = getDateOnly(new Date(Date.now() - 86400000));
-    const tomorrow = getDateOnly(new Date(Date.now() + 86400000));
-
-    if (filterBy === "") return true;
-
-    const predictionDate = getDateOnly(data.datetime); // Normalize DB date
-
-    if (filterBy === "today") return predictionDate === today;
-    if (filterBy === "yesterday") return predictionDate === yesterday;
-    if (filterBy === "tomorrow") return predictionDate === tomorrow;
-
-    if (filterBy === "custom-date" && startDate && endDate) {
-      const start = getDateOnly(startDate);
-      const end = getDateOnly(endDate);
-      return predictionDate >= start && predictionDate <= end;
-    }
-
-    if (["win", "loss", "void", "N/A"].includes(filterBy)) {
-      return data.status === filterBy;
-    }
-
-    if (["free", "investment", "vip", "mega"].includes(filterBy)) {
-      return data.subscriptionType === filterBy;
-    }
-
-    return true;
-  });
-  
-  const sortedPredictions = filteredPredictions?.sort((a, b) => {
-    switch (sortBy) {
-      case "":
-        return b.datetime.localeCompare(a.datetime);
-      case "league-asc":
-        return a.league.localeCompare(b.league);
-      case "league-desc":
-        return b.league.localeCompare(a.league);
-        case "hometeam-asc":
-        return a.hometeam.localeCompare(b.hometeam);
-      case "hometeam-desc":
-        return b.hometeam.localeCompare(a.hometeam);
-        case "awayteam-asc":
-          return a.awayteam.localeCompare(b.awayteam);
-          case "awayteam-desc":
-            return b.awayteam.localeCompare(a.awayteam);
-            default:
-              return 0;
-            }
-          });
-          const totalPages = Math.ceil((sortedPredictions?.length || 0) / PAGE_SIZE);
-        
-          const paginatedData = sortedPredictions?.sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(
-            (currentPage - 1) * PAGE_SIZE,
-            currentPage * PAGE_SIZE
-          ) || [];
 
   const formattedDate = (date: Date): string =>
     date.toISOString().split("T")[0];
@@ -232,8 +182,8 @@ const page = () => {
                             Filter By: Date Range
                           </span>
                           <span className="flex flex-col text-end">
-                            <span>from: {getDateOnly(startDate)}</span>
-                            <span>to: {getDateOnly(endDate)}</span>
+                            <span>from: {formattedDate(startDate)}</span>
+                            <span>to: {formattedDate(endDate)}</span>
                           </span>
                         </span>
                       </>
@@ -473,13 +423,13 @@ const page = () => {
             </div>
           </div>
 
-          {paginatedData === undefined ? (
+          {isLoading ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-500">
                 Loading predictions...
               </h3>
             </div>
-          ) : paginatedData?.length === 0 ? (
+          ) : predictions?.length === 0 ? (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-gray-500">
                 No predictions found
@@ -503,7 +453,7 @@ const page = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData?.map((data) => (
+                {predictions?.map((data) => (
                   <TableRow key={data.gameId} className="text-center">
                     <TableCell className="font-normal">
                       {formattedTime(new Date(data.datetime))}
@@ -544,7 +494,6 @@ const page = () => {
                     <TableCell className="text-right">
                       <DropdownMenu
                         modal={false}
-                        onOpenChange={(v) => closeDropdown1(v)}
                       >
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -570,7 +519,7 @@ const page = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
-                          <Dialog onOpenChange={closeDropdown1}>
+                          <Dialog>
                             <DialogTrigger asChild>
                               <DropdownMenuItem
                                 onSelect={(e) => e.preventDefault()}
@@ -587,7 +536,7 @@ const page = () => {
                               <EditPredictionForm prediction={data} />
                             </DialogContent>
                           </Dialog>
-                          <Dialog onOpenChange={closeDropdown1}>
+                          <Dialog>
                             <DialogTrigger>
                               <DropdownMenuItem
                                 onSelect={(e) => e.preventDefault()}
@@ -636,9 +585,7 @@ const page = () => {
           )}
         </CardContent>
       </Card>
-      <div className="w-full text-center font-light">
-        Page {currentPage} of {totalPages}
-      </div>
+      c
       <Pagination>
         <PaginationContent>
           <PaginationItem>
@@ -648,12 +595,9 @@ const page = () => {
                 e.preventDefault();
                 handlePageChange(currentPage - 1);
               }}
-              className={
-                currentPage === 1 ? "pointer-events-none opacity-50" : ""
-              }
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
             />
           </PaginationItem>
-
           {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => (
             <PaginationItem key={i}>
               <PaginationLink
@@ -668,13 +612,11 @@ const page = () => {
               </PaginationLink>
             </PaginationItem>
           ))}
-
           {totalPages > 5 && (
             <PaginationItem>
               <PaginationEllipsis />
             </PaginationItem>
           )}
-
           <PaginationItem>
             <PaginationNext
               href="#"
@@ -682,11 +624,7 @@ const page = () => {
                 e.preventDefault();
                 handlePageChange(currentPage + 1);
               }}
-              className={
-                currentPage === totalPages
-                  ? "pointer-events-none opacity-50"
-                  : ""
-              }
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
             />
           </PaginationItem>
         </PaginationContent>

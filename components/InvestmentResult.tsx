@@ -2,10 +2,14 @@
 
 import { CircleCheck, CircleMinus, CircleX } from "lucide-react";
 import { format, subDays, isSameDay } from "date-fns";
-import { usePredictions } from "@/lib/react-query/queries";
+import { getInvestmentPredictions } from "@/lib/appwrite/fetch";
+import { useQuery } from "@tanstack/react-query";
 
 const InvestmentResult = () => {
-  const { data: predictions, isLoading } = usePredictions();
+  const { data: predictions, isLoading } = useQuery({
+    queryKey: ["investment-predictions"],
+    queryFn: () => getInvestmentPredictions(),
+  });
 
   const last7Days = Array.from({ length: 7 }, (_, i) =>
     subDays(new Date(), 7 - i)

@@ -19,6 +19,7 @@ export const appwriteConfig = {
     settingsId: process.env.NEXT_PUBLIC_APPWRITE_SETTINGS_COLLECTION_ID || "",
     notificationId: process.env.NEXT_PUBLIC_APPWRITE_NOTIFICATION_COLLECTION_ID || "",
     commentCollectionId: process.env.NEXT_PUBLIC_APPWRITE_COMMENT_COLLECTION_ID || "",
+    collectionCountsId: process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_COUNTS_ID || "",
 }
 
 export const client1 = new Client();

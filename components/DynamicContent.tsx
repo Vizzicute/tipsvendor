@@ -8,7 +8,7 @@ import PageContent from "@/components/PageContent";
 import PredictionTable from "@/components/PredictionTable";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import WBTLinks from "@/components/WBTLinks";
-import { singleSeoPageByUrl, useBlogs, usePredictions } from "@/lib/react-query/queries";
+import { singleSeoPageByUrl, use4MostRecentBlogs, usePredictionFromYesterday } from "@/lib/react-query/queries";
 
 const DynamicContent = ({
   name,
@@ -25,12 +25,12 @@ const DynamicContent = ({
     data: predictions,
     isPending: isLoading,
     error: predictionsError,
-  } = usePredictions();
+  } = usePredictionFromYesterday();
 
   const {
     data: blog,
     isPending: isBlogLoading,
-  } = useBlogs();
+  } = use4MostRecentBlogs();
 
   const sortedBlog = blog?.sort((a, b) => {
     return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();

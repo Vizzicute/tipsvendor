@@ -13,6 +13,13 @@ interface BlogTabsProps {
   categories: Models.Document[] | undefined;
   loading: boolean;
   onTabChange?: (value: string) => void;
+  currentTab: string;
+  blogPage: number;
+  blogTotalPages: number;
+  handleBlogPageChange: (page: number) => void;
+  commentPage: number;
+  commentTotalPages: number;
+  handleCommentPageChange: (page: number) => void;
 }
 
 const BlogTabs = ({
@@ -21,10 +28,17 @@ const BlogTabs = ({
   categories,
   loading,
   onTabChange,
+  currentTab,
+  blogPage,
+  blogTotalPages,
+  handleBlogPageChange,
+  commentPage,
+  commentTotalPages,
+  handleCommentPageChange,
 }: BlogTabsProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const tab = searchParams.get("tab") || "content";
+  const tab = currentTab;
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -41,10 +55,10 @@ const BlogTabs = ({
         <TabsTrigger value="categories">Categories</TabsTrigger>
       </TabsList>
       <TabsContent value="content">
-        <BlogContent blog={blog || []} isLoading={loading} />
+        <BlogContent blog={blog || []} isLoading={loading} currentPage={blogPage} totalPages={blogTotalPages} handlePageChange={handleBlogPageChange} />
       </TabsContent>
       <TabsContent value="comments">
-        <BlogComments comments={comments || []} isLoading={loading} />
+        <BlogComments comments={comments || []} isLoading={loading} currentPage={commentPage} totalPages={commentTotalPages} handlePageChange={handleCommentPageChange} />
       </TabsContent>
       <TabsContent value="categories">
         <BlogCategories categories={categories || []} isLoading={loading} />

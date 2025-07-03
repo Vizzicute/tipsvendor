@@ -42,15 +42,16 @@ import Link from "next/link";
 import BlogStatusActionDialog from "@/components/BlogStatusActionDialog";
 import { Models } from "node-appwrite";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./ui/pagination";
+
 interface BlogContentProps {
   blog: Models.Document[];
   isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
+  handlePageChange: (page: number) => void;
 }
 
-const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
-  const PAGE_SIZE = 15;
-  const [currentPage, setCurrentPage] = useState(1);
-
+const BlogContent = ({ blog, isLoading, currentPage, totalPages, handlePageChange }: BlogContentProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [, setOpenDropdown1] = useState(false);
   const closeDropdown1 = (v: boolean | ((prevState: boolean) => boolean)) =>
@@ -116,19 +117,6 @@ const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
         return 0;
     }
   });
-
-  const totalPages = Math.ceil((sortedBlog?.length || 0) / PAGE_SIZE);
-
-  const paginatedData = sortedBlog?.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
-
-   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   const formattedDate = (date: Date): string =>
     date.toISOString().split("T")[0];
@@ -377,7 +365,7 @@ const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedData?.map((data) => (
+                {sortedBlog?.map((data) => (
                   <TableRow key={data.$id} className="text-center">
                     <TableCell className="font-normal flex flex-wrap">
                       {formattedDate(new Date(data.$createdAt)) ===
@@ -473,7 +461,7 @@ const BlogContent = ({ blog, isLoading }: BlogContentProps) => {
       </Card>
 
       <div className="w-full text-center font-light">
-        Page {currentPage} of {totalPages}
+        Page {currentPage.toString().padStart(2, "0")} of {totalPages.toString().padStart(2, "0")}
       </div>
       <Pagination>
         <PaginationContent>

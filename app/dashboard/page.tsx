@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
-import { useBlogs, usePredictions } from "@/lib/react-query/queries";
+import { useBlogs, usePredictionFromYesterday } from "@/lib/react-query/queries";
 import {
   useEditSubscription,
   useSignOutAccount,
@@ -53,7 +53,7 @@ const Page = () => {
     }) => verificationMail(email, name, link),
   });
 
-  const { data: predictions } = usePredictions();
+  const { data: predictions } = usePredictionFromYesterday();
 
   const today = getDateOnly(new Date());
   const yesterday = getDateOnly(new Date(Date.now() - 86400000));
