@@ -57,8 +57,11 @@ export async function getInvestmentPredictions() {
 }
 
 export async function getFromYesterdaysPredictions(filters = {}) {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+  // Calculate start and end of yesterday
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
 
   type PredictionFilters = {
     tip?: string;
@@ -71,7 +74,12 @@ export async function getFromYesterdaysPredictions(filters = {}) {
     // ...add more as needed
   };
 
-  const queries = [Query.limit(100), Query.greaterThanEqual("datetime", yesterday.toISOString())];
+  // Only get predictions from yesterday (00:00:00 to 23:59:59)
+  const queries = [
+    Query.limit(100),
+    Query.greaterThanEqual("datetime", startOfYesterday.toISOString()),
+    Query.lessThan("datetime", startOfToday.toISOString()),
+  ];
 
   const { tip, isBtts, chance, isBanker, either, htft, overs } = filters as PredictionFilters;
 
