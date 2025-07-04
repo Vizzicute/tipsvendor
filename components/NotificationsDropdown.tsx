@@ -42,19 +42,19 @@ export default function NotificationsDropdown({
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = userNotifications(user?.id || "");
+  const { data: notifications, isLoading } = userNotifications(user.id);
 
   const markAsReadMutation = useMutation({
     mutationFn: markNotificationAsRead,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
     },
   });
 
   const markAllAsReadMutation = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(user?.id || ""),
+    mutationFn: () => markAllNotificationsAsRead(user.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
     },
   });
 

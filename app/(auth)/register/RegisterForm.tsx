@@ -25,6 +25,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { notifyNewUser } from "@/lib/appwrite/notificationTriggers";
 import { updateCollectionCounts } from "@/lib/appwrite/update";
 import { getCollectionCounts } from "@/lib/appwrite/fetch";
+import { useEffect } from "react";
+import { IUser } from "@/types";
 
 const RegisterForm = () => {
   const {
@@ -33,6 +35,15 @@ const RegisterForm = () => {
     isAuthenticated,
     isLoading: isUserLoading,
   } = useUserContext();
+  let loadedUser: IUser | null = null;
+  useEffect(() => {
+    if (isUserLoading) {
+      return;
+    }
+    if (user) {
+      loadedUser = user;
+    }
+  }, [isUserLoading, user]);
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
     useCreateUserAccount();
   const { mutateAsync: signInAccount, isPending: isSigningInUser } =
@@ -86,9 +97,9 @@ const RegisterForm = () => {
       await verifyMail({
         email: values.email,
         name: values.name ? values.name : "",
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user.id}`,
+        link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${loadedUser?.id}`,
       });
-      await notifyNewUser(user.id, user.name);
+      await notifyNewUser(loadedUser?.id || "", loadedUser?.name || "");
       if (oldData) {
         await updateCollectionCounts(
           {
