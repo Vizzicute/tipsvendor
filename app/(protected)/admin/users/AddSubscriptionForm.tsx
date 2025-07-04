@@ -19,7 +19,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -41,6 +41,8 @@ import LoadingButton from "@/components/LoadingButton";
 import { notifyNewSubscription } from "@/lib/appwrite/notificationTriggers";
 import { useUsers } from "@/lib/react-query/queries";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 const formSchema = z.object({
   user: z.string().min(1, "User is required"),
@@ -66,7 +68,10 @@ const durations = [
 
 const AddSubscriptionForm = () => {
   const { data: users } = useUsers();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("subscription"),
+  });
   const queryClient = useQueryClient();
 
   const regularUsers = users?.filter(user => user.role === "user");
@@ -91,6 +96,11 @@ const AddSubscriptionForm = () => {
     }
     toast.success("Subscription Added");
     notifyNewSubscription(values.user, values.subscriptionType, parseInt(values.duration));
+    if (oldData) {
+      await updateCollectionCounts({
+        subscriptions: oldData?.counts + 1
+      }, oldData?.$id);
+    }
     queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
     await getCurrentUser();
     form.reset();

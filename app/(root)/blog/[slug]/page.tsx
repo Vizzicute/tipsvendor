@@ -19,6 +19,9 @@ import { useBlogs } from "@/hooks/useBlogs";
 import BlogCard from "@/components/BlogCard";
 import { notifyNewComment } from "@/lib/appwrite/notificationTriggers";
 import { singleBlogBySlug } from "@/lib/react-query/queries";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
+import { useQuery } from "@tanstack/react-query";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -28,7 +31,10 @@ const BlogPost = () => {
   const { mutateAsync: addComment, isPending: isAddingComment } =
     useAddComment();
   const { user, isAuthenticated } = useUserContext();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("comments"),
+  });
   const { data: singleBlog, isLoading } = singleBlogBySlug(slug as string);
 
   const { data: blogs } = useBlogs();
@@ -62,6 +68,11 @@ const BlogPost = () => {
         isAuthenticated ? user?.name || "User" : guestName,
         singleBlog?.title || "Blog Post"
       );
+      if (oldData) {
+        await updateCollectionCounts({
+          comments: oldData?.counts + 1
+        }, oldData?.$id);
+      }
       setComment("");
       setGuestName("");
       setGuestEmail("");

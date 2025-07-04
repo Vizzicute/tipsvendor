@@ -1,4 +1,4 @@
-import { Models } from "appwrite";
+
 import React from "react";
 import {
   Dialog,
@@ -18,7 +18,7 @@ import {
 import { IUser } from "@/types";
 
 interface UserProfileEditProps {
-  user: Models.Document | IUser;
+  user: IUser;
 }
 
 const UserProfileEdit = ({ user }: UserProfileEditProps) => {
@@ -38,7 +38,7 @@ const UserProfileEdit = ({ user }: UserProfileEditProps) => {
                 Update Profile
               </DialogTitle>
             </DialogHeader>
-            <UserProfileForm user={user} />
+            <UserProfileForm user={user as IUser} />
           </DialogContent>
         </Dialog>
       </div>
@@ -57,7 +57,7 @@ const UserProfileEdit = ({ user }: UserProfileEditProps) => {
                   Update Profile
                 </DialogTitle>
               </DrawerHeader>
-              <UserProfileForm user={user} />
+              <UserProfileForm user={user as IUser} />
             </div>
           </DrawerContent>
         </Drawer>

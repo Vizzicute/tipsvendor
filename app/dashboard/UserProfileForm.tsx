@@ -1,4 +1,4 @@
-import { Models } from "appwrite";
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -56,7 +56,7 @@ const profileSchema = z
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
-const UserProfileForm = ({ user }: { user: Models.Document | IUser }) => {
+const UserProfileForm = ({ user }: { user: IUser }) => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),

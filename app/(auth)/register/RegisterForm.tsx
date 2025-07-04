@@ -21,16 +21,26 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 import { toast } from "sonner";
 import { verificationMail } from "@/lib/utils/verificationMail";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { notifyNewUser } from "@/lib/appwrite/notificationTriggers";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 const RegisterForm = () => {
-  const { user, checkAuthUser, isAuthenticated, isLoading: isUserLoading } = useUserContext();
+  const {
+    user,
+    checkAuthUser,
+    isAuthenticated,
+    isLoading: isUserLoading,
+  } = useUserContext();
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
     useCreateUserAccount();
   const { mutateAsync: signInAccount, isPending: isSigningInUser } =
     useSignInAccount();
-
+  const { data: oldData } = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("user"),
+  });
   // Add mutation for verificationMail
   const { mutateAsync: verifyMail, isPending: isVerifyingMail } = useMutation({
     mutationFn: async ({
@@ -79,6 +89,14 @@ const RegisterForm = () => {
         link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user.id}`,
       });
       await notifyNewUser(user.id, user.name);
+      if (oldData) {
+        await updateCollectionCounts(
+          {
+            user: oldData?.counts + 1,
+          },
+          oldData?.$id
+        );
+      }
       toast.success(
         "Registration successful! Please check your email for verification."
       );

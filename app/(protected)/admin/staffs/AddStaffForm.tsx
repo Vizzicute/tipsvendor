@@ -28,17 +28,22 @@ import {
 import { useAddUser } from "@/lib/react-query/queriesAndMutations";
 import { newStaffMail } from "@/lib/utils/sendNewStaffMail";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 const AddStaffForm = () => {
   const queryClient = useQueryClient();
   const { mutateAsync: addUser, isPending: isLoading } = useAddUser();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("user"),
+  });
   const formSchema = z.object({
     name: z.string().nonempty("Add name."),
     email: z.string().email(),
@@ -70,6 +75,11 @@ const AddStaffForm = () => {
         `${process.env.NEXT_PUBLIC_APP_URL}/new-staff/${values.email}`,
         staffRole
       );
+      if (oldData) {
+        await updateCollectionCounts({
+          staff: oldData?.counts + 1
+        }, oldData?.$id);
+      }
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["documents"] });
       await getCurrentUser();

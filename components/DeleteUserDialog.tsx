@@ -12,8 +12,10 @@ import LoadingButton from "./LoadingButton";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { useDeleteUser } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 interface DeleteUserDialogProps {
   accountId: string;
@@ -26,7 +28,10 @@ const DeleteUserDialog = ({
 }: DeleteUserDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("user"),
+  });
   const { mutateAsync: deleteUser, isPending: isDeleting } =
     useDeleteUser();
 
@@ -46,6 +51,11 @@ const DeleteUserDialog = ({
       await deleteUser(accountId);
       toast.success("User Deleted");
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      if (oldData) {
+        await updateCollectionCounts({
+          users: oldData?.counts - 1
+        }, oldData?.$id);
+      }
       await getCurrentUser();
       setOpen(false);
     } catch {

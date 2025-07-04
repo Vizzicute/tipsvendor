@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import UserProfileEdit from "@/components/UserProfileEdit";
 import { INITIAL_USER, useUserContext } from "@/context/AuthContext";
+import { IUser } from "@/types";
 import { useBlogs, usePredictionFromYesterday } from "@/lib/react-query/queries";
 import {
   useEditSubscription,
@@ -196,7 +197,7 @@ const Page = () => {
                 </p>
                 {user && (
                   <div className="w-fit flex flex-row items-center gap-1 justify-center">
-                    <UserProfileEdit user={user} />
+                    <UserProfileEdit user={user as IUser} />
                     <NotificationsDropdown className="bg-black text-secondary" />
                   </div>
                 )}

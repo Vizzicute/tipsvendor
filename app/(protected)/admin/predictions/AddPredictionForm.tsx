@@ -21,9 +21,12 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { africanCountries, americanCountries, asianCountries, europeanCountries, internationalCompetitions, topleagues, uefaClubCompetitions } from "@/data";
+import { appwriteConfig } from "@/lib/appwrite/config";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
 import { useAddPrediction } from "@/lib/react-query/queriesAndMutations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -31,6 +34,10 @@ import { z } from "zod";
 
 const AddPredictionForm = () => {
   const queryClient = useQueryClient();
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("predictions"),
+  });
 
   const formSchema = z.object({
     hometeam: z.string().nonempty("Add Hometeam."),
@@ -94,6 +101,11 @@ const AddPredictionForm = () => {
       form.reset();
       setSportTypeValue("");
       await queryClient.setQueryData(["predictions"], (oldData: any) => [...oldData, newPrediction]);
+      if (oldData) {
+        await updateCollectionCounts({
+          predictions: oldData?.counts + 1
+        }, oldData?.$id);
+      }
       return;
     }
   }

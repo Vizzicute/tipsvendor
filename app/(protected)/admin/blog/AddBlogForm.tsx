@@ -28,7 +28,7 @@ import { fileUrl, uploadFile } from "@/lib/appwrite/media";
 import { useAddBlog } from "@/lib/react-query/queriesAndMutations";
 import { truncate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommandGroup } from "cmdk";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -36,13 +36,18 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { useBlogCategories } from "@/lib/react-query/queries";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 const STORAGE_KEY = "draft-blog-post";
 
 const AddBlogForm = () => {
   const { data: blogCategories } = useBlogCategories();
   const date = new Date();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("blog"),
+  });
   // Get components with padding
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -161,6 +166,11 @@ const AddBlogForm = () => {
           setStatus("published");
           setPreviewUrl("/featuredImagePlaceholder.jpeg");
           await queryClient.setQueryData(["documents"], (oldData: any) => [...oldData, newBlog]);
+          if (oldData) {
+            await updateCollectionCounts({
+              blogs: oldData?.counts + 1
+            }, oldData?.$id);
+          }
 
           toast.success(
             status === "draft"

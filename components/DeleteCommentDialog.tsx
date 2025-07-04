@@ -12,7 +12,9 @@ import LoadingButton from "./LoadingButton";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { useDeleteComment } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 interface DeleteCommentDialogProps {
   commentId: string;
@@ -25,7 +27,10 @@ const DeleteCommentDialog = ({
 }: DeleteCommentDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("comments"),
+  });
   const { mutateAsync: deleteComment, isPending: isDeleting } =
     useDeleteComment();
 
@@ -45,6 +50,11 @@ const DeleteCommentDialog = ({
       await deleteComment(commentId);
       toast.success("Comment Deleted");
       queryClient.invalidateQueries({ queryKey: ["delete-comment"] });
+      if (oldData) {
+        await updateCollectionCounts({
+          comments: oldData?.counts - 1
+        }, oldData?.$id);
+      }
       setOpen(false);
     } catch {
       toast("Failed. Please try again.");

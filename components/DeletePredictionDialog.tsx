@@ -12,7 +12,9 @@ import LoadingButton from "./LoadingButton";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { useDeletePrediction } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 interface DeletePredictionDialogProps {
   gameId: string;
@@ -25,7 +27,10 @@ const DeletePredictionDialog = ({
 }: DeletePredictionDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("prediction"),
+  });
   const { mutateAsync: deletePrediction, isPending: isDeleting } =
     useDeletePrediction();
 
@@ -45,6 +50,11 @@ const DeletePredictionDialog = ({
       await deletePrediction(gameId);
       toast.success("Prediction Deleted");
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      if (oldData) {
+        await updateCollectionCounts({
+          predictions: oldData?.counts - 1
+        }, oldData?.$id);
+      }
       setOpen(false);
     } catch {
       toast("Failed. Please try again.");

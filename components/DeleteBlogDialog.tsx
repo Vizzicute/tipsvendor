@@ -12,7 +12,9 @@ import LoadingButton from "./LoadingButton";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { useDeleteBlog } from "@/lib/react-query/queriesAndMutations";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { updateCollectionCounts } from "@/lib/appwrite/update";
+import { getCollectionCounts } from "@/lib/appwrite/fetch";
 
 interface DeleteBlogDialogProps {
   blogId: string;
@@ -25,7 +27,10 @@ const DeleteBlogDialog = ({
 }: DeleteBlogDialogProps) => {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-
+  const {data: oldData} = useQuery({
+    queryKey: ["collectionCounts"],
+    queryFn: () => getCollectionCounts("blog"),
+  });
   const { mutateAsync: deleteBlog, isPending: isDeleting } =
     useDeleteBlog();
 
@@ -45,6 +50,11 @@ const DeleteBlogDialog = ({
       await deleteBlog(blogId);
       toast.success("Blog Deleted");
       queryClient.invalidateQueries({ queryKey: ["documents"] });
+      if (oldData) {
+        await updateCollectionCounts({
+          blogs: oldData?.counts - 1
+        }, oldData?.$id);
+      }
       setOpen(false);
     } catch {
       toast("Failed. Please try again.");
