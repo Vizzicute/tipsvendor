@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { africanCountries, americanCountries, asianCountries, europeanCountries, internationalCompetitions, topleagues, uefaClubCompetitions } from "@/data";
-import { appwriteConfig } from "@/lib/appwrite/config";
 import { getCollectionCounts } from "@/lib/appwrite/fetch";
 import { updateCollectionCounts } from "@/lib/appwrite/update";
 import { useAddPrediction } from "@/lib/react-query/queriesAndMutations";
