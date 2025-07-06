@@ -215,7 +215,7 @@ export async function updateBlogStatus(status: string, blogId: string, published
 export async function editSeoPage(blog: editSeoPageType, pageId: string) {
   try {
     const newBlog = await databases2.updateDocument(
-      `${`${appwriteConfig.databaseId1}`}`,
+      `${`${appwriteConfig.databaseId2}`}`,
       `${appwriteConfig.seoCollectionId}`,
       `${pageId}`,
       {
