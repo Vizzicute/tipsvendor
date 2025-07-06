@@ -8,7 +8,11 @@ import PageContent from "@/components/PageContent";
 import PredictionTable from "@/components/PredictionTable";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import WBTLinks from "@/components/WBTLinks";
-import { singleSeoPageByUrl, use4MostRecentBlogs, usePredictionFromYesterday } from "@/lib/react-query/queries";
+import {
+  singleSeoPageByUrl,
+  use4MostRecentBlogs,
+  usePredictionFromYesterday,
+} from "@/lib/react-query/queries";
 
 const DynamicContent = ({
   name,
@@ -27,10 +31,7 @@ const DynamicContent = ({
     error: predictionsError,
   } = usePredictionFromYesterday();
 
-  const {
-    data: blog,
-    isPending: isBlogLoading,
-  } = use4MostRecentBlogs();
+  const { data: blog, isPending: isBlogLoading } = use4MostRecentBlogs();
 
   const sortedBlog = blog?.sort((a, b) => {
     return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
@@ -94,7 +95,14 @@ const DynamicContent = ({
     return prediction.subscriptionType === "free";
   });
 
-  const pageTitle = name === "free" ? "" : name;
+  const pageTitle =
+    name === "free"
+      ? ""
+      : name === "isBanker"
+      ? "banker"
+      : name === "isBtts"
+      ? "btts"
+      : name;
 
   const {
     data: seopage,
