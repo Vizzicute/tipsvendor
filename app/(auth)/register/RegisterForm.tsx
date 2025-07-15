@@ -25,7 +25,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { notifyNewUser } from "@/lib/appwrite/notificationTriggers";
 import { updateCollectionCounts } from "@/lib/appwrite/update";
 import { getCollectionCounts } from "@/lib/appwrite/fetch";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IUser } from "@/types";
 
 const RegisterForm = () => {
@@ -35,15 +35,21 @@ const RegisterForm = () => {
     isAuthenticated,
     isLoading: isUserLoading,
   } = useUserContext();
-  let loadedUser: IUser | null = null;
+  const [localUser, setLocalUser] = useState<IUser | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (isUserLoading) {
       return;
     }
     if (user) {
-      loadedUser = user;
+      setLocalUser(user);
     }
   }, [isUserLoading, user]);
+  useEffect(() => {
+    if (isAuthenticated && user && user.id) {
+      setLocalUser(user);
+    }
+  }, [isAuthenticated, user]);
   const { mutateAsync: createUserAccount, isPending: isCreatingAccount } =
     useCreateUserAccount();
   const { mutateAsync: signInAccount, isPending: isSigningInUser } =
@@ -76,6 +82,7 @@ const RegisterForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     const newUser = await createUserAccount(values);
 
     if (!newUser) {
@@ -91,29 +98,35 @@ const RegisterForm = () => {
       return toast("Registration Failed. Please try again");
     }
 
-    const isLoggedIn = await checkAuthUser();
+    const currentAccount = localStorage.getItem("authUser");
 
-    if (isLoggedIn && isAuthenticated) {
-      await verifyMail({
-        email: values.email,
-        name: values.name ? values.name : "",
-        link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${loadedUser?.id}`,
-      });
-      await notifyNewUser(loadedUser?.id || "", loadedUser?.name || "");
-      if (oldData) {
-        await updateCollectionCounts(
-          {
-            user: oldData?.counts + 1,
-          },
-          oldData?.$id
+    // Wait for user to update
+    setTimeout(async () => {
+      if (currentAccount && localUser) {
+        const parsedUser = JSON.parse(currentAccount);
+        await checkAuthUser();
+        await verifyMail({
+          email: values.email,
+          name: values.name ? values.name : "",
+          link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${parsedUser.$id}`,
+        });
+        await notifyNewUser(parsedUser.$id || "", parsedUser.name || "");
+        if (oldData) {
+          await updateCollectionCounts(
+            {
+              user: oldData?.counts + 1,
+            },
+            oldData?.$id
+          );
+        }
+        toast.success(
+          "Registration successful! Please check your email for verification."
         );
+        form.reset();
+        redirect("/dashboard");
       }
-      toast.success(
-        "Registration successful! Please check your email for verification."
-      );
-      form.reset();
-      redirect("/dashboard");
-    }
+    }, 500); // Wait 500ms for user context to update
+    setIsLoading(false);
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -184,7 +197,8 @@ const RegisterForm = () => {
             isCreatingAccount ||
             isSigningInUser ||
             isUserLoading ||
-            isVerifyingMail
+            isVerifyingMail ||
+            isLoading
           }
           type="submit"
           className="w-full text-stone-100 rounded-full uppercase"

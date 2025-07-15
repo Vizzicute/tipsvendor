@@ -20,12 +20,12 @@ export default function AuthWrapper({
     if (isLoading) return; // Wait until user is loaded
 
     const protectRoute = async () => {
-      if (!isAuthenticated  && pathname.startsWith("/dashboard")) {
+      if (!isAuthenticated && !isLoading && pathname.startsWith("/dashboard")) {
         router.replace("/login");
         return;
       }
 
-      if (!isAuthenticated && pathname.startsWith("/admin")) {
+      if (!isAuthenticated && !isLoading && pathname.startsWith("/admin")) {
         router.replace("/admin-auth");
         return;
       }

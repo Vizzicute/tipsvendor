@@ -56,6 +56,8 @@ export function usePredictions(filters = {}, page = 1, pageSize = 15) {
     queryKey: ["predictions", filters, page, pageSize],
     queryFn: () => getPredictions(filters, page, pageSize),
     staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 }
 
@@ -64,6 +66,8 @@ export function usePredictionFromYesterday() {
     queryKey: ["predictions-from-yesterday"],
     queryFn: () => getFromYesterdaysPredictions(),
     staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 }
 

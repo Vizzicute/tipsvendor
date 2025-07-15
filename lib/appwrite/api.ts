@@ -192,8 +192,8 @@ export async function googleAuth() {
   try {
     const googleSession = await account.createOAuth2Session(
       OAuthProvider.Google,
-      process.env.NEXT_PUBLIC_APP_URL,
-      process.env.NEXT_PUBLIC_APP_URL
+      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`
     );
 
     return googleSession;

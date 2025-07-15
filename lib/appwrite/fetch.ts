@@ -43,7 +43,7 @@ export async function getPredictions(filters = {}, page = 1, pageSize = 15) {
 
 export async function getInvestmentPredictions() {
   const last7Days = new Date();
-  last7Days.setDate(last7Days.getDate() - 7);
+  last7Days.setDate(last7Days.getDate() - 8);
   
   const predictions = await databases1.listDocuments(
     `${appwriteConfig.databaseId1}`,
