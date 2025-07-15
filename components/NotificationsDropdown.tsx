@@ -42,7 +42,10 @@ export default function NotificationsDropdown({
   const { user } = useUserContext();
   const queryClient = useQueryClient();
 
-  const { data: notifications, isLoading } = userNotifications(user.id);
+  // Only fetch notifications if user.id exists
+  const { data: notifications, isLoading } = user.id
+    ? userNotifications(user.id)
+    : { data: [], isLoading: true };
 
   const markAsReadMutation = useMutation({
     mutationFn: markNotificationAsRead,

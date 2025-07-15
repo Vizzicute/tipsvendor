@@ -179,6 +179,8 @@ export const userNotifications = (userId: string) =>
     queryFn: async () => getUserNotifications(userId),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
 export const useAnalyticsDoc = () =>
