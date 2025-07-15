@@ -16,7 +16,6 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from "@/lib/appwrite/notifications";
-import { useUserContext } from "@/context/AuthContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -39,25 +38,22 @@ export default function NotificationsDropdown({
   variant,
   className,
 }: NotificationsDropdownProps) {
-  const { user } = useUserContext();
+  const user = JSON.parse(localStorage.getItem("authUser") || "{}");
   const queryClient = useQueryClient();
 
-  // Only fetch notifications if user.id exists
-  const { data: notifications, isLoading } = user.id
-    ? userNotifications(user.id)
-    : { data: [], isLoading: true };
+  const { data: notifications, isLoading } = userNotifications(user.$id);
 
   const markAsReadMutation = useMutation({
     mutationFn: markNotificationAsRead,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", user.$id] });
     },
   });
 
   const markAllAsReadMutation = useMutation({
-    mutationFn: () => markAllNotificationsAsRead(user.id),
+    mutationFn: () => markAllNotificationsAsRead(user.$id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications", user.id] });
+      queryClient.invalidateQueries({ queryKey: ["notifications", user.$id] });
     },
   });
 
