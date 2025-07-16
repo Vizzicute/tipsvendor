@@ -84,6 +84,8 @@ export function use4MostRecentBlogs() {
     queryKey: ["4-most-recent-blogs"],
     queryFn: get4MostRecentBlogs,
     staleTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 }
 
