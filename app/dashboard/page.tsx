@@ -42,6 +42,9 @@ const Page = () => {
   const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading: isUserLoading } =
     useUserContext();
 
+    const userRegisteredDate = user.$createdAt || user.createdAt;
+  const formattedRegisteredDate = formatDate(userRegisteredDate, "PPP");
+
   const { mutateAsync: verifyMail, isPending: isVerifyingMail } = useMutation({
     mutationFn: async ({
       email,
@@ -225,7 +228,7 @@ const Page = () => {
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Registered:</span>
                   <span>
-                    {formatDate(user.$createdAt, "PPP") || "N/A"}
+                    {formattedRegisteredDate || "N/A"}
                   </span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">

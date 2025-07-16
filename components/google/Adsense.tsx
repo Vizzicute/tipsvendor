@@ -13,7 +13,8 @@ export function AdSenseManager() {
       pathname.startsWith("/admin-auth") ||
       pathname.startsWith("/register") ||
       pathname.startsWith("/new-staff") ||
-      pathname.startsWith("/reset-password")
+      pathname.startsWith("/reset-password") ||
+      pathname.startsWith("/verification")
     )
       return;
     try {
