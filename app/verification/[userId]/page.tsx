@@ -1,12 +1,13 @@
 "use client";
 
 import Logo from "@/components/Logo";
+import { useUserContext } from "@/context/AuthContext";
 import { verifyUser } from "@/lib/react-query/queries";
 import { useParams } from "next/navigation";
 
 export default function VerificationPage() {
   const { userId } = useParams() as { userId: string };
-  
+
   if (!userId) {
     console.log("Missing userId in URL parameters");
     return (
@@ -20,8 +21,13 @@ export default function VerificationPage() {
   }
 
   const { data, isPending, isSuccess, isError } = verifyUser(userId);
+  const { setUser } = useUserContext();
 
   if (isSuccess && data) {
+    const updatedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+    if (updatedUser) {
+      setUser(updatedUser);
+    }
     setTimeout(() => {
       window.location.assign("/dashboard");
     }, 2000);

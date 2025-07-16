@@ -33,15 +33,7 @@ export async function POST(request: Request) {
       { isVerified: true }
     );
 
-    // After successful verification (e.g., in your frontend)
-    // Call your verification API first...
-    await fetch("/api/very-email", { method: "POST", body: JSON.stringify({ userId }) });
-
-    // Then update localStorage with the latest user info
-    const updatedUser = await getCurrentUser();
-    if (updatedUser) {
-      localStorage.setItem("authUser", JSON.stringify(updatedUser));
-    }
+    await getCurrentUser();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

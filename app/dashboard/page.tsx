@@ -20,7 +20,7 @@ import { verificationMail } from "@/lib/utils/verificationMail";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Models } from "appwrite";
 import { formatDate } from "date-fns";
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -39,7 +39,7 @@ const Page = () => {
   const queryClient = useQueryClient();
   const { mutateAsync: signOutAccount, isPending: isSigningOut } =
     useSignOutAccount();
-  const { user, setUser, isAuthenticated, setIsAuthenticated } =
+  const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading: isUserLoading } =
     useUserContext();
 
   const { mutateAsync: verifyMail, isPending: isVerifyingMail } = useMutation({
@@ -81,7 +81,7 @@ const Page = () => {
   };
 
   // Get all subscriptions as array
-  const subscriptions: Models.Document[] = user?.subscription
+  const subscriptions: Models.Document[] = user.subscription
     ? Array.isArray(user.subscription)
       ? user.subscription
       : [user.subscription]
@@ -122,7 +122,7 @@ const Page = () => {
   const { mutateAsync: editSubscription } = useEditSubscription();
 
   useEffect(() => {
-    if (user?.subscription) {
+    if (user.subscription) {
       // If subscription is an array, check all; else, check the single subscription
       const subs = Array.isArray(user.subscription)
         ? user.subscription
@@ -136,9 +136,9 @@ const Page = () => {
   async function ResendMail() {
     try {
       await verifyMail({
-      email: user?.email,
-      name: user?.name ? user.name : "",
-      link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user?.id}`,
+      email: user.email,
+      name: user.name ? user.name : "",
+      link: `${process.env.NEXT_PUBLIC_APP_URL}/verification/${user.$id}`,
     });
 
     toast.success("Verification sent. Please check your Mailbox!");
@@ -158,6 +158,15 @@ const Page = () => {
         <LoadingButton loading={isVerifyingMail} onClick={ResendMail} variant={"ghost"} className="text-cyan-500 hover:underline">
           Send Verification Mail
         </LoadingButton>
+      </div>
+    );
+  }
+
+  if (isUserLoading) {
+    return (
+      <div className="text-lg flex flex-col gap-4 size-full justify-center items-center">
+        <Loader2 className="animate-spin" />
+        <span className="animate-pulse">Loading user information...</span>
       </div>
     );
   }
@@ -184,16 +193,16 @@ const Page = () => {
               <div className="min-md:size-auto max-md:w-full flex flex-col py-5 px-10 rounded-md bg-stone-500 items-center">
                 <Avatar className="h-24 w-24">
                   <AvatarImage
-                    src={user?.imageUrl}
-                    alt={user?.name}
+                    src={user.imageUrl}
+                    alt={user.name}
                     className="object-contain"
                   />
                   <AvatarFallback>
-                    {user?.name?.charAt(0)}
+                    {user.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <p className="text-center text-lg text-black font-semibold my-2">
-                  {user?.name}
+                  {user.name}
                 </p>
                 {user && (
                   <div className="w-fit flex flex-row items-center gap-1 justify-center">
@@ -205,20 +214,18 @@ const Page = () => {
               <div className="flex min-md:flex-1 max-md:w-full flex-col space-y-2 text-black font-semibold">
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Email:</span>
-                  <span>{user?.email}</span>
+                  <span>{user.email || "N/A"}</span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Country:</span>
                   <span>
-                    {user.country ? user.country : "N/A"}
+                    {user.country || "N/A"}
                   </span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">
                   <span>Registered:</span>
                   <span>
-                    {user?.createdAt
-                      ? formatDate(user.createdAt, "PPP")
-                      : "N/A"}
+                    {formatDate(user.$createdAt, "PPP") || "N/A"}
                   </span>
                 </div>
                 <div className="w-full bg-secondary flex items-center justify-between rounded-sm p-3">

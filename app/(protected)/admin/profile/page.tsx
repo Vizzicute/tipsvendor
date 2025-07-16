@@ -43,8 +43,13 @@ export default function ProfilePage() {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const { mutateAsync: signoutAllAccount, isPending: isSigningOut } =
     useSignOutAllAccount();
-  const { user, setUser, isAuthenticated, setIsAuthenticated, isLoading: isUserLoading } =
-    useUserContext();
+  const {
+    user,
+    setUser,
+    isAuthenticated,
+    setIsAuthenticated,
+    isLoading: isUserLoading,
+  } = useUserContext();
 
   const handleSignout = async () => {
     signoutAllAccount();
@@ -137,6 +142,10 @@ export default function ProfilePage() {
       toast.success("Profile updated successfully");
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       await getCurrentUser();
+      const parsedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+      if (parsedUser) {
+        setUser(parsedUser);
+      }
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile");

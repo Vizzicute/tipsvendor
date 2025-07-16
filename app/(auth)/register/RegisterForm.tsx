@@ -46,7 +46,7 @@ const RegisterForm = () => {
     }
   }, [isUserLoading, user]);
   useEffect(() => {
-    if (isAuthenticated && user && user.id) {
+    if (isAuthenticated && user && user.$id) {
       setLocalUser(user);
     }
   }, [isAuthenticated, user]);

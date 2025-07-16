@@ -10,6 +10,7 @@ export const INITIAL_USER = {
     country: '',
     address: '',
     imageUrl: '',
+    isVerified: false,
     role: '',
     subscription: [],
     createdAt: '',
@@ -48,7 +49,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     imageUrl: parsedUser.imageUrl,
                     role: parsedUser.role,
                     subscription: parsedUser.subscription,
-                    createdAt: parsedUser.$createdAt
+                    createdAt: parsedUser.$createdAt,
+                    isVerified: parsedUser.isVerified || false,
                 });
 
                 setIsAuthenticated(true);

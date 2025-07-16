@@ -6,6 +6,7 @@ export type IUser = {
   country?: string;
   imageUrl: string;
   role: string;
+  isVerified?: boolean;
   address: string;
   subscription: any;
   createdAt: string;

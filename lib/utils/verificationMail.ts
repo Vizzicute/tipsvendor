@@ -11,7 +11,7 @@ export async function verificationMail(
         <div style="text-align: center; margin-bottom: 24px;">
           <img src="${
             process.env.NEXT_PUBLIC_APP_URL
-          }/logo-2.png" width="150" alt="Email Icon" style="margin-bottom: 12px;" />
+          }/logo-2.png" width="250" alt="Email Icon" style="margin-bottom: 12px;" />
           <h2 style="margin: 0; color: #2563eb;">Verify Your Email</h2>
         </div>
         <div style="color: #374151; font-size: 16px; margin-bottom: 16px;">

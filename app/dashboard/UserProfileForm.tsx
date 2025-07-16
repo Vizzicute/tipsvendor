@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -36,6 +35,7 @@ import {
 import { editAvatar } from "@/lib/appwrite/media";
 import { IUser } from "@/types";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { useUserContext } from "@/context/AuthContext";
 
 // Define schema with zod
 const profileSchema = z
@@ -57,16 +57,17 @@ const profileSchema = z
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const UserProfileForm = ({ user }: { user: IUser }) => {
+  const { setUser } = useUserContext();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      imageUrl: user?.imageUrl || "",
-      name: user?.name || "",
-      email: user?.email || "",
-      country: user?.country || "",
-      phone: user?.phone || "",
-      address: user?.address || "",
+      imageUrl: user.imageUrl || "",
+      name: user.name || "",
+      email: user.email || "",
+      country: user.country || "",
+      phone: user.phone || "",
+      address: user.address || "",
       password: "",
       confirmPassword: "",
     },
@@ -99,14 +100,23 @@ const UserProfileForm = ({ user }: { user: IUser }) => {
 
       if (data.password) {
         await fetch("/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.accountId, password: data.password }),
-      });
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user.accountId,
+            password: data.password,
+          }),
+        });
       }
       form.reset(data);
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       await getCurrentUser();
+      const updatedUser = JSON.parse(
+        localStorage.getItem("authUser") || "{}"
+      );
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
