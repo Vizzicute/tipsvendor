@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 
 export default function VerificationPage() {
   const { userId } = useParams() as { userId: string };
+  const { setUser } = useUserContext();
 
   if (!userId) {
     console.log("Missing userId in URL parameters");
@@ -21,13 +22,10 @@ export default function VerificationPage() {
   }
 
   const { data, isPending, isSuccess, isError } = verifyUser(userId);
-  const { setUser } = useUserContext();
 
   if (isSuccess && data) {
-    const updatedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-    if (updatedUser) {
-      setUser(updatedUser);
-    }
+    localStorage.setItem("authUser", JSON.stringify(data.user));
+    setUser(data.user);
     setTimeout(() => {
       window.location.assign("/dashboard");
     }, 2000);
