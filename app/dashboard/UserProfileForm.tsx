@@ -58,6 +58,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const UserProfileForm = ({ user }: { user: IUser }) => {
   const { setUser } = useUserContext();
+  const id = user.$id || user.id;
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -95,7 +96,7 @@ const UserProfileForm = ({ user }: { user: IUser }) => {
           phone: data.phone,
           address: data.address,
         },
-        userId: user.$id,
+        userId: id,
       });
 
       if (data.password) {
