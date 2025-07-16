@@ -34,6 +34,7 @@ import {
 } from "@/data";
 import { editAvatar } from "@/lib/appwrite/media";
 import { IUser } from "@/types";
+import { getCurrentUser } from "@/lib/appwrite/api";
 import { useUserContext } from "@/context/AuthContext";
 
 // Define schema with zod
@@ -86,7 +87,7 @@ const UserProfileForm = ({ user }: { user: IUser }) => {
         });
         avatarUrl = result.avatarUrl;
       }
-      const updatedUser = await editUser({
+      await editUser({
         user: {
           name: data.name,
           email: data.email,
@@ -110,10 +111,10 @@ const UserProfileForm = ({ user }: { user: IUser }) => {
       }
       form.reset(data);
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      localStorage.setItem("authUser", JSON.stringify(updatedUser));
-      const parsedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
-      if (parsedUser) {
-        setUser(parsedUser);
+      await getCurrentUser();
+      const updatedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+      if (updatedUser) {
+        setUser(updatedUser);
       }
       toast.success("Profile updated successfully!");
     } catch (error) {
