@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect } from "react";
 import BlogSection from "@/components/BlogSection";
 import CategorySection from "@/components/CategorySection";
 import Hero from "@/components/Hero";
@@ -13,6 +14,8 @@ import {
   use4MostRecentBlogs,
   usePredictionFromYesterday,
 } from "@/lib/react-query/queries";
+import { fetchExchangeRates } from "@/lib/utils/ngnExchangeRates";
+import { toast } from "sonner";
 
 const DynamicContent = ({
   name,
@@ -24,6 +27,22 @@ const DynamicContent = ({
   totalGoals?: string;
 }) => {
   // const [adlink, adimgurl] = advert;
+
+  useEffect(() => {
+    const loadExchangeRates = async () => {
+      try {
+        await fetchExchangeRates();
+      } catch (error) {
+        console.error("Error loading exchange rates:", error);
+        toast.error("Failed to load exchange rates");
+      }
+    };
+
+    loadExchangeRates();
+    // Refresh rates every hour
+    const interval = setInterval(loadExchangeRates, 3600000);
+    return () => clearInterval(interval);
+  }, []);
 
   const {
     data: predictions,
